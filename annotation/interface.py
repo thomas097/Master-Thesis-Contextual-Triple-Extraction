@@ -148,7 +148,7 @@ class Interface:
         self._annotate(self._current)
         self._root.mainloop()
 
-    def _next_sample(self):
+    def _save_sample(self):
         # Save annotation to file
         annotation = {'tokens': self._current, 'triples': [], 'perspectives': []}
         for i in range(len(self._current)):
@@ -160,7 +160,9 @@ class Interface:
             annotation['perspectives'].append({'polarity': polarity})
 
         self._dataloader.save(annotation)
+        self._next_sample()
 
+    def _next_sample(self):
         # Remove old columns
         self._dialog_col.destroy()
         self._triple_col.destroy()
@@ -214,7 +216,7 @@ class Interface:
 
             self._perspectives[i] = self._persp_col.add_toggle(i, 'Negated?')
 
-        self._triple_col.add_padding(1)
+        self._triple_col.add_padding(2)
         self._persp_col.add_padding(1)
 
         # If parser was given, pre-populate the buttons
@@ -229,8 +231,9 @@ class Interface:
                 # Set perspective
                 self._perspectives[turn].set(persp)
 
-        # Add Next button
-        self._persp_col.add_button(len(dialog) + 1, 'Next', command=self._next_sample)
+        # Add Skip and Next buttons
+        self._persp_col.add_button(len(dialog) + 1, 'Skip', command=self._next_sample)
+        self._persp_col.add_button(len(dialog) + 1, 'Next', command=self._save_sample)
 
 
 if __name__ == '__main__':
