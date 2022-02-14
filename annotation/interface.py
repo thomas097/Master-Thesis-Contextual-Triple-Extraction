@@ -73,7 +73,7 @@ class Row(tk.Frame):
 class Column(tk.Frame):
     def __init__(self, root):
         super().__init__(root)
-        self.pack(side=tk.LEFT, padx=8, pady=16)
+        self.pack(side=tk.LEFT, anchor=tk.NW, padx=8, pady=16)
         self._rows = []
 
     def _expand(self, i):
@@ -145,13 +145,13 @@ class Interface:
         self._perspectives = {}
 
         # Start annotation loop
-        self._annotate(self._current)
+        self._annotate()
         self._root.mainloop()
 
     def _save_sample(self):
         # Save annotation to file
         annotation = {'tokens': self._current, 'triples': [], 'perspectives': []}
-        for i in range(len(self._current)):
+        for i in range(len(self._current) + 1):
             subj = self._triples[(i, 0)].indices
             pred = self._triples[(i, 1)].indices
             obj = self._triples[(i, 2)].indices
@@ -181,7 +181,7 @@ class Interface:
         if self._current is None:
             quit()
 
-        self._annotate(self._current)
+        self._annotate()
 
     def _assign_to_triple(self, i, j):
         token = self._current[i][j]
@@ -200,16 +200,16 @@ class Interface:
             else:
                 button.highlight(False)
 
-    def _annotate(self, dialog):
+    def _annotate(self):
         # Populate dialog Column with Tokens
-        for i, turn in enumerate(dialog):
+        for i, turn in enumerate(self._current):
             for j, token in enumerate(turn):
                 token = self._dialog_col.add_button(i, token, command=partial(self._assign_to_triple, i, j))
                 self._tokens[(i, j)] = token
         self._dialog_col.add_padding(2)
 
         # Populate triple and perspective Columns
-        for i, turn in enumerate(dialog):
+        for i in range(len(self._current) + 1):
             triple = self._triple_col.add_triple(i, command=self._set_focus)
             for j in range(3):
                 self._triples[(i, j)] = triple[j]  # e.g. Button of Subject
@@ -221,21 +221,21 @@ class Interface:
 
         # If parser was given, pre-populate the buttons
         if self._parser is not None:
-            for turn, (triple, persp) in enumerate(zip(*self._parser.parse(dialog))):
+            for turn, (triple, persp) in enumerate(zip(*self._parser.parse(self._current))):
                 # Set each argument one-by-one
                 for arg in range(3):
                     for i, j in triple[arg]:  # Loop through token idx in arg
-                        token = dialog[i][j]
+                        token = self._current[i][j]
                         self._triples[(turn, arg)].add(token, (i, j))
 
                 # Set perspective
                 self._perspectives[turn].set(persp)
 
         # Add Skip and Next buttons
-        self._persp_col.add_button(len(dialog) + 1, 'Skip', command=self._next_sample)
-        self._persp_col.add_button(len(dialog) + 1, 'Next', command=self._save_sample)
+        self._persp_col.add_button(len(self._current) + 1, 'Skip', command=self._next_sample)
+        self._persp_col.add_button(len(self._current) + 1, 'Next', command=self._save_sample)
 
 
 if __name__ == '__main__':
-    dataloader = DatasetIO('data.txt')
+    dataloader = DatasetIO('datasets/dailydialog.txt')
     interface = Interface(dataloader)
