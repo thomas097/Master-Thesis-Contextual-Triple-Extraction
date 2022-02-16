@@ -237,5 +237,5 @@ class Interface:
 
 
 if __name__ == '__main__':
-    dataloader = DatasetIO('datasets/dailydialog.txt')
+    dataloader = DatasetIO('datasets/personachat.txt')
     interface = Interface(dataloader)

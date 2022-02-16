@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from nltk import word_tokenize
+import spacy
 import json
 
 
@@ -19,6 +19,9 @@ class DatasetIO:
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
+        # Tokenizer
+        self.__nlp = spacy.load("en_core_web_sm")
+
     @property
     def _outfile(self):
         return '{}/{}_{}.json'.format(self._output_dir, self._dataset_name, str.zfill(str(self._ptr), 6))
@@ -35,7 +38,7 @@ class DatasetIO:
 
         # Return sample as list of tokenized turns
         dialog = self._lines[self._ptr]
-        return [word_tokenize(turn.strip()) for turn in dialog.split(self._sep)]
+        return [[token.text for token in self.__nlp(turn.strip())] for turn in dialog.split(self._sep)]
 
     def save(self, annotation):
         with open(self._outfile, 'w') as file:
