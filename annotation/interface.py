@@ -40,24 +40,6 @@ class TripleButton(tk.Button):
         self._var.set(' ' * 8)
 
 
-class PerspectiveCheckbox(tk.Checkbutton):
-    def __init__(self, root):
-        self._var = tk.IntVar()
-        super().__init__(root, variable=self._var, onvalue=0, offvalue=1)  # unchecked = positive
-        self.pack(side=tk.LEFT)
-        self.deselect()
-
-    def set(self, polarity):
-        if polarity:
-            self.deselect()  # unchecked = positive
-        else:
-            self.select()
-
-    @property
-    def polarity(self):
-        return self._var.get()
-
-
 class Entry(tk.Frame):
     def __init__(self, root):
         super().__init__(root)
@@ -104,11 +86,12 @@ class Column(tk.Frame):
         self.add_text(i, '⧽')
         return subj, pred, obj
 
-    def add_toggle(self, i, text):
+    def add_perspective(self, i, command):
         self._expand(i)
-        toggle = PerspectiveCheckbox(self._rows[i])
-        self.add_text(i, text)
-        return toggle
+        self.add_text(i, '⧼')
+        polarity = TripleButton(self._rows[i], relief='groove', command=partial(command, i, 3))
+        self.add_text(i, '⧽')
+        return polarity
 
     def add_padding(self, n):
         start = len(self._rows)
@@ -119,7 +102,7 @@ class Column(tk.Frame):
 ## Interface
 
 class Interface:
-    def __init__(self, dataloader, parser=None, title='Annotation Tool', fontsize=15):
+    def __init__(self, dataloader, title='Annotation Tool', fontsize=12):
         # Window
         self._root = tk.Tk()
         self._root.title(title)
@@ -133,7 +116,6 @@ class Interface:
         self._persp_col = Column(self._root)
 
         # Initial conditions
-        self._parser = parser
         self._dataloader = dataloader
         self._current = self._dataloader.next()
         if self._current is None:
@@ -142,7 +124,6 @@ class Interface:
         self._triple_focus = (0, 0)
         self._tokens = {}
         self._triples = {}
-        self._perspectives = {}
 
         # Start annotation loop
         self._annotate()
@@ -150,14 +131,13 @@ class Interface:
 
     def _save_sample(self):
         # Save annotation to file
-        annotation = {'tokens': self._current, 'triples': [], 'perspectives': []}
-        for i in range(len(self._current) + 1):
+        annotation = {'tokens': self._current, 'triples': []}
+        for i in range(len(self._current) * 2):
             subj = self._triples[(i, 0)].indices
             pred = self._triples[(i, 1)].indices
             obj = self._triples[(i, 2)].indices
-            polarity = self._perspectives[i].polarity
-            annotation['triples'].append((subj, pred, obj))
-            annotation['perspectives'].append({'polarity': polarity})
+            pol = self._triples[(i, 3)].indices
+            annotation['triples'].append((subj, pred, obj, pol))
 
         self._dataloader.save(annotation)
         self._next_sample()
@@ -170,7 +150,6 @@ class Interface:
         self._triple_focus = (0, 0)
         self._tokens = {}
         self._triples = {}
-        self._perspectives = {}
 
         # Load new data
         self._dialog_col = Column(self._root)
@@ -209,33 +188,22 @@ class Interface:
         self._dialog_col.add_padding(2)
 
         # Populate triple and perspective Columns
-        for i in range(len(self._current) + 1):
+        for i in range(len(self._current) * 2):
             triple = self._triple_col.add_triple(i, command=self._set_focus)
-            for j in range(3):
-                self._triples[(i, j)] = triple[j]  # e.g. Button of Subject
+            self._triples[(i, 0)] = triple[0]  # Subject
+            self._triples[(i, 1)] = triple[1]  # Predicate
+            self._triples[(i, 2)] = triple[2]  # Object
 
-            self._perspectives[i] = self._persp_col.add_toggle(i, 'Negated?')
-
-        self._triple_col.add_padding(2)
-        self._persp_col.add_padding(1)
-
-        # If parser was given, pre-populate the buttons
-        if self._parser is not None:
-            for turn, (triple, persp) in enumerate(zip(*self._parser.parse(self._current))):
-                # Set each argument one-by-one
-                for arg in range(3):
-                    for i, j in triple[arg]:  # Loop through token idx in arg
-                        token = self._current[i][j]
-                        self._triples[(turn, arg)].add(token, (i, j))
-
-                # Set perspective
-                self._perspectives[turn].set(persp)
+            perspective = self._persp_col.add_perspective(i, command=self._set_focus)
+            self._triples[(i, 3)] = perspective
 
         # Add Skip and Next buttons
-        self._persp_col.add_button(len(self._current) + 1, 'Skip', command=self._next_sample)
-        self._persp_col.add_button(len(self._current) + 1, 'Next', command=self._save_sample)
+        self._triple_col.add_padding(2)
+        self._persp_col.add_padding(2)
+        self._persp_col.add_button(len(self._current) * 2, 'Skip', command=self._next_sample)
+        self._persp_col.add_button(len(self._current) * 2, 'Next', command=self._save_sample)
 
 
 if __name__ == '__main__':
-    dataloader = DatasetIO('datasets/personachat.txt')
+    dataloader = DatasetIO('datasets/personachat.txt', output_dir='new_annotations')
     interface = Interface(dataloader)
