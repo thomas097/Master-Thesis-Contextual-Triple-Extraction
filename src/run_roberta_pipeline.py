@@ -7,8 +7,10 @@ from itertools import product
 if __name__ == '__main__':
     # Load models
     print('Loading models')
-    arg_extract_model = ArgumentExtraction('models/argument_extraction_model.pt')
-    scoring_model = TripleScoring('models/scorer_model.pt')
+    arg_extract_model = ArgumentExtraction(base_model='albert-base-v2',
+                                           path='models/argument_extraction_albert-v2_03_03_2022.pt')
+    scoring_model = TripleScoring(base_model='albert-base-v2',
+                                  path='models/scorer_albert-v2_03_03_2022.pt')
     print('\t- done!\n')
 
     # Test!
@@ -28,8 +30,8 @@ if __name__ == '__main__':
     # Score all possible triples
     triple_scores = []
     for subj, pred, obj in product(subjs, preds, objs):
-        score, _ = scoring_model.predict(input_.split(), [subj, pred, obj])
-        triple_scores.append((score, (subj, pred, obj)))
+        entailment, polarity, _ = scoring_model.predict(input_.split(), [subj, pred, obj])
+        triple_scores.append((entailment, (subj, pred, obj, polarity)))
 
     # Rank triples from high (entailed) to low (not entailed)
     for score, triple in sorted(triple_scores, key=lambda x: -x[0]):

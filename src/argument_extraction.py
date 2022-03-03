@@ -1,5 +1,5 @@
 import torch
-from transformers import RobertaTokenizer, RobertaModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
 
 from transformers import logging
@@ -9,16 +9,18 @@ from utils import *
 
 
 class ArgumentExtraction(torch.nn.Module):
-    def __init__(self, path=None, output_dim=3):
-        """ Inits a RoBERTa-base model with span-extraction heads for SPO arguments
+    def __init__(self, base_model='albert-base-v2', path=None, output_dim=3):
+        """ Inits a transformer with custom multi-span-extraction heads for SPO arguments
         """
         super().__init__()
-        self._tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
-        self._model = RobertaModel.from_pretrained("roberta-base")
+        print('loading', base_model)
+        self._tokenizer = AutoTokenizer.from_pretrained(base_model)
+        self._model = AutoModel.from_pretrained(base_model)
 
-        self._subj_head = torch.nn.Linear(768, output_dim)
-        self._pred_head = torch.nn.Linear(768, output_dim)
-        self._obj_head = torch.nn.Linear(768, output_dim)
+        config = AutoConfig.from_pretrained(base_model)
+        self._subj_head = torch.nn.Linear(config.hidden_size, output_dim)
+        self._pred_head = torch.nn.Linear(config.hidden_size, output_dim)
+        self._obj_head = torch.nn.Linear(config.hidden_size, output_dim)
         self._output_dim = output_dim
 
         self._relu = torch.nn.ReLU()
@@ -29,7 +31,7 @@ class ArgumentExtraction(torch.nn.Module):
         self.to(self._device)
 
         # Load model if enabled
-        if path:
+        if path is not None:
             self.load_state_dict(torch.load(path, map_location=self._device))
 
     def forward(self, x):
@@ -61,7 +63,6 @@ class ArgumentExtraction(torch.nn.Module):
                 labels.append(0)
 
             else:
-
                 token_ids = self._tokenizer.encode(' ' + token, add_special_tokens=False)
                 input_ids += token_ids
 
@@ -149,5 +150,5 @@ if __name__ == '__main__':
     # Fit model to data
     model = ArgumentExtraction()
     model.fit(tokens, labels)
-    torch.save(model.state_dict(), 'models/argument_extraction_model2.pt')
+    torch.save(model.state_dict(), 'models/argument_extraction_albert-v2_03_03_2022')
 

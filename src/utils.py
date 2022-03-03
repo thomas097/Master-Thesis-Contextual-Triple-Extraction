@@ -1,7 +1,8 @@
 import glob
 import json
+import re
 import random
-import itertools
+from collections import defaultdict
 import numpy as np
 
 
@@ -48,12 +49,12 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
         if one_hot:
             pred = np.argmax(pred)
 
-        if pred == 1:  # Beginning
+        if pred == 1: # Beginning
             out.append(' '.join(span))
-            span = [token.replace('Ġ', '')]
+            span = [re.sub('[^A-Za-z0-9\-]', '', token)]
 
-        elif pred == 2:  # Inside
-            span.append(token.replace('Ġ', ''))
+        elif pred == 2: # Inside
+            span.append(re.sub('[^A-Za-z0-9\-]', '', token))
 
     if span:
         out.append(' '.join(span))
@@ -63,74 +64,46 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
 ## Triple Scoring
 
 def extract_triples(annotation):
-    """ Extracts triples from the annotations.
-    """
     turns = annotation['tokens']
-    triples = annotation['triples']
+    triple_ids = annotation['triples']
     num_tokens = sum([len(turn) for turn in turns])
 
-    triple_tokens = []
-    for triple in triples:
-        arg_tokens = [[], [], []]
-        for k, arg in enumerate(triple[:3]):
-            if not arg:
-                arg_tokens[k].append('')
-            for i, j in arg:
-                token = turns[i][j]
-                arg_tokens[k].append(token)
-        triple_tokens.append([' '.join(a) for a in arg_tokens if a])
+    arguments = defaultdict(list)
+    triples = []
+    entailment_labels = []
+    polarity_labels = []
 
-    return [t for t in triple_tokens if t != ['', '', '']]
+    for subj, pred, obj, pol in triple_ids:
+        # Extract tokens belonging to triple arguments
+        subj = ' '.join(turns[i][j] for i, j in subj) if subj else ''
+        pred = ' '.join(turns[i][j] for i, j in pred) if pred else ''
+        obj = ' '.join(turns[i][j] for i, j in obj) if obj else ''
 
+        if subj or pred or obj:
+            triples += [(subj, pred, obj)]
+            entailment_labels += [1]
+            polarity_labels += [0] if pol else [1] # negative or positive
 
-def extract_negative_triples(triples):
-    """ Creates negative examples from ground-truth triples.
-    """
-    # Group all subjects, all objects, and so on.
-    subjs, preds, objs = [],[],[]
-    for subj, pred, obj in triples:
-        subjs.append(subj)
-        preds.append(pred)
-        objs.append(obj)
+            arguments['subjs'].append(subj)
+            arguments['preds'].append(pred)
+            arguments['objs'].append(obj)
 
-    # Sample random triples not part of the true examples
-    fake_triples = []
-    for subj, pred, obj in itertools.product(subjs, preds, objs):
-        triple = [subj, pred, obj]
-        if triple not in triples and triple not in fake_triples: # no duplicates
-            fake_triples.append(triple)
+    # Create negative examples (i.e. not entailed)
+    n = len(triples)
+    for i in range(100):
+        s = random.choice(arguments['subjs'])
+        p = random.choice(arguments['preds'])
+        o = random.choice(arguments['objs'])
 
-    # Select a random sample (to avoid imbalance)
-    random.shuffle(fake_triples)
-    return fake_triples[:len(triples)]
+        # Check if the triple was already generated
+        if (s, p, o) not in triples and s and p and o:
+            triples += [(s, p, o)] # not entailed
+            entailment_labels += [0]
+            polarity_labels += [-1] # Skip
+            n -= 1
 
+        # Create as many on-entailed examples as entailed ones
+        if n == 0:
+            break
 
-## Co-reference Resolution
-
-def load_visual_pcr(path):
-    turns, labels = [], []
-    with open(path, 'r', encoding='utf-8') as file:
-        for line in file:
-            data = eval(line.replace('true', 'True').replace('false', 'False'))
-
-            dialog = [t for ts in data['sentences'] for t in ts]
-
-            if data['pronoun_info']:
-                pronoun_info = data['pronoun_info'][0]
-
-                i, j = pronoun_info['current_pronoun']
-                pronoun = ' '.join(dialog[i:j + 1])
-
-                if pronoun_info['correct_NPs']:
-                    k, l = pronoun_info['correct_NPs'][0]
-                    target = ' '.join(dialog[k:l + 1])
-
-                    idx = [idx for idx, sent in enumerate(data['sentences']) if pronoun in sent][0]
-                    sents = data['sentences'][:idx + 1]
-
-                    if target.lower() not in ' '.join(sents[0]).lower():  # first is caption
-                        turns.append([' '.join(s).lower() for s in sents[1:]])
-                        labels.append((pronoun, target))
-
-    turns, labels = zip(*[(x, y) for x, y in zip(turns, labels) if len(x)])
-    return turns, labels
+    return triples, entailment_labels, polarity_labels

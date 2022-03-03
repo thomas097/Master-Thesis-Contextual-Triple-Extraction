@@ -1,5 +1,5 @@
 import torch
-from transformers import RobertaTokenizer, RobertaModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
 
 from transformers import logging
@@ -9,30 +9,35 @@ from utils import *
 
 
 class TripleScoring(torch.nn.Module):
-    def __init__(self, path):
+    def __init__(self, base_model='albert-base-v2', path=None):
         super().__init__()
-        self._tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
-        self._model = RobertaModel.from_pretrained("roberta-base")
+        print('loading', base_model)
+        self._tokenizer = AutoTokenizer.from_pretrained(base_model)
+        self._model = AutoModel.from_pretrained(base_model)
 
         # SPO extraction heads
-        self._head = torch.nn.Linear(768, 1)
+        config = AutoConfig.from_pretrained(base_model)
+        self._entailment_head = torch.nn.Linear(config.hidden_size, 2)
+        self._polarity_head = torch.nn.Linear(config.hidden_size, 2)
+
         self._relu = torch.nn.ReLU()
-        self._sigmoid = torch.nn.Sigmoid()
+        self._softmax = torch.nn.Softmax(dim=-1)
 
         # GPU support
         self._device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.to(self._device)
 
-        # Load model if enabled
-        if path:
+        if path is not None:
             self.load_state_dict(torch.load(path, map_location=self._device))
 
     def forward(self, x):
         """ Computes the forward pass through the model
         """
-        h = self._model(**x).last_hidden_state
-        z = self._relu(h[:, 0])
-        return self._sigmoid(self._head(z))  # attach classifier at <s> token
+        h = self._model(x).last_hidden_state
+        z = self._relu(h[:, 0])  # attach classifier at <s> token
+        y0 = self._softmax(self._entailment_head(z))
+        y1 = self._softmax(self._polarity_head(z))
+        return y0, y1
 
     def _retokenize(self, tokens, triple):
         """ Takes in a sequence of turns and the triple and generates a list of
@@ -53,58 +58,49 @@ class TripleScoring(torch.nn.Module):
         input_ids += self._tokenizer.encode(' '.join(triple), add_special_tokens=False)
         return input_ids
 
-    def _batch_tokenize(self, batch_tokens, batch_pos_triples, batch_neg_triples):
+    def _batch_tokenize(self, tokens, triples):
         # Create a batch of positive and negative examples
-        inputs, labels = [], []
-        for tokens, pos_triples, neg_triples in zip(batch_tokens, batch_pos_triples, batch_neg_triples):
-            for triple in pos_triples:
-                inputs.append(self._retokenize(tokens, triple))
-                labels.append([1])
-            for triple in neg_triples:
-                inputs.append(self._retokenize(tokens, triple))
-                labels.append([0])
+        inputs = [self._retokenize(tokens, triple) for triple in triples]
 
         # Pad input ids sequences of samples in batch if needed
         max_len = max([len(ids) for ids in inputs])
-        attn_masks = [[1] * len(ids) + [0] * (max_len - len(ids)) for ids in inputs]
         inputs = [ids + [self._tokenizer.unk_token_id] * (max_len - len(ids)) for ids in inputs]
 
-        # Shuffle samples to eliminate order effects
-        samples = list(zip(inputs, attn_masks, labels))
-        random.shuffle(samples)
-        inputs, attn_masks, labels = zip(*samples)
+        return torch.LongTensor(inputs).to(self._device)
 
-        # Push to GPU
-        inputs = {'input_ids': torch.LongTensor(inputs).to(self._device),
-                  'attention_mask': torch.LongTensor(attn_masks).to(self._device)}
-        labels = torch.Tensor(labels).to(self._device)
-        return inputs, labels
-
-    def fit(self, tokens, pos_triples, neg_triples, epochs=2, lr=1e-5, batch_size=1):
+    def fit(self, dialogs, triples, entailment_labels, polarity_labels, epochs=2, lr=1e-5):
         """ Fits the model to the annotations
         """
         # Put data on GPU
         X = []
-        for i in range(0, len(tokens), batch_size):
-            batch_tokens = tokens[i:i + batch_size]
-            batch_pos_triples = pos_triples[i:i + batch_size]
-            batch_neg_triples = neg_triples[i:i + batch_size]
-            batch = self._batch_tokenize(batch_tokens, batch_pos_triples, batch_neg_triples)
-            X.append(batch)
+        for tokens, triple_lst, labels1, labels2 in zip(dialogs, triples, entailment_labels, polarity_labels):
+            batch = self._batch_tokenize(tokens, triple_lst)
+            entailed = torch.LongTensor(labels1).to(self._device)
+            polarity = torch.LongTensor(labels2).to(self._device)
+            X.append((batch, entailed, polarity))
 
         # Set up optimizer and objective
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
-        criterion = torch.nn.BCELoss()
+        criterion = torch.nn.CrossEntropyLoss()
 
         for epoch in range(epochs):
             losses = []
             random.shuffle(X)
-            for x, y_true in tqdm(X):
-                y_hat = self(x)
 
-                loss = criterion(y_hat, y_true)  # Was the triple correct?
+            for x, ent_true, pol_true in tqdm(X):
+                # Predict polarity and entailment
+                ent_pred, pol_pred = self(x)
+
+                # Compute loss
+                loss = criterion(ent_pred, ent_true)  # Was the triple correct?
+
+                for i, v in enumerate(pol_true):  # Only add to loss when entailed
+                    if v > -1e-3:
+                        loss += criterion(pol_pred[i:i+1], pol_true[i:i+1]) / len(pol_true)  # Was the triple confirmed or denied?
+
                 losses.append(loss.item())
 
+                # Update model
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -116,32 +112,33 @@ class TripleScoring(torch.nn.Module):
             triple arguments
         """
         # Tokenization
-        input_ids = self._retokenize(tokens, triple)
-        inputs = {'input_ids': torch.LongTensor([input_ids]).to(self._device),
-                  'attention_mask': torch.ones((1, len(input_ids))).to(self._device)}
+        input_ids = self._batch_tokenize(tokens, [triple])
 
         # Invert tokenization for viewing
-        new_tokens = self._tokenizer.convert_ids_to_tokens(input_ids)
+        new_tokens = self._tokenizer.convert_ids_to_tokens(input_ids[0])
 
         # Predict logit tensor for input
-        y = self(inputs).cpu().detach().numpy()
-        return y[0], new_tokens
+        y0, y1 = self(input_ids)
+        y0 = y0.cpu().detach().numpy()[0][1]
+        y1 = y1.cpu().detach().numpy()[0][1] # 2nd index = pos class
+        return y0, y1, new_tokens
 
 
 if __name__ == '__main__':
     annotations = load_annotations('<path_to_annotation_file')
 
     # Extract annotation triples and compute negative triples
-    tokens, pos_triples, neg_triples = [], [], []
+    tokens, triples, entailment_labels, polarity_labels = [], [], [], []
     for ann in annotations:
-        triples = extract_triples(ann)
-        pos_triples.append(triples)
-        neg_triples.append(extract_negative_triples(triples))
+        ann_triples, ann_ent, ann_pol = extract_triples(ann)
+        triples.append(ann_triples)
+        entailment_labels.append(ann_ent)
+        polarity_labels.append(ann_pol)
         tokens.append([t for ts in ann['tokens'] for t in ts + ['<eos>']])
 
     # Fit model
     scorer = TripleScoring()
-    scorer.fit(tokens, pos_triples, neg_triples)
-    torch.save(scorer.state_dict(), 'models/scorer_model2.pt')
+    scorer.fit(tokens, triples, entailment_labels, polarity_labels)
+    torch.save(scorer.state_dict(), 'models/scorer_albert-v2_03_03_2022')
 
 
