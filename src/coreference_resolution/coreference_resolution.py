@@ -56,7 +56,7 @@ class EmbeddingSimilarity:
 class Coref:
     def __init__(self, embeddings_file):
         self._nlp = spacy.load('en_core_web_sm')
-        self._allowed = ['it', 'he', 'his', 'him', 'her', 'she', 'they', 'them', 'their', 'our', 'us', 'we']
+        self._allowed = ['it', 'he', 'his', 'him', 'her', 'she', 'they', 'them', 'their', 'our', 'us', 'we', 'there']
 
         # Perplexity/agreement scoring
         self._scorer = GPTScorer()
@@ -75,9 +75,11 @@ class Coref:
 
     def _locate_pronouns(self, tokens):
         pronouns = []
+        # Add obvious pronouns
         for token in tokens:
-            if token.pos_ == 'PRON' and token.lower_ in self._allowed:
+            if token.lower_ in self._allowed:
                 pronouns.append((token.lower_, token.i))
+        # TODO: add ambiguous noun phrases
         return pronouns
 
     def resolve(self, context, response, beam=4):
@@ -86,7 +88,7 @@ class Coref:
         response_tokens = self._nlp(response)
 
         # Identify unresolved pronouns and possible antecedents
-        candidates = self._identify_candidates(context_tokens) | self._identify_candidates(response_tokens)
+        candidates = self._identify_candidates(context_tokens) #| self._identify_candidates(response_tokens)
         pronouns = self._locate_pronouns(response_tokens)
         print("candidates:", [c for _, c, _ in candidates])
         print('pronouns:', [p for p, _ in pronouns])
