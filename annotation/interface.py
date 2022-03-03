@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.font as TkFont
-from dataloader import DatasetIO
+from dataloader import DataLoader
 from functools import partial
 
 
@@ -15,35 +15,31 @@ class TripleButton(tk.Button):
 
         # Register assigned tokens
         self._root = root
-        self._tokens = []
-        self._indices = []
+        self.tokens = []
+        self.indices = []
         self.clear()
 
-    @property
-    def indices(self):
-        return self._indices
-
-    def highlight(self, value):
+    def highlight(self, value, color='lightgrey'):
+        """ Highlight the button when selected.
+        """
         if value:
-            self.configure(bg='lightgrey')
+            self.configure(bg=color)
         else:
             self.configure(bg=self._root.cget('bg'))
 
     def add(self, token, index):
-        self._tokens.append(token)
-        self._indices.append(index)
-        self._var.set(' '.join(self._tokens))
+        """ Assigns token to argument.
+        """
+        self.tokens.append(token)
+        self.indices.append(index)
+        self._var.set(' '.join(self.tokens))
 
-    def clear(self):
-        self._tokens = []
-        self._indices = []
-        self._var.set(' ' * 8)
-
-
-class Entry(tk.Frame):
-    def __init__(self, root):
-        super().__init__(root)
-        self.pack(side=tk.LEFT)
+    def clear(self, minsize=8):
+        """ Erase all tokens of button.
+        """
+        self.tokens = []
+        self.indices = []
+        self._var.set(' ' * minsize)
 
 
 class Row(tk.Frame):
@@ -53,14 +49,15 @@ class Row(tk.Frame):
 
 
 class Column(tk.Frame):
-    def __init__(self, root):
+    def __init__(self, root, row=0, col=0, colspan=1):
         super().__init__(root)
-        self.pack(side=tk.LEFT, anchor=tk.NW, padx=8, pady=16)
+        self.grid(row=row, column=col, columnspan=colspan, padx=8, pady=2)
         self._rows = []
 
-    def _expand(self, i):
-        # Add rows until there are enough
-        while i > len(self._rows) - 1:
+    def _expand(self, num):
+        """ Add rows until there are 'num'
+        """
+        while num > len(self._rows) - 1:
             self._rows.append(Row(self))
 
     def add_button(self, i, text, command):
@@ -69,10 +66,13 @@ class Column(tk.Frame):
         button.pack(side=tk.LEFT)
         return button
 
-    def add_text(self, i, text):
+    def add_text(self, i, text, pad=None):
         self._expand(i)
         label = tk.Label(self._rows[i], text=text, relief='flat')
-        label.pack(side=tk.LEFT)
+        if pad is not None:
+            label.pack(side=tk.LEFT, padx=pad)
+        else:
+            label.pack(side=tk.LEFT)
         return label
 
     def add_triple(self, i, command):
@@ -90,89 +90,98 @@ class Column(tk.Frame):
         self._expand(i)
         self.add_text(i, '⧼')
         polarity = TripleButton(self._rows[i], relief='groove', command=partial(command, i, 3))
+        self.add_text(i, ',')
+        certainty = TripleButton(self._rows[i], relief='groove', command=partial(command, i, 4))
         self.add_text(i, '⧽')
-        return polarity
+        return polarity, certainty
 
     def add_padding(self, n):
         start = len(self._rows)
         for i in range(start, start + n):
-            self.add_text(i, '')
+            self.add_text(i, '', pad=20)
 
 
 ## Interface
 
 class Interface:
-    def __init__(self, dataloader, title='Annotation Tool', fontsize=12):
+    def __init__(self, dataloader, num_triples=5, title='Annotation Tool', fontsize=15):
         # Window
         self._root = tk.Tk()
         self._root.title(title)
         self._font = TkFont.nametofont("TkDefaultFont")
         self._font.configure(size=fontsize)
         self._root.option_add("*Font", self._font)
+        self._title = title
 
         # Create Dialog, Triple and Perspective columns
-        self._dialog_col = Column(self._root)
-        self._triple_col = Column(self._root)
-        self._persp_col = Column(self._root)
+        self._dialog_col = Column(self._root, row=0, col=0, colspan=2)
+        self._triple_col = Column(self._root, row=1, col=0, colspan=1)
+        self._persp_col = Column(self._root, row=1, col=1, colspan=1)
+        self._button_col = Column(self._root, row=2, col=0, colspan=2)
 
         # Initial conditions
         self._dataloader = dataloader
         self._current = self._dataloader.next()
-        if self._current is None:
-            quit()
 
-        self._triple_focus = (0, 0)
-        self._tokens = {}
-        self._triples = {}
+        self._num_triples = num_triples
+        self._focus = (0, 0)  # What argument is currently being annotated?
+        self._token_buttons = {}
+        self._triple_buttons = {}
 
         # Start annotation loop
         self._annotate()
         self._root.mainloop()
 
-    def _save_sample(self):
+    def _save_and_next(self):
         # Save annotation to file
-        annotation = {'tokens': self._current, 'triples': []}
-        for i in range(len(self._current) * 2):
-            subj = self._triples[(i, 0)].indices
-            pred = self._triples[(i, 1)].indices
-            obj = self._triples[(i, 2)].indices
-            pol = self._triples[(i, 3)].indices
-            annotation['triples'].append((subj, pred, obj, pol))
+        annotation = {'tokens': self._current, 'annotations': []}
+        for i in range(self._num_triples):
+            subj = self._triple_buttons[(i, 0)].indices
+            pred = self._triple_buttons[(i, 1)].indices
+            obj = self._triple_buttons[(i, 2)].indices
+            polarity = self._triple_buttons[(i, 3)].indices
+            certainty = self._triple_buttons[(i, 4)].indices
+            annotation['annotations'].append((subj, pred, obj, polarity, certainty))
 
         self._dataloader.save(annotation)
-        self._next_sample()
+        self._skip()
 
-    def _next_sample(self):
-        # Remove old columns
+    def _clear(self):
         self._dialog_col.destroy()
         self._triple_col.destroy()
         self._persp_col.destroy()
-        self._triple_focus = (0, 0)
-        self._tokens = {}
-        self._triples = {}
+        self._button_col.destroy()
 
-        # Load new data
-        self._dialog_col = Column(self._root)
-        self._triple_col = Column(self._root)
-        self._persp_col = Column(self._root)
+        self._dialog_col = Column(self._root, row=0, col=0, colspan=2)
+        self._triple_col = Column(self._root, row=1, col=0, colspan=1)
+        self._persp_col = Column(self._root, row=1, col=1, colspan=1)
+        self._button_col = Column(self._root, row=2, col=0, colspan=2)
+
+        self._focus = (0, 0)
+        self._token_buttons = {}
+        self._triple_buttons = {}
+
+    def _skip(self):
+        self._clear()
         self._current = self._dataloader.next()
-
-        if self._current is None:
-            quit()
-
         self._annotate()
 
-    def _assign_to_triple(self, i, j):
+    def _go_back(self):
+        self._clear()
+        self._current = self._dataloader.prev()
+        self._annotate()
+
+    def _assign_to_focus(self, i, j):
         token = self._current[i][j]
-        button = self._triples[self._triple_focus]
+        button = self._triple_buttons[self._focus]
         button.add(token, (i, j))
 
     def _set_focus(self, i, j):
         # Set focus to the j-th argument of the i-th triple
-        self._triple_focus = (i, j)
+        self._focus = (i, j)
 
         #  Set color of selected argument
-        for idx, button in self._triples.items():
+        for idx, button in self._triple_buttons.items():
             if (i, j) == idx:
                 button.highlight(True)
                 button.clear()
@@ -183,27 +192,31 @@ class Interface:
         # Populate dialog Column with Tokens
         for i, turn in enumerate(self._current):
             for j, token in enumerate(turn):
-                token = self._dialog_col.add_button(i, token, command=partial(self._assign_to_triple, i, j))
-                self._tokens[(i, j)] = token
-        self._dialog_col.add_padding(2)
+                token = self._dialog_col.add_button(2 * i, token, command=partial(self._assign_to_focus, i, j))
+                self._token_buttons[(i, j)] = token
+        self._dialog_col.add_padding(1)
 
         # Populate triple and perspective Columns
-        for i in range(len(self._current) * 2):
-            triple = self._triple_col.add_triple(i, command=self._set_focus)
-            self._triples[(i, 0)] = triple[0]  # Subject
-            self._triples[(i, 1)] = triple[1]  # Predicate
-            self._triples[(i, 2)] = triple[2]  # Object
+        for i in range(self._num_triples):
+            subject, predicate, object_ = self._triple_col.add_triple(i, command=self._set_focus)
+            self._triple_buttons[(i, 0)] = subject
+            self._triple_buttons[(i, 1)] = predicate
+            self._triple_buttons[(i, 2)] = object_
 
-            perspective = self._persp_col.add_perspective(i, command=self._set_focus)
-            self._triples[(i, 3)] = perspective
+            polarity, certainty = self._persp_col.add_perspective(i, command=self._set_focus)
+            self._triple_buttons[(i, 3)] = polarity
+            self._triple_buttons[(i, 4)] = certainty
+        self._triple_col.add_padding(1)
 
         # Add Skip and Next buttons
-        self._triple_col.add_padding(2)
-        self._persp_col.add_padding(2)
-        self._persp_col.add_button(len(self._current) * 2, 'Skip', command=self._next_sample)
-        self._persp_col.add_button(len(self._current) * 2, 'Next', command=self._save_sample)
+        self._button_col.add_button(1, 'Back', command=self._go_back)
+        self._button_col.add_button(1, 'Skip', command=self._skip)
+        self._button_col.add_button(1, 'Save + Next', command=self._save_and_next)
+
+        # Set title to annotation id
+        self._root.title(self._title + ": " + self._dataloader.current_id)
 
 
 if __name__ == '__main__':
-    dataloader = DatasetIO('datasets/personachat.txt', output_dir='new_annotations')
+    dataloader = DataLoader('datasets/train.json', output_dir='newest_annotations')
     interface = Interface(dataloader)
