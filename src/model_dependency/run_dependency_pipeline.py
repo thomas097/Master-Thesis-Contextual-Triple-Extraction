@@ -1,4 +1,5 @@
 import spacy
+from coreference_resolution import Coref
 from pprint import pprint
 
 
@@ -9,12 +10,17 @@ ROOT_DEPS = ['ROOT', 'conj', 'advcl', 'ccomp']
 OBJ_DEPS = ['dobj', 'pobj', 'attr', 'advmod', 'acomp', 'ccomp']
 NP_DEPS = ['det', 'compound']
 
+WH_WORDS = ['how', 'what', 'why', 'who', 'when', 'where']
+
 POS_INTJS = ['yes', 'correct', 'yup', 'yea', 'yeah']
 NEG_INTJS = ['no', 'nope', 'nah', 'neh']
 
+PRONOUNS = ['it', 'he', 'his', 'him', 'her', 'she', 'they', 'them', 'their', 'our', 'us', 'we', 'there']
+
 
 class SpacyTripleExtractor:
-    def __init__(self):
+    def __init__(self, embeddings_file):
+        self._coref = Coref(embeddings_file)
         self._nlp = spacy.load("en_core_web_sm")
 
     @staticmethod
@@ -91,15 +97,14 @@ class SpacyTripleExtractor:
     @staticmethod
     def _get_feedback_polarity(root):
         # Check for polar interjections
-        intjs = [t for t in root.children if t.dep_ == 'intj']
-        if intjs:
-            if intjs[0].lower_ in NEG_INTJS:
-                return 'negative'
-            elif intjs[0].lower_ in POS_INTJS:
+        for t in list(root.children) + [root]:
+            if t.lower_ in POS_INTJS:
                 return 'positive'
+            elif t.lower_ in NEG_INTJS:
+                return 'negative'
         return 'neutral'
 
-    def _get_triples(self, turn):
+    def _get_triples(self, turn, turn_idx):
         triples = []
         for sent in turn.sents:
             for pred_root in self._get_predicate_roots(sent):
@@ -109,8 +114,6 @@ class SpacyTripleExtractor:
                 object_ = self._get_object(predicate)
                 polarity = self._get_polarity(pred_root)
                 feedback = self._get_feedback_polarity(pred_root)
-
-                #spacy.displacy.serve(sent) # for debugging
 
                 # Complete predicate with nested objects (not main object)
                 predicate = self._predicate_with_nested_obj(predicate, object_)
@@ -123,41 +126,70 @@ class SpacyTripleExtractor:
                 if not subject and not predicate and not object_:
                     object_ = self._get_singular_object(sent.root)
 
-                triples.append([subject, predicate, object_, polarity, feedback])
+                # Remove Wh-objects, interjections (indicates question)
+                if object_ and object_[0].lower_ in WH_WORDS + NEG_INTJS + POS_INTJS:
+                    object_ = []
+
+                triples.append([subject, predicate, object_, polarity, feedback, turn_idx])
 
         return triples
 
-    def _interp_context(self, triples):
-        # Inherent predicate for object-only triples, e.g. "Do you like cats? dogs"!
-        for i, (subj, pred, obj, pol, feedback) in enumerate(triples):
-            if not subj and not pred:
-                context = [(s, p) for s, p, _, _, _ in triples[:i] if s and p]  # subject and predicate are there
-                if context:
-                    prev_subj, prev_pred = context[-1]
-                    triples[i] = [prev_subj, prev_pred, obj, pol, feedback]
+    def _interp_context(self, triples, turns):
+        # Co-reference resolution
+        for i, (subj, pred, obj, _, _, sent_idx) in enumerate(triples):
+            # Resolve subject
+            if len(subj) == 1 and subj[0].lower_ in PRONOUNS:
+                context = turns[:sent_idx + 1]
+                pronoun = subj[0].lower_
+                triples[i][0] = self._coref.resolve(context, pronoun).split()
 
-        # Yes/no feedback
-        for i, triple in enumerate(triples):
-            if i > 0 and triple[4] == 'negative':
+            # Resolve object
+            if len(obj) == 1 and obj[0].lower_ in PRONOUNS:
+                context = turns[:sent_idx + 1]
+                pronoun = obj[0].lower_
+                triples[i][2] = self._coref.resolve(context, pronoun).split()
+
+        # If object is missing, inherit object from the response (for question)
+        for i, (subj, pred, obj, pol, _, _) in enumerate(triples):
+            if i < len(triples) - 1 and subj and pred and not obj:
+                next_obj = triples[i + 1][2]
+                if next_obj:
+                    triples[i][2] = next_obj
+
+        # Predicate ellipsis, e.g. "Do you like cats? no, dogs!"
+        for i, (subj, pred, _, _, _, _) in enumerate(triples):
+            if not subj and not pred:
+                context = [(s, p) for s, p, _, _, _, _ in triples[:i] if s and p]
+                if context:
+                    new_subj, new_pred = context[-1]
+                    triples[i][0] = new_subj
+                    triples[i][1] = new_pred
+
+        # Negate previous triples if response is "no"
+        for i, (_, _, _, _, feedback, _) in enumerate(triples):
+            if i > 0 and feedback == 'negative':
                 triples[i - 1][3] = 'negative'
 
-        # Remove everything but SPO and polarity
+        # Discard everything but SPO and polarity
         triples = [tuple(triple[:4]) for triple in triples]
         return triples
 
     def extract_triples(self, inputs):
         # Extract triples from each turn in the input
         triples = []
-        for turn in inputs.split('<eos>'):
-            triples += self._get_triples(self._nlp(turn.strip()))
+        for turn_idx, turn in enumerate(inputs.split('<eos>')):
+            triples += self._get_triples(self._nlp(turn.strip()), turn_idx)
+
+        turns = inputs.split('<eos>')
 
         # Contextually interpret these triples
-        triples = self._interp_context(triples)
+        triples = self._interp_context(triples, turns)
         return triples
 
 
 if __name__ == '__main__':
-    parser = SpacyTripleExtractor()
-    example = 'not really , my roomies all love animals though . all three of them<eos>do you have any trouble losing weight ?<eos>i do not think so lol . i tend to stay in shape'
+    parser = SpacyTripleExtractor('embeddings/glove.10000.300d.txt')
+
+    example = 'Jim loves the outdoors <eos> are you a hiker too ? <eos> No. he does a hike.'
     result = parser.extract_triples(example)
     pprint(result)
