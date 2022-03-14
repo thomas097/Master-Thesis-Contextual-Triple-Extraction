@@ -23,7 +23,7 @@ def triple_to_bio_tags(annotation, arg):
         for some argument (arg=0->subj, arg=1->pred, arg=2->obj).
     """
     turns = annotation['tokens']
-    triples = annotation['triples']
+    triples = annotation['annotations']
     num_tokens = sum([len(turn) + 1 for turn in turns])  #+1 for <eos>
 
     # Create label vector containing a value for each token in dialogue
@@ -70,16 +70,14 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
 def extract_triples(annotation):
     turns = annotation['tokens']
     triple_ids = annotation['annotations']
-    num_tokens = sum([len(turn) for turn in turns])
 
     arguments = defaultdict(list)
     triples = []
-    entailment_labels = []
-    polarity_labels = []
+    labels = []
 
     triple_ids = [t[:4] for t in triple_ids]
 
-    for subj, pred, obj, pol in triple_ids:
+    for subj, pred, obj, neg in triple_ids:
         # Extract tokens belonging to triple arguments
         subj = ' '.join(turns[i][j] for i, j in subj) if subj else ''
         pred = ' '.join(turns[i][j] for i, j in pred) if pred else ''
@@ -87,22 +85,19 @@ def extract_triples(annotation):
 
         if subj or pred or obj:
 
-            if not pol:
+            if not neg:
                 triples += [(subj, pred, obj)]
-                entailment_labels += [1]
-                polarity_labels += [1]
+                labels += [1]
             else:
-                for _ in range(4): # oversampling
-                    triples += [(subj, pred, obj)]
-                    entailment_labels += [1]
-                    polarity_labels += [0]
+                triples += [(subj, pred, obj)] * 6 # oversampling
+                labels += [2] * 6
 
             arguments['subjs'].append(subj)
             arguments['preds'].append(pred)
             arguments['objs'].append(obj)
 
     # Create negative examples (i.e. not entailed)
-    n = len(triples)
+    n = int(len(triples) * 0.6)
     for i in range(100):
         s = random.choice(arguments['subjs'])
         p = random.choice(arguments['preds'])
@@ -111,12 +106,11 @@ def extract_triples(annotation):
         # Check if the triple was already generated
         if (s, p, o) not in triples and s and p and o:
             triples += [(s, p, o)] # not entailed
-            entailment_labels += [0]
-            polarity_labels += [None] # Skip
+            labels += [0]
             n -= 1
 
         # Create as many on-entailed examples as entailed ones
         if n == 0:
             break
 
-    return triples, entailment_labels, polarity_labels
+    return triples, labels

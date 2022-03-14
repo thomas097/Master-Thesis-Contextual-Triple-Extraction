@@ -80,7 +80,7 @@ class ArgumentExtraction(torch.nn.Module):
         rep_labels = np.repeat([0] + list(labels), repeats)
         return torch.LongTensor([rep_labels]).to(self._device)
 
-    def fit(self, tokens, labels, epochs=2, lr=1e-5, weight=2):
+    def fit(self, tokens, labels, epochs=2, lr=1e-5, weight=3):
         """ Fits the model to the annotations
         """
         # Re-tokenize to obtain input_ids and associated labels
@@ -115,7 +115,7 @@ class ArgumentExtraction(torch.nn.Module):
                 loss.backward()
                 optim.step()
 
-            print("mean loss =", np.mean(losses) / 3)
+            print("mean loss =", np.mean(losses))
 
     def predict(self, token_seq):
         # Retokenize token sequence
@@ -142,11 +142,11 @@ if __name__ == '__main__':
                        triple_to_bio_tags(ann, 1),
                        triple_to_bio_tags(ann, 2)))
 
-        # Flatten dialogs to token sequence separated by <eos>
+        # Flatten turn sequence
         tokens.append([t for ts in ann['tokens'] for t in ts + ['<eos>']])
 
     # Fit model to data
     model = ArgumentExtraction()
     model.fit(tokens, labels)
-    torch.save(model.state_dict(), 'models/argument_extraction_albert-v2_03_03_2022')
+    torch.save(model.state_dict(), 'models/argument_extraction_albert-v2_14_03_2022')
 

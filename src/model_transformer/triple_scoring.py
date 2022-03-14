@@ -18,9 +18,7 @@ class TripleScoring(torch.nn.Module):
 
         # SPO candidate scoring heads
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
-        self._entailed_head = torch.nn.Linear(hidden_size, 2)
-        self._polarity_head = torch.nn.Linear(hidden_size, 2)
-
+        self._head = torch.nn.Linear(hidden_size, 3)
         self._relu = torch.nn.ReLU()
         self._softmax = torch.nn.Softmax(dim=-1)
 
@@ -34,14 +32,9 @@ class TripleScoring(torch.nn.Module):
     def forward(self, input_ids, speaker_ids):
         """ Computes the forward pass through the model
         """
-        # Feed dialog through transformer
         out = self._model(input_ids=input_ids, token_type_ids=speaker_ids)
         h = self._relu(out.last_hidden_state[:, 0])
-
-        # Predict spans
-        y_ent = self._softmax(self._entailed_head(h))
-        y_pol = self._softmax(self._polarity_head(h))
-        return y_ent, y_pol
+        return self._softmax(self._head(h))
 
     def _retokenize_tokens(self, tokens, triple, speaker=0):
         # Tokenize each token individually (keeping track of subwords)
@@ -73,14 +66,13 @@ class TripleScoring(torch.nn.Module):
         """ Fits the model to the annotations
         """
         X = []
-        for tokens, triple_lst, (ent_labels, pol_labels) in zip(tokens, triples, labels):
-            for triple, entailed, polarity in zip(triple_lst, ent_labels, pol_labels):
+        for tokens, triple_lst, triple_labels in zip(tokens, triples, labels):
+            for triple, label in zip(triple_lst, triple_labels):
                 # Put data on GPU
                 input_ids, speaker_ids = self._retokenize_tokens(tokens, triple)
-                entailed = torch.LongTensor([entailed]).to(self._device)
-                polarity = torch.LongTensor([polarity]).to(self._device) if polarity is not None else None
+                label_ids = torch.LongTensor([label]).to(self._device)
 
-                X.append((input_ids, speaker_ids, entailed, polarity))
+                X.append((input_ids, speaker_ids, label_ids))
 
         # Set up optimizer and objective
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
@@ -90,35 +82,23 @@ class TripleScoring(torch.nn.Module):
             random.shuffle(X)
 
             losses = []
-            for input_ids, speaker_ids, y_ent, y_pol in tqdm(X):
-
+            for input_ids, speaker_ids, y in tqdm(X):
                 # Update w.r.t. entailment
-                y_ent_hat, _ = self(input_ids, speaker_ids)
-                loss = criterion(y_ent_hat, y_ent)  # Was the triple correct?
+                y_hat = self(input_ids, speaker_ids)
+                loss = criterion(y_hat, y)  # Was the triple entailed?
                 losses.append(loss.item())
 
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
-                # Update w.r.t. polarity
-                if y_pol is not None:
-                    _, y_pol_hat = self(input_ids, speaker_ids)
-                    loss = criterion(y_pol_hat, y_pol)  # What was the polarity?
-                    losses.append(loss.item())
-
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
-
             print("mean loss =", np.mean(losses))
 
     def predict(self, tokens, triple):
         input_ids, speaker_ids = self._retokenize_tokens(tokens, triple)
-        entailed, polarity = self(input_ids, speaker_ids)
-        entailed = entailed.cpu().detach().numpy()[0]
-        polarity = polarity.cpu().detach().numpy()[0]
-        return entailed, polarity
+        label = self(input_ids, speaker_ids)
+        label = label.cpu().detach().numpy()[0]
+        return label
 
 
 if __name__ == '__main__':
@@ -127,9 +107,9 @@ if __name__ == '__main__':
     # Extract annotation triples and compute negative triples
     tokens, triples, labels = [], [], []
     for ann in annotations:
-        ann_triples, ann_ent, ann_pol = extract_triples(ann)
+        ann_triples, triple_labels = extract_triples(ann)
         triples.append(ann_triples)
-        labels.append([ann_ent, ann_pol])
+        labels.append(triple_labels)
         tokens.append([t for ts in ann['tokens'] for t in ts + ['<eos>']])
 
     # Fit model
