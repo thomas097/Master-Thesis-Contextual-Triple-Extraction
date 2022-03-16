@@ -2,21 +2,22 @@ import sys
 sys.path.insert(0, '../model_dependency')
 sys.path.insert(0, '../model_transformer')
 
-from personagpt import *
+from personagpt import PersonaGPT
+from persona_utils import Persona
 from run_transformer_pipeline import AlbertTripleExtractor
 
 
-def evaluate(model):
-    persona, entity_pool = generate_persona()
+def evaluate(persona, model):
+    persona_facts = persona.sample_persona()
     print('PERSONA:')
-    for item in persona:
+    for item in persona_facts:
         print(item)
     print()
 
-    bot = PersonaGPT(persona=persona)
+    bot = PersonaGPT(persona=persona.persona)
     for i in range(10):
         print('---------------------------------')
-        question = generate_question(entity_pool)
+        question = persona.sample_question()
         print('USER:', question)
 
         response = bot.respond(question)
@@ -34,4 +35,5 @@ def evaluate(model):
 if __name__ == '__main__':
     model = AlbertTripleExtractor('../model_transformer/models/argument_extraction_albert-v2_14_03_2022',
                                   '../model_transformer/models/scorer_albert-v2_14_03_2022')
-    evaluate(model)
+    persona = Persona('personas.json')
+    evaluate(persona, model)

@@ -3,8 +3,6 @@ import torch
 import random
 import re
 
-from templates import *
-
 
 class PersonaGPT:
     def __init__(self, base_model='af1tang/personaGPT', persona=None):
@@ -38,47 +36,3 @@ class PersonaGPT:
         message = self._generate_response(bot_input_ids)
 
         return self._tokenizer.decode(message, skip_special_tokens=True)
-
-
-def generate_persona():
-    """ Generates a persona from the templates in templates.py
-    """
-    persona = []
-    entity_pool = {}
-
-    for key, options in PERSONA_TEMPLATES.items():
-        # Sample template from key category
-        template = random.choice(options)
-
-        # Populate template with entities
-        entities = re.findall('[A-Z_]+', template)
-        for i, slot in enumerate(entities):
-            entity = random.choice(ENTITIES[slot])
-            template = template.replace(slot, entity, 1)
-            entities[i] = (slot, entity)
-
-        persona.append(template)
-        entity_pool[key] = entities
-
-    return persona, entity_pool
-
-
-def generate_question(entity_pool):
-    """ Generates questions about the generated persona
-    """
-    # Pick what topic to ask about
-    topic = random.choice(list(entity_pool.keys()))
-    entities = entity_pool[topic]
-
-    # Pick a question with said topic
-    question = random.choice(PERSONA_QUESTIONS[topic])
-
-    # Populate wildcards if needed
-    for i in range(question.count('*')):
-        _, entity = entities[i]
-        question = question.replace('*', entity, 1)
-
-    # Fix perspective
-    question = question.replace('my', 'your')
-
-    return question
