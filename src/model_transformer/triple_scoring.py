@@ -12,7 +12,7 @@ class TripleScoring(torch.nn.Module):
     def __init__(self, base_model='albert-base-v2', path=None):
         super().__init__()
         # Base model
-        print('loading', base_model)
+        print('loading', base_model, 'triple scorer')
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._model = AutoModel.from_pretrained(base_model)
 
@@ -115,6 +115,6 @@ if __name__ == '__main__':
     # Fit model
     scorer = TripleScoring()
     scorer.fit(tokens, triples, labels)
-    torch.save(scorer.state_dict(), 'models/scorer_albert-v2_03_03_2022')
+    torch.save(scorer.state_dict(), 'models/scorer_albert-v2_14_03_2022')
 
 

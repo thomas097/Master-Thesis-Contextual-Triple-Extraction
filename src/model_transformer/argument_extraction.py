@@ -14,7 +14,7 @@ class ArgumentExtraction(torch.nn.Module):
         """
         super().__init__()
         # Base model
-        print('loading', base_model)
+        print('loading', base_model, 'argument extractor')
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._model = AutoModel.from_pretrained(base_model)
 
