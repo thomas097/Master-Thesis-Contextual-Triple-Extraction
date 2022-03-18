@@ -1,12 +1,21 @@
 import os
 import spacy
 import json
+import tkinter as tk
+from tkinter.filedialog import askopenfilename
 
 
 class List:
     def __init__(self, items):
         self._items = items
         self._i = -1
+
+    def __len__(self):
+        return len(self._items)
+
+    @property
+    def index(self):
+        return self._i
 
     def has_next(self):
         return self._i < len(self._items) - 1
@@ -48,6 +57,10 @@ class DataLoader:
         self._output_dir = output_dir
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
+
+    @property
+    def progress(self):
+        return '{}/{}'.format(self._dataset.index, len(self._dataset))
 
     @property
     def current_id(self):
@@ -102,9 +115,17 @@ class DataLoader:
             json.dump(annotation, file)
 
 
+def filebrowser():
+    root = tk.Tk()
+    root.withdraw()
+    filename = askopenfilename()
+    root.destroy()
+    return filename
+
+
 if __name__ == '__main__':
     # Sanity check
-    dataset = DataLoader('datasets/train.json')
+    dataset = DataLoader(filebrowser())
     print('next():', dataset.next())
     print('next():', dataset.next())
     print('next():', dataset.next())

@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.font as TkFont
-from dataloader import DataLoader
+from dataloader import DataLoader, filebrowser
 from functools import partial
 
 from config import *
@@ -18,12 +18,6 @@ class ArgumentButton(tk.Button):
         self.tokens = []
         self.indices = []
         self.clear()
-
-    def set_placeholder(self, string):
-        """ Sets a placeholder with a text description
-        """
-        self.config(fg=ARG_PLACEHOLDER_TEXT_COLOR)
-        self._label.set(string)
 
     def highlight(self, value):
         """ Highlight the button when selected.
@@ -67,9 +61,9 @@ class Column(tk.Frame):
         while num > len(self._rows) - 1:
             self._rows.append(Row(self))
 
-    def add_button(self, i, text, command, font_color=FONT_COLOR, relief=RELIEF, bg_color=BG_COLOR, padding=PADDING):
+    def add_button(self, i, text, command, padding=PADDING):
         self._expand(i)
-        button = tk.Button(self._rows[i], text=text, relief=relief, command=command, bg=bg_color, fg=font_color)
+        button = tk.Button(self._rows[i], text=text, relief=RELIEF, command=command)
         button.pack(side=tk.LEFT, padx=padding, pady=padding, ipadx=padding, ipady=padding)
         return button
 
@@ -105,9 +99,10 @@ class Interface:
         # Window
         self._window = tk.Tk()
         self._window.title(TITLE)
-        tkfont = TkFont.nametofont(FONT_STYLE)
-        tkfont.configure(size=FONT_SIZE)
-        self._window.option_add("*Font", tkfont)
+        self._font = TkFont.nametofont(FONT_STYLE)
+        self._font.configure(size=FONT_SIZE)
+        self._window.option_add("*Font", self._font)
+        self._window.deiconify()
 
         # Centered Frame to add interface into
         self._root = tk.Frame(self._window, bg=BG_COLOR)
@@ -140,7 +135,7 @@ class Interface:
 
         if j < 0:
             i -= 1
-            j = 4 # index of 5th argument
+            j = 4  # index of 5th argument
         elif j > 4:
             j = 0
             i += 1
@@ -236,23 +231,15 @@ class Interface:
             self._triples[(i, 4)] = certainty
 
         # Add Skip and Next buttons
-        self._button_frame.add_button(1, ' ⮜ ', command=self._go_back, padding=BUTTON_PADDING,
-                                      relief='flat', font_color=BUTTON_FONT_COLOR, bg_color=BACK_COLOR)
-        self._button_frame.add_button(1, ' ✖ ', command=self._skip, padding=BUTTON_PADDING,
-                                      relief='flat', font_color=BUTTON_FONT_COLOR, bg_color=SKIP_COLOR)
-        self._button_frame.add_button(1, ' ✔ ', command=self._save_and_next, padding=BUTTON_PADDING,
-                                      relief='flat', font_color=BUTTON_FONT_COLOR, bg_color=NEXT_COLOR)
+        self._button_frame.add_button(1, ' ⮜ ', command=self._go_back, padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, ' ✖ ', command=self._skip, padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, ' ✔ ', command=self._save_and_next, padding=BUTTON_PADDING)
 
         # Set default focus and placeholder text
-        self._window.title('Annotating ' + self._dataloader.current_id)
+        self._window.title('Annotating {} ({})'.format(self._dataloader.current_id, self._dataloader.progress))
         self._set_focus(0, 0)
-        self._triples[(0, 0)].set_placeholder('  S  ')
-        self._triples[(0, 1)].set_placeholder('  P  ')
-        self._triples[(0, 2)].set_placeholder('  O  ')
-        self._triples[(0, 3)].set_placeholder('  ¬  ')
-        self._triples[(0, 4)].set_placeholder('  ?  ')
 
 
 if __name__ == '__main__':
-    dataloader = DataLoader('datasets/train.json', output_dir='annotations')
+    dataloader = DataLoader(filebrowser(), output_dir='annotations')
     interface = Interface(dataloader)
