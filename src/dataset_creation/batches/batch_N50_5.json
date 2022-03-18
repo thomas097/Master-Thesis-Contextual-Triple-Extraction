@@ -1,0 +1,474 @@
+[
+    {
+        "id": "personachat-train-007135",
+        "triplet": "hi i love the the color red and i am searching for work .<eos>cool . what kind of work are you looking for ?<eos>i i am looking for csr position possibly work fro . home .",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_13"
+        ]
+    },
+    {
+        "id": "circa-train-033138",
+        "triplet": "i share a one bedroom with my 2 small dogs . 21 with two pets .<eos>do you want one bedroom ?<eos>no",
+        "categories": [
+            "ellipsis_pred",
+            "act_deny",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_1"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-006748",
+        "triplet": "We haven't decided yet . There are a lot of things to sort out , you know .<eos>Are you having a big wedding ?<eos>Yes , I've always dream of having a big wedding .",
+        "categories": [
+            "singular_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_12"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-012639",
+        "triplet": "I can ' t tell you that .<eos>Why can ' t you tell me ?<eos>That is private information .",
+        "categories": [
+            "demonstrative_dets",
+            "length_5"
+        ]
+    },
+    {
+        "id": "personachat-train-001129",
+        "triplet": "did you go to college before having a child . i did . i wasted years .<eos>lol , yes and working . what kind of farm do you have ?<eos>a hydroponic farm to grow bean shoots .",
+        "categories": [
+            "ellipsis_pred",
+            "wh_question",
+            "length_8"
+        ]
+    },
+    {
+        "id": "circa-train-026499",
+        "triplet": "good . . . looking forward to the football games this weekend . . . you have big plans<eos>do you have plans for this weekend ?<eos>yes , we're going upstate .",
+        "categories": [
+            "plural_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_7"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-002133",
+        "triplet": "Shirley .<eos>What's your son's name ?<eos>Daniel .",
+        "categories": [
+            "ellipsis_pred",
+            "wh_question",
+            "length_2"
+        ]
+    },
+    {
+        "id": "personachat-train-006315",
+        "triplet": "i tried shooting some lions but i forgot i do not live in africa .<eos>ll ok ok . are you going to dress up for halloween this year ?<eos>yes ! ! i actually need to go shopping with my daughters !",
+        "categories": [
+            "possessive_prons",
+            "singular_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_13"
+        ]
+    },
+    {
+        "id": "circa-train-007536",
+        "triplet": "yeah that's cool , do you live with your brother<eos>does your brother still live in the neighborhood ?<eos>yes , you can still find him there .",
+        "categories": [
+            "singular_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_9"
+        ]
+    },
+    {
+        "id": "personachat-train-002763",
+        "triplet": "he sure will ! our family migrated to america when i was five .<eos>where did you migrate from ?<eos>brazil . i am in college now and trying to be a teacher .",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_14"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-002460",
+        "triplet": "Hi , Clyde . This is my friend , Wen . She's visiting from UCLA .<eos>Clyde Smith . Pleasure to meet you . May I treat you ladies to dinner ?<eos>OK ! I was just tellin ' Wen about African American food .",
+        "categories": [
+            "singular_personal_prons",
+            "length_13"
+        ]
+    },
+    {
+        "id": "personachat-train-002643",
+        "triplet": "that is interesting ! my wife taught spanish for a while<eos>oh that's cool . do you have any pets ?<eos>i don't , i train animals at work so that's plenty for me",
+        "categories": [
+            "demonstrative_dets",
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_15"
+        ]
+    },
+    {
+        "id": "personachat-train-017691",
+        "triplet": "well , recently i've become obsessed with archery . pretty top notch stuff .<eos>really do you go hunting ?<eos>no , i realized i hated sports but i had no skills . so i just picked one . archery .",
+        "categories": [
+            "singular_personal_prons",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_21"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-001333",
+        "triplet": "I'm here for a facial . I made an appointment over the phone for 3 30 today .<eos>What's your name ?<eos>Addison .",
+        "categories": [
+            "ellipsis_pred",
+            "wh_question",
+            "length_2"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-011638",
+        "triplet": "Yes , It's Henrylee yahoo . com .<eos>How old are you ?<eos>Twenty one .",
+        "categories": [
+            "ellipsis_pred",
+            "wh_question",
+            "length_3"
+        ]
+    },
+    {
+        "id": "personachat-train-002190",
+        "triplet": "i'm good thanks for asking<eos>what are you doing up so late ?<eos>i cant sleep cuz i am scared",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_8"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-003920",
+        "triplet": "It was always very busy there .<eos>What did you do ?<eos>I stood behind the register and took pizza orders .",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_10"
+        ]
+    },
+    {
+        "id": "personachat-train-001940",
+        "triplet": "i am photographer in new york . . i work for myself .<eos>nice . do you work long hours ?<eos>not so much . mostly weekends .",
+        "categories": [
+            "ellipsis_pred",
+            "yes_no_question",
+            "length_7"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-001392",
+        "triplet": "Sure , no problem . Here you are . That'll be 25 dollars .<eos>Do you take credit cards ?<eos>Yes , we accept Visa and MasterCard .",
+        "categories": [
+            "plural_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_8"
+        ]
+    },
+    {
+        "id": "circa-train-029063",
+        "triplet": "i live with my parents . they make bank teaching at the school in town .<eos>do your parents live in town ?<eos>no",
+        "categories": [
+            "ellipsis_pred",
+            "act_deny",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_1"
+        ]
+    },
+    {
+        "id": "circa-train-029161",
+        "triplet": "no , i live in a big city so there isn't much room for sports<eos>are you confident you can keep yourself safe in a big city ?<eos>i would say so",
+        "categories": [
+            "act_impl_confirm",
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_4"
+        ]
+    },
+    {
+        "id": "personachat-train-004558",
+        "triplet": "no longer i m a teacher for six grade<eos>i like that you are a teacher . what subjects do you teach ?<eos>i teach math and i m into volleyball team coaching",
+        "categories": [
+            "singular_personal_prons",
+            "length_10"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-012022",
+        "triplet": "Well , it has nothing to do with virus . The problem is your attachment is a bit larger . It has exceeded the e mail capacity .<eos>I see . What can I do now ?<eos>You can send a compressed one .",
+        "categories": [
+            "singular_personal_prons",
+            "length_7"
+        ]
+    },
+    {
+        "id": "circa-train-024126",
+        "triplet": "7 years is a long time , i'm not very satisfy with my job .<eos>have you spent a long time at your current job ?<eos>yes",
+        "categories": [
+            "ellipsis_pred",
+            "act_confirm",
+            "yes_no_question",
+            "length_1"
+        ]
+    },
+    {
+        "id": "personachat-train-007698",
+        "triplet": "i've a tattoo of a fish how perfect<eos>do you like to travel ?<eos>i don't go to far from the office",
+        "categories": [
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_9"
+        ]
+    },
+    {
+        "id": "personachat-train-005537",
+        "triplet": "really . is it a red color ? i love everything red . its my best color<eos>yeah its red i love red too ?<eos>nice one . for me i just have prius",
+        "categories": [
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_9"
+        ]
+    },
+    {
+        "id": "circa-train-024129",
+        "triplet": "i had so much fun at the debutante ball this last weekend<eos>are you looking forward to a fun weekend ?<eos>it's my birthday .",
+        "categories": [
+            "act_impl_confirm",
+            "possessive_prons",
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_5"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-002367",
+        "triplet": "Are you ready to order , sir ?<eos>Yes . Can you show me the menu , please ?<eos>Of course . Here you are .",
+        "categories": [
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_7"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-011499",
+        "triplet": "When do you have in mind ?<eos>How about Thursday ?<eos>That will be fine with me .",
+        "categories": [
+            "demonstrative_dets",
+            "singular_personal_prons",
+            "open_question",
+            "length_7"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-009484",
+        "triplet": "Yes . I locked myself out . May I borrow a duplicate key for Room 201 ?<eos>Certainly . Where are you now ?<eos>I'm right outside my room .",
+        "categories": [
+            "possessive_prons",
+            "singular_personal_prons",
+            "wh_question",
+            "length_7"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-002778",
+        "triplet": "Well , do you like novels ?<eos>Yes , very much . Which one is the latest ?<eos>Here is one written by famous Japanese novelist . You can have a look .",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_15"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-002981",
+        "triplet": "Hi , taxi .<eos>Get in , please . Where to , madam ?<eos>The international airport , please . I have to be there by 8",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_13"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-012637",
+        "triplet": "I would like to speak to you , if you don ' t mind .<eos>What would you like to speak to me about ?<eos>I would like to talk to you about this year ' s election .",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_14"
+        ]
+    },
+    {
+        "id": "circa-train-018624",
+        "triplet": "i try to sell my handmade items at the fair !<eos>have you ever been to the fair ?<eos>yes , just about every year since i could walk .",
+        "categories": [
+            "singular_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_11"
+        ]
+    },
+    {
+        "id": "personachat-train-017170",
+        "triplet": "i've a husband sorry<eos>oh ok . some people are more flexible , so i did not know . you have kids ?<eos>no i do not want to be pregnant i love sushi too much",
+        "categories": [
+            "singular_personal_prons",
+            "act_deny_elaborate",
+            "length_13"
+        ]
+    },
+    {
+        "id": "personachat-train-005466",
+        "triplet": "hello , how are you doing today ?<eos>doing real well , real well . what are you up to ?<eos>i'm watching my favorite movie right now",
+        "categories": [
+            "possessive_prons",
+            "singular_personal_prons",
+            "wh_question",
+            "length_8"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-000900",
+        "triplet": "Have you made up your mind ?<eos>Not yet , can you recommend me some chickens ?<eos>We have roast chicken , grilled chicken , chicken curry and chicken chops .",
+        "categories": [
+            "plural_personal_prons",
+            "yes_no_question",
+            "length_14"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-005863",
+        "triplet": "Yes , I like to make new friends .<eos>What do you usually do with them ?<eos>We like to get together , chat and enjoy beautiful music .",
+        "categories": [
+            "plural_personal_prons",
+            "wh_question",
+            "length_12"
+        ]
+    },
+    {
+        "id": "personachat-train-016038",
+        "triplet": "that is a great thing to aspire to be like .<eos>what else do you like to do ?<eos>i like to listen to rap while cooking dinner .",
+        "categories": [
+            "singular_personal_prons",
+            "open_question",
+            "length_10"
+        ]
+    },
+    {
+        "id": "circa-train-019407",
+        "triplet": "it was a long time ago . anyway , i just got back from the mall .<eos>do you want to go to the mall ?<eos>that would be pointless .",
+        "categories": [
+            "act_impl_deny",
+            "demonstrative_dets",
+            "length_5"
+        ]
+    },
+    {
+        "id": "personachat-train-006578",
+        "triplet": "that is tough if its meant to happen it will<eos>yes . meanwhile i got community theatre to keep me busy . you like theatre ?<eos>i hope things work out for you i've to go",
+        "categories": [
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_11"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-006270",
+        "triplet": "My friend George has been to Switzerland twice .<eos>Does he like that country ?<eos>Yes , he likes the people and the quietness there .",
+        "categories": [
+            "singular_personal_prons",
+            "act_confirm_elaborate",
+            "yes_no_question",
+            "length_11"
+        ]
+    },
+    {
+        "id": "circa-train-023840",
+        "triplet": "only a few minutes to chat while the red sauce simmers . dinner for 17 !<eos>would you like to have dinner ?<eos>no , i'm not very hungry .",
+        "categories": [
+            "singular_personal_prons",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_8"
+        ]
+    },
+    {
+        "id": "personachat-train-017229",
+        "triplet": "ah , california . nice . at night , i love to look at the stars .<eos>do you have any hobbies ?<eos>i'm a big car enthusiast . i really would love to own a porsche . someday .",
+        "categories": [
+            "singular_personal_prons",
+            "yes_no_question",
+            "length_18"
+        ]
+    },
+    {
+        "id": "personachat-train-009578",
+        "triplet": "cookies and cakes and cupcakes and yes i love to swim<eos>yum ! what music do you like ?<eos>i love country musica",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_4"
+        ]
+    },
+    {
+        "id": "circa-train-019647",
+        "triplet": "it is kind of fan fiction jane austen type stuff set in keylargo<eos>are you a science fiction fan ?<eos>no , i prefer non fiction .",
+        "categories": [
+            "singular_personal_prons",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_7"
+        ]
+    },
+    {
+        "id": "circa-train-014874",
+        "triplet": "sounds like a blast , i'm hoping to visit family in new york this year<eos>do have family in new york ?<eos>no",
+        "categories": [
+            "ellipsis_pred",
+            "act_deny",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_1"
+        ]
+    },
+    {
+        "id": "circa-train-015200",
+        "triplet": "i love swimming in my leisure time .<eos>is horseback riding something you enjoy during your leisure time ?<eos>no , i'm scared of horses .",
+        "categories": [
+            "singular_personal_prons",
+            "act_deny_elaborate",
+            "yes_no_question",
+            "length_8"
+        ]
+    },
+    {
+        "id": "personachat-train-000046",
+        "triplet": "lol , i would love too<eos>what else do you enjoy ?<eos>i enjoy the outdoors and love to sit around water",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_10"
+        ]
+    },
+    {
+        "id": "daily_dialogs-train-002376",
+        "triplet": "I'm making a shopping budget , so that I don't spend too much money .<eos>How much money can you spend ?<eos>I can only spend 300 a month .",
+        "categories": [
+            "singular_personal_prons",
+            "wh_question",
+            "length_8"
+        ]
+    }
+]
