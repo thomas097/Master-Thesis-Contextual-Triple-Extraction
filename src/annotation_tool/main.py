@@ -1,6 +1,6 @@
-from dataloader import DataLoader
+from dataloader import DataLoader, filebrowser
 from interface import Interface
 
 if __name__ == '__main__':
-    dataloader = DataLoader('../dataset_creation/batches/batch_0.json', output_dir='annotations')
+    dataloader = DataLoader(filebrowser(), output_dir='annotations')
     interface = Interface(dataloader)
