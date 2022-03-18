@@ -24,4 +24,6 @@ To use the annotation tool, run `main.py` in the IDE of your choice or from the 
 
 `python3 main.py`
 
-This will open a file browser which allows you to select a batch file to annotate (stored under `src/dataset_creation/batches`). When a batch file is selected, the program will open. Instructions on how to use the program can be found in the [Annotation Guidelines.pdf](https://github.com/thomas097/Master-Thesis-Contextual-Triple-Extraction/blob/main/src/annotation_tool/Annotation_Guidelines.pdf) document.
+This will open a file browser which allows you to select a batch file to annotate (stored under `src/dataset_creation/batches`). After a batch has been chosen, the program will open. Instructions on how to use the program can be found in the [Annotation Guidelines.pdf](https://github.com/thomas097/Master-Thesis-Contextual-Triple-Extraction/blob/main/src/annotation_tool/Annotation_Guidelines.pdf) document. 
+
+Results are stored in a directory `annotations/`.
