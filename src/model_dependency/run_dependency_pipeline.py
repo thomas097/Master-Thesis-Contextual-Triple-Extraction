@@ -118,6 +118,8 @@ class SpacyTripleExtractor:
                 # Complete predicate with nested objects (not main object)
                 predicate = self._predicate_with_nested_obj(predicate, object_)
 
+                print([subject, predicate, object_, polarity, feedback])
+
                 # Add subject to conjuncts (if needed)
                 if not subject:
                     subject = self._get_subject(sent.root)
@@ -176,9 +178,14 @@ class SpacyTripleExtractor:
 
     def extract_triples(self, inputs):
         # Extract triples from each turn in the input
+        print('Raw triples:')
         triples = []
         for turn_idx, turn in enumerate(inputs.split('<eos>')):
             triples += self._get_triples(self._nlp(turn.strip()), turn_idx)
+
+        print('Non-contextual:')
+        pprint(triples)
+        print()
 
         turns = inputs.split('<eos>')
 
@@ -190,6 +197,14 @@ class SpacyTripleExtractor:
 if __name__ == '__main__':
     parser = SpacyTripleExtractor('embeddings/glove.10000.300d.txt')
 
-    example = 'Jim loves the outdoors <eos> are you a hiker too ? <eos> No. he does a hike.'
+    example = 'in my living room watching goodfellas <eos> what is goodfellas , i have never heard of that ? <eos> best movie of all time'
     result = parser.extract_triples(example)
     pprint(result)
+
+    while True:
+        print('#' * 20)
+        example = input('>> ')
+        result = parser.extract_triples(example)
+
+        print('Contextualized:')
+        pprint(result)
