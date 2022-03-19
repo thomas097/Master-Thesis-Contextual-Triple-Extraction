@@ -8,14 +8,19 @@ from tkinter.filedialog import askopenfilename
 class List:
     def __init__(self, items):
         self._items = items
-        self._i = -1
+        self._i = 0
 
     def __len__(self):
         return len(self._items)
 
     @property
-    def index(self):
+    def i(self):
         return self._i
+
+    def current(self):
+        """ Returns item currently selected
+        """
+        return self._items[self._i]
 
     def has_next(self):
         return self._i < len(self._items) - 1
@@ -23,9 +28,8 @@ class List:
     def next(self):
         """ Returns the next item in the list
         """
-        self._i += 1
-        if self._i >= len(self._items):
-            self._i = len(self._items) - 1
+        if self.has_next():
+            self._i += 1
         return self._items[self._i]
 
     def has_prev(self):
@@ -34,85 +38,86 @@ class List:
     def prev(self):
         """ Goes back to previous item visited in the list
         """
-        self._i -= 1
-        if self._i < 0:
-            self._i = 0
+        if self.has_prev():
+            self._i -= 1
         return self._items[self._i]
 
 
 class DataLoader:
     def __init__(self, path, output_dir='annotations', sep='<eos>'):
         # Tokenizer
-        self.__nlp = spacy.load("en_core_web_sm")
+        self._nlp = spacy.load("en_core_web_sm")
+        self._sep = sep
 
         # Read 'sep'-separated dataset from file
         with open(path, 'r', encoding='utf-8') as file:
             self._dataset = List(json.load(file))
-
-        self._history = []    # IDs of previously annotated samples
-        self._current = None  # Sample currently being annotated
-        self._sep = sep
 
         # Set up directory to store annotations into
         self._output_dir = output_dir
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
-    @property
-    def progress(self):
-        return '{}/{}'.format(self._dataset.index, len(self._dataset))
+        # Item currently being annotated
+        self._item = self._dataset.current()
+        self._load_savepoint()
 
-    @property
-    def current_id(self):
-        """ Returns the ID of the sample being annotated
-        """
-        return self._current['id']
+    def summary(self):
+        return 'Annotating {} ({}/{})'.format(self._item['id'], self._dataset.i, len(self._dataset))
 
-    def _previously_annotated(self, sample):
+    def already_annotated(self):
         """ Checks whether sample was annotated in previous session
             (this sample can be skipped)
         """
-        filename = self._output_dir + '/annotated_' + sample['id'] + '.json'
+        filename = '%s/annotated_%s.json' % (self._output_dir, self._item['id'])
         return os.path.exists(filename)
 
-    def _in_current_session(self, sample):
-        """ Checks whether sample was annotated in current session
+    def _load_savepoint(self):
+        """ Finds first unannotated sample in the dataset
         """
-        return sample['id'] in self._history
+        self._item = self._dataset.current()
+        while self.already_annotated() and self._dataset.has_next():
+            self._item = self._dataset.next()
 
-    def _tokenize(self, current):
-        turns = current['triplet'].split(self._sep)
-        return [[w.lower_ for w in self.__nlp(turn.strip())] for turn in turns]
+    def _tokenize(self, item):
+        turns = item['triplet'].split(self._sep)
+        return [[w.lower_ for w in self._nlp(turn.strip())] for turn in turns]
+
+    def current(self):
+        """ Returns the current sample
+        """
+        return self._tokenize(self._item)
 
     def next(self):
         """ Returns the next sample to be annotated
         """
-        # Continue until unannotated sample is found
-        self._current = self._dataset.next()
-        while self._previously_annotated(self._current) and self._dataset.has_next():
-            self._current = self._dataset.next()
-
-        # Add new sample to history
-        self._history.append(self._current['id'])
-
-        # Return sample as list of tokenized turns
-        return self._tokenize(self._current)
+        self._item = self._dataset.next()
+        return self._tokenize(self._item)
 
     def prev(self):
         """ Returns the previously annotated sample (within current session)
         """
         # Step down list until previous sample is found
-        self._current = self._dataset.prev()
-        while not self._in_current_session(self._current) and self._dataset.has_prev():
-            self._current = self._dataset.prev()
-
-        # Return sample as list of tokenized turns
-        return self._tokenize(self._current)
+        self._item = self._dataset.prev()
+        return self._tokenize(self._item)
 
     def save(self, annotation):
-        outfile = self._output_dir + '/annotated_' + self._current['id'] + '.json'
-        with open(outfile, 'w') as file:
+        """ Saves annotation from Interface to file
+        """
+        filename = '%s/annotated_%s.json' % (self._output_dir, self._item['id'])
+        with open(filename, 'w', encoding='utf-8') as file:
             json.dump(annotation, file)
+
+    def load(self):
+        """ Loads annotation file from Interface
+        """
+        if not self.already_annotated():
+            return []
+
+        filename = '%s/annotated_%s.json' % (self._output_dir, self._item['id'])
+        with open(filename, 'r', encoding='utf-8') as file:
+            annotations = json.load(file)
+        return annotations
 
 
 def filebrowser():

@@ -123,7 +123,7 @@ class Interface:
 
         # Annotate first sample
         self._dataloader = dataloader
-        self._current = self._dataloader.next()
+        self._item = self._dataloader.current()
 
         self._init_layout()
         self._root.mainloop()
@@ -157,13 +157,13 @@ class Interface:
                 button.highlight(False)
 
     def _assign_to_focus(self, i, j):
-        token = self._current[i][j]
+        token = self._item[i][j]
         button = self._triples[self._focus]
         button.add(token, (i, j))
 
-    def _save_and_next(self):
-        # Save annotation to file
-        annotation = {'tokens': self._current, 'annotations': []}
+    def _next(self, skipped=False):
+        # Create annotation capsule
+        annotation = {'tokens': self._item, 'annotations': [], 'skipped': skipped}
         for i in range(NUM_TRIPLES):
             triple = (self._triples[(i, 0)].indices,  # subject
                       self._triples[(i, 1)].indices,  # predicate
@@ -172,15 +172,15 @@ class Interface:
                       self._triples[(i, 4)].indices)  # certainty
             annotation['annotations'].append(triple)
 
+        # Save to file
         self._dataloader.save(annotation)
-        self._skip()
 
-    def _skip(self):
-        self._current = self._dataloader.next()
+        # Show next sample
+        self._item = self._dataloader.next()
         self._init_layout()
 
-    def _go_back(self):
-        self._current = self._dataloader.prev()
+    def _back(self):
+        self._item = self._dataloader.prev()
         self._init_layout()
 
     def _clear_layout(self):
@@ -213,13 +213,13 @@ class Interface:
         self._persp_frame = Column(self._root, row=1, col=1, colspan=1, sticky=tk.W)
         self._button_frame = Column(self._root, row=2, col=0, colspan=2, sticky=tk.S)
 
-        # Populate token Column
-        for i, turn in enumerate(self._current):
+        # Show dialogue
+        for i, turn in enumerate(self._item):
             for j, token in enumerate(turn):
                 token = self._token_frame.add_button(i, token, padding=TOKEN_PADDING, command=partial(self._assign_to_focus, i, j))
                 self._tokens[(i, j)] = token
 
-        # Populate triple and perspective Columns
+        # Create triple and perspective Columns
         for i in range(NUM_TRIPLES):
             subject, predicate, object_ = self._triple_frame.add_triple(i, command=self._set_focus)
             self._triples[(i, 0)] = subject
@@ -230,14 +230,22 @@ class Interface:
             self._triples[(i, 3)] = polarity
             self._triples[(i, 4)] = certainty
 
+        # Fill in annotation if we have already done so
+        if self._dataloader.already_annotated():
+            annotations = self._dataloader.load()['annotations']
+            for i, triple in enumerate(annotations):
+                for j, arg in enumerate(triple):
+                    for turn_idx, token_idx in arg:
+                        self._focus = (i, j)  # set tmp argument focus
+                        self._assign_to_focus(turn_idx, token_idx)
+
         # Add Skip and Next buttons
-        self._button_frame.add_button(1, ' ⮜ ', command=self._go_back, padding=BUTTON_PADDING)
-        self._button_frame.add_button(1, ' ✖ ', command=self._skip, padding=BUTTON_PADDING)
-        self._button_frame.add_button(1, ' ✔ ', command=self._save_and_next, padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, ' ⮜ ', command=self._back, padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, ' ✖ ', command=partial(self._next, skipped=True), padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, ' ✔ ', command=partial(self._next, skipped=False), padding=BUTTON_PADDING)
 
         # Set default focus and placeholder text
-        self._window.title('Annotating {} ({})'.format(self._dataloader.current_id, self._dataloader.progress))
-        self._set_focus(0, 0)
+        self._window.title(self._dataloader.summary())
 
 
 if __name__ == '__main__':
