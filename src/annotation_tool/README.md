@@ -9,13 +9,13 @@ The annotation tool has been created with Python 3.8 (but should be compatible w
 The following libraries must be installed:
 * `spacy >= 3.2.0`
 
-To use Spacy, we recommend using the `en_core_web_sm` pipeline for English (needed for tokenization), which can be installed by:
-
-`> python3 -m spacy download en_core_web_sm`
+To use Spacy, we recommend installing it with the `en_core_web_sm` pipeline for English (needed for tokenization), which can be installed by:
+`> pip install spacy`
+`> python -m spacy download en_core_web_sm`
 
 It is recommended to install the above dependencies in a fresh virtual environment, which can be created and activated using the following commands:
 
-`> python3 -m spacy download en_core_web_smpython3 -m venv ENV_NAME`<br>
+`> python -m venv ENV_NAME`<br>
 `> .\sample_venv\Scripts\activate`
 
 ## Usage
