@@ -1,0 +1,26 @@
+has_profession, I, work as, a janitor
+has_profession, I, have become, a banker
+has_profession, I, work as, a waiter
+has_profession, I, am, a hairdresser
+employed_by, I, work for, a company
+employed_by, I, work for, my boss
+employed_by, I, am employed by, a company
+work_at, I, work at, the gas station
+work_at, I, work at, the store
+has_attribute, I, have, brown eyes
+has_attribute, I, have, a big nose
+has_attribute, I, am, alive
+has_attribute, I, became, ugly
+has_attribute, I, am, a vegetarian
+owns, I, have got, a car
+owns, I, have, a new TV
+owns, I, got, a ticket
+owns, I, own, that house
+go_to, I, will leave to, my house
+go_to, I, am going to, the store
+go_to, I, will go to, the restaurant
+do_activity, I, am going to, play sports
+do_activity, I, will, dance
+likes, I, like, food
+likes, I, enjoy, good company
+likes, I, love, cats
