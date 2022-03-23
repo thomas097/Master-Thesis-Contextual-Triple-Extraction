@@ -78,7 +78,8 @@ class OLLIEBaseline:
 
 
 class OpenIEBaseline:
-    def __init__(self, sep='<eos>'):
+    def __init__(self, path="stanford-corenlp-latest/stanford-corenlp-4.4.0", sep='<eos>'):
+        self._path = path
         self._sep = sep
 
     @staticmethod
@@ -97,7 +98,7 @@ class OpenIEBaseline:
 
         # Capture OpenIE output
         wd = os.getcwd()
-        os.chdir("stanford-corenlp-latest/stanford-corenlp-4.4.0")
+        os.chdir(self._path)
         out = subprocess.check_output('java -mx1g -cp "*" edu.stanford.nlp.naturalli.OpenIE ../../tmp.txt',
                                       stderr=subprocess.PIPE)
         os.chdir(wd)
