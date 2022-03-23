@@ -1,7 +1,7 @@
 # General
 TITLE = 'Annotation Tool'
 FONT_STYLE = "TkDefaultFont"
-FONT_SIZE = 15
+FONT_SIZE = 14
 FONT_COLOR = 'black'
 BG_COLOR = 'grey95'
 RELIEF = 'groove'
@@ -19,7 +19,7 @@ TOKEN_RELIEF = 'groove'
 TOKEN_PADDING = 0
 
 # Triples
-NUM_TRIPLES = 7
+NUM_TRIPLES = 8
 ARG_PLACEHOLDER = '       '
 ARG_PLACEHOLDER_TEXT_COLOR = 'grey'
 ARG_FONT_COLOR = 'black'
