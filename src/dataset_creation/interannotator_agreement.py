@@ -1,8 +1,8 @@
 from nltk.metrics.agreement import AnnotationTask
-from nltk.metrics import jaccard_distance
+from nltk.metrics import jaccard_distance, masi_distance
 
 
-def two_coder_agreement(ann1, ann2):
+def two_coder_agreement(ann1, ann2, distance=jaccard_distance):
     # Create matrix with, annotators, and triple labels
     task_data = []
     # Annotator 1
@@ -13,7 +13,7 @@ def two_coder_agreement(ann1, ann2):
         task_data.append(('coder2', dialogue_id, frozenset(triples)))
 
     # Compute annotator agreement using Krippendorf
-    task = AnnotationTask(distance=jaccard_distance)
+    task = AnnotationTask(distance=distance)
     task.load_array(task_data)
     # No chance correction needed as random agreement is very unlikely (in the order of 1e-6)
     return task.avg_Ao()
@@ -27,6 +27,6 @@ if __name__ == '__main__':
     ann2 = {'d1': [('I', 'like', 'cats'), ('I', 'have', 'dogs'), ('I', 'have', 'pandas')],
             'd2': [('I', 'like', 'cats'), ('I', 'have', 'dogs')],
             'd4': [('I', 'like', 'cats'), ('I', 'have', 'dogs')],
-            'd3': [('I', 'like', 'cats'), ('I', 'have', 'cats')]}
+            'd3': [('I', 'like', 'cats'), ('I', 'have', 'dogs')]}
 
     print(two_coder_agreement(ann1, ann2))
