@@ -6,8 +6,8 @@ random.seed(2)
 
 
 if __name__ == '__main__':
-    SAMPLES_PER_BATCH = 100
-    NUM_SHARED_SAMPLES = 20
+    SAMPLES_PER_BATCH = 200
+    NUM_SHARED_SAMPLES = 25
     PILOT_BATCH = 20
     NUM_BATCHES = 20
     DATASET = 'merged_trainval_unannotated.json'
@@ -20,6 +20,15 @@ if __name__ == '__main__':
     with open(DATASET, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
+    # Remove duplicates (just in case)
+    used_ids = set()
+    new_data = []
+    for sample in data:
+        if sample['id'] not in used_ids:
+            new_data.append(sample)
+        used_ids.add(sample['id'])
+    data = new_data
+
     # Divide subset of N * K samples into K batches
     batches = []
     samples = random.sample(data, SAMPLES_PER_BATCH * NUM_BATCHES)
@@ -28,28 +37,26 @@ if __name__ == '__main__':
         batch = samples[j:j + SAMPLES_PER_BATCH]
         batches.append(batch)
 
-    # Pair batches and have them share NUM_SHARED_SAMPLES
+    # Share a subset of dialogs
+    start = SAMPLES_PER_BATCH // 2
+    shared_batch = batches[0][start:start + NUM_SHARED_SAMPLES]  # share middle 25 of first batch
     used_ids = set()
-    for i in range(0, NUM_BATCHES, 2):
-        batch1 = batches[i]
-        batch2 = batches[i + 1]
-        batch2[:NUM_SHARED_SAMPLES] = batch1[:NUM_SHARED_SAMPLES] # b1 -> b2
+    for i, batch in enumerate(batches):
+        batch[start:start + NUM_SHARED_SAMPLES] = shared_batch
 
-        # Keep track of ids in batches
-        for sample in batch1 + batch2:
+        # Update used_ids with samples already in batch
+        for sample in batch:
             used_ids.add(sample['id'])
 
-        # Save both to file
+        # Save to file
         with open('batches/batch_%s.json' % i, 'w') as file1:
-            json.dump(batch1, file1, indent=4)
-
-        with open('batches/batch_%s.json' % (i + 1), 'w') as file2:
-            json.dump(batch2, file2, indent=4)
+            json.dump(batch, file1, indent=4)
 
     print("{} samples divided over {} batches".format(len(used_ids), NUM_BATCHES))
 
     # Create batch will all remaining samples
     remaining_batch = [sample for sample in data if sample['id'] not in used_ids]
+    random.shuffle(remaining_batch)
 
     pilot_batch = []
     if len(remaining_batch) > PILOT_BATCH:
