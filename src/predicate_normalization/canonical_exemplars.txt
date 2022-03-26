@@ -1,3 +1,5 @@
+has_name, I, am, Thomas
+has_name, I, am, Nina
 has_profession, I, work as, a janitor
 has_profession, I, have become, a banker
 has_profession, I, work as, a waiter
