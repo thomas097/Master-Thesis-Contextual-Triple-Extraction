@@ -1,7 +1,7 @@
 # General
 TITLE = 'Annotation Tool'
-FONT_STYLE = "TkDefaultFont"
-FONT_SIZE = 14
+FONT_FAMILY = "TkDefaultFont"
+FONT_SIZE = 12
 FONT_COLOR = 'black'
 BG_COLOR = 'grey95'
 RELIEF = 'groove'

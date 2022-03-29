@@ -75,22 +75,22 @@ class Column(tk.Frame):
 
     def add_triple(self, i, command):
         self._expand(i)
-        self.add_text(i, '⧼')
+        self.add_text(i, '[')
         subj = ArgumentButton(self._rows[i], command=partial(command, i, 0))
         self.add_text(i, ',')
         pred = ArgumentButton(self._rows[i], command=partial(command, i, 1))
         self.add_text(i, ',')
         obj = ArgumentButton(self._rows[i], command=partial(command, i, 2))
-        self.add_text(i, '⧽')
+        self.add_text(i, ']')
         return subj, pred, obj
 
     def add_perspective(self, i, command):
         self._expand(i)
-        self.add_text(i, '⧼')
+        self.add_text(i, '[')
         polarity = ArgumentButton(self._rows[i], command=partial(command, i, 3))
         self.add_text(i, ',')
         certainty = ArgumentButton(self._rows[i], command=partial(command, i, 4))
-        self.add_text(i, '⧽')
+        self.add_text(i, ']')
         return polarity, certainty
 
 
@@ -99,7 +99,7 @@ class Interface:
         # Window
         self._window = tk.Tk()
         self._window.title(TITLE)
-        self._font = TkFont.nametofont(FONT_STYLE)
+        self._font = TkFont.nametofont(FONT_FAMILY)
         self._font.configure(size=FONT_SIZE)
         self._window.option_add("*Font", self._font)
         self._window.deiconify()
@@ -240,9 +240,9 @@ class Interface:
                         self._assign_to_focus(turn_idx, token_idx)
 
         # Add Skip and Next buttons
-        self._button_frame.add_button(1, ' ⮜ ', command=self._back, padding=BUTTON_PADDING)
-        self._button_frame.add_button(1, ' ✖ ', command=partial(self._next, skipped=True), padding=BUTTON_PADDING)
-        self._button_frame.add_button(1, ' ✔ ', command=partial(self._next, skipped=False), padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, 'back', command=self._back, padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, 'skip', command=partial(self._next, skipped=True), padding=BUTTON_PADDING)
+        self._button_frame.add_button(1, 'next', command=partial(self._next, skipped=False), padding=BUTTON_PADDING)
 
         # Set default focus and placeholder text
         self._window.title(self._dataloader.summary())
