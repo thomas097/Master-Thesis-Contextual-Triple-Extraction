@@ -1,4 +1,4 @@
-## Contextual Interpretation of Complex Responses for Dialogue Systems (Working Title)
+## Contextual Knowledge Extraction from Dialogue (Working Title)
 _In partial fulfillment of the degree of MSc Artificial Intelligence at the Vrije Universiteit (VU), Amsterdam_
 
 ## Overview
