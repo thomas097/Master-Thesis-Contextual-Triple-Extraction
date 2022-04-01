@@ -12,7 +12,9 @@ def load_annotations(path):
     annotations = []
     for fname in glob.glob(path + '/*.json'):
         with open(fname, 'r', encoding='utf-8') as file:
-            annotations.append(json.load(file))
+            data = json.load(file)
+            if 'skipped' not in data or not data['skipped']:
+                annotations.append(data)
     return annotations
 
 
@@ -50,7 +52,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
             pred = np.argmax(pred)
 
         if pred == 1: # Beginning
-            span = re.sub('[^\w\d\- ]+', '', ' '.join(span))
+            span = re.sub('[^\w\d\-]+', ' ', ''.join(span)).strip()
             out.append(span)
             span = [token]
 
@@ -58,7 +60,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
             span.append(token)
 
     if span:
-        span = re.sub('[^\w\d\- ]+', '', ' '.join(span))
+        span = re.sub('[^\w\d\-]+', ' ', ''.join(span)).strip()
         out.append(span)
 
     # Remove empty strings and duplicates
@@ -67,7 +69,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
 
 ## Triple Scoring
 
-def extract_triples(annotation):
+def extract_triples(annotation, pol_oversampling=8, neg_undersampling=0.7, ellipsis_oversampling=3):
     turns = annotation['tokens']
     triple_ids = annotation['annotations']
 
@@ -77,7 +79,14 @@ def extract_triples(annotation):
 
     triple_ids = [t[:4] for t in triple_ids]
 
+    # Oversampling of elliptical triples
+    for triple in deepcopy(triple_ids):
+        turn_ids = set([i for i, _ in triple[0]]) | set([i for i, _ in triple[2]])
+        if len(turn_ids) > 1:
+            triple_ids += [triple] * ellipsis_oversampling
+
     for subj, pred, obj, neg in triple_ids:
+
         # Extract tokens belonging to triple arguments
         subj = ' '.join(turns[i][j] for i, j in subj) if subj else ''
         pred = ' '.join(turns[i][j] for i, j in pred) if pred else ''
@@ -89,15 +98,19 @@ def extract_triples(annotation):
                 triples += [(subj, pred, obj)]
                 labels += [1]
             else:
-                triples += [(subj, pred, obj)] * 6 # oversampling
-                labels += [2] * 6
+                triples += [(subj, pred, obj)] * pol_oversampling # oversampling
+                labels += [2] * pol_oversampling
 
             arguments['subjs'].append(subj)
             arguments['preds'].append(pred)
             arguments['objs'].append(obj)
 
+    # Empty annotation (skipped?)
+    if not triples:
+        return [], [], []
+
     # Create negative examples (i.e. not entailed)
-    n = int(len(triples) * 0.6)
+    n = int(len(triples) * neg_undersampling)
     for i in range(100):
         s = random.choice(arguments['subjs'])
         p = random.choice(arguments['preds'])
@@ -113,4 +126,4 @@ def extract_triples(annotation):
         if n == 0:
             break
 
-    return triples, labels
+    return turns, triples, labels

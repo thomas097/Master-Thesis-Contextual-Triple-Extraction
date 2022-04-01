@@ -12,11 +12,11 @@ class TripleScoring(torch.nn.Module):
     def __init__(self, base_model='albert-base-v2', path=None):
         super().__init__()
         # Base model
-        print('loading', base_model, 'triple scorer')
+        print('loading %s triple scorer' % base_model)
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._model = AutoModel.from_pretrained(base_model)
 
-        # SPO candidate scoring heads
+        # SPO candidate scoring head
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
         self._head = torch.nn.Linear(hidden_size, 3)
         self._relu = torch.nn.ReLU()
@@ -39,10 +39,10 @@ class TripleScoring(torch.nn.Module):
     def _retokenize_tokens(self, tokens, triple, speaker=0):
         # Tokenize each token individually (keeping track of subwords)
         f_input_ids = [self._tokenizer.cls_token_id]
-        speaker_ids = [0]
+        speaker_ids = [speaker]
         for t in tokens:
             if t != '<eos>':
-                token_ids = self._tokenizer.encode(' ' + t, add_special_tokens=False)
+                token_ids = self._tokenizer.encode(t, add_special_tokens=False)
                 f_input_ids += token_ids
                 speaker_ids += [speaker] * len(token_ids)  # repeat speaker_id if subword tokenized
             else:
@@ -83,9 +83,9 @@ class TripleScoring(torch.nn.Module):
 
             losses = []
             for input_ids, speaker_ids, y in tqdm(X):
-                # Update w.r.t. entailment
+                # Was the triple entailed? Positively? Negatively?
                 y_hat = self(input_ids, speaker_ids)
-                loss = criterion(y_hat, y)  # Was the triple entailed?
+                loss = criterion(y_hat, y)
                 losses.append(loss.item())
 
                 optimizer.zero_grad()
@@ -102,19 +102,19 @@ class TripleScoring(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    annotations = load_annotations('<path_to_annotation_file')
+    annotations = load_annotations('<path_to_annotations')
 
     # Extract annotation triples and compute negative triples
     tokens, triples, labels = [], [], []
     for ann in annotations:
-        ann_triples, triple_labels = extract_triples(ann)
+        ann_tokens, ann_triples, triple_labels = extract_triples(ann)
         triples.append(ann_triples)
         labels.append(triple_labels)
-        tokens.append([t for ts in ann['tokens'] for t in ts + ['<eos>']])
+        tokens.append([t for ts in ann_tokens for t in ts + ['<eos>']])
 
     # Fit model
     scorer = TripleScoring()
     scorer.fit(tokens, triples, labels)
-    torch.save(scorer.state_dict(), 'models/scorer_albert-v2_14_03_2022')
+    torch.save(scorer.state_dict(), 'models/scorer_albert-v2_31_03_2022')
 
 

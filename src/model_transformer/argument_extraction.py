@@ -14,7 +14,7 @@ class ArgumentExtraction(torch.nn.Module):
         """
         super().__init__()
         # Base model
-        print('loading', base_model, 'argument extractor')
+        print('loading %s argument extractor' % base_model)
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._model = AutoModel.from_pretrained(base_model)
 
@@ -59,7 +59,7 @@ class ArgumentExtraction(torch.nn.Module):
         input_ids = [[self._tokenizer.cls_token_id]]
         for t in tokens:
             if t != '<eos>':
-                input_ids.append(self._tokenizer.encode(' ' + t, add_special_tokens=False))
+                input_ids.append(self._tokenizer.encode(t, add_special_tokens=False))
             else:
                 input_ids.append([self._tokenizer.eos_token_id])
 
@@ -138,6 +138,7 @@ if __name__ == '__main__':
     # Convert argument annotations to BIO-tag sequences
     tokens, labels = [], []
     for ann in annotations:
+        # Map triple arguments to BIO tagged masks
         labels.append((triple_to_bio_tags(ann, 0),
                        triple_to_bio_tags(ann, 1),
                        triple_to_bio_tags(ann, 2)))
@@ -148,5 +149,5 @@ if __name__ == '__main__':
     # Fit model to data
     model = ArgumentExtraction()
     model.fit(tokens, labels)
-    torch.save(model.state_dict(), 'models/argument_extraction_albert-v2_14_03_2022')
+    torch.save(model.state_dict(), 'models/argument_extraction_albert-v2_31_03_2022')
 
