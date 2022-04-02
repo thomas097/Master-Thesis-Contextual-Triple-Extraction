@@ -1,20 +1,34 @@
 import sys
-sys.path.insert(0, '../model_dependency')
-sys.path.insert(0, '../model_transformer')
+sys.path.insert(0, '../../model_dependency')
+sys.path.insert(0, '../../model_transformer')
+
+import glob
+import json
+import numpy as np
+from tqdm import tqdm
 
 from run_transformer_pipeline import AlbertTripleExtractor
-from utils import load_annotations, triple_to_bio_tags
+from baselines import ReVerbBaseline, OLLIEBaseline, OpenIEBaseline
+
+
+def load_annotations(path, files=None):
+    used_files = files if files is not None else glob.glob(path + '/*.json')
+    for fname in used_files:
+        with open(fname, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            if not data['skipped']:
+                yield data
 
 
 def triples_from_annotation(ann):
-    triple_lst = ann['triples'] if 'triples' in ann else ann['annotations']  # TODO: fix
+    triple_lst = ann['annotations']
     tokens = ann['tokens']
 
     triples = []
     for triple in triple_lst:
-        subj = ' '.join([tokens[i][j] for i, j in triple[0]])
-        pred = ' '.join([tokens[i][j] for i, j in triple[1]])
-        obj_ = ' '.join([tokens[i][j] for i, j in triple[2]])
+        subj = ' '.join([tokens[i][j] for i, j in triple[0]]).replace(' [unk] ', ' ')
+        pred = ' '.join([tokens[i][j] for i, j in triple[1]]).replace(' [unk] ', ' ')
+        obj_ = ' '.join([tokens[i][j] for i, j in triple[2]]).replace(' [unk] ', ' ')
         polar = 'positive' if not triple[3] else 'negative'
 
         # Skip blank triples
@@ -23,31 +37,70 @@ def triples_from_annotation(ann):
     return triples
 
 
-def best_match(preds, labels):
-    return list(zip(preds, labels))  # TODO: match with e.g. one word margin
+def confusion_matrix(predicted_triples, labeled_triples):
+    tp, tn, fp, fn = 0, 0, 0, 0
+
+    # Map triples to strings to allow convenient matching
+    preds = set([' '.join(triple) for triple in predicted_triples])
+    labels = set([' '.join(triple) for triple in labeled_triples])
+
+    # Build confusion table
+    for triple in preds | labels:
+        if triple in preds and triple in labels:
+            tp += 1
+        elif triple in preds and triple not in labels:
+            fp += 1
+        elif triple not in preds and triple in labels:
+            fn += 1
+        else:
+            tn += 1
+    return np.array([tp, fp, fn, tn])
 
 
-def evaluate(annotation_file, model, decision_thres=0.5):
+def evaluate(annotation_file, model, decision_thres=0.7):
+    # Measure True Positives, True Negatives, etc.
+    conf_matrix = np.zeros(4)
+
     # Extract triples from annotations
-    data = []
-    for ann in load_annotations(annotation_file):
+    for ann in tqdm(load_annotations(annotation_file)):
         # Ground truth
         y_true = triples_from_annotation(ann)
 
-        # Predictions
-        input_ = ' '.join([t for ts in ann['tokens'] for t in ts + ['<eos>']])
+        # Predict triple
+        input_ = ' '.join([t for ts in ann['tokens'] for t in ts + ['<eos>']]).replace(' [unk] ', ' ')
         y_pred = [triple for ent, triple in model.extract_triples(input_) if ent > decision_thres]
 
-        # Match correctly predicted
-        data += best_match(y_true, y_pred)
-        break
+        # Update confusion table
+        conf_matrix += confusion_matrix(y_pred, y_true)
 
-    print(data)
+    # Print performance metrics
+    print('Aggregate confusion table')
+    print(conf_matrix.reshape(2, 2))
 
+    print()
+    tp, fp, fn, tn = conf_matrix
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    F1 = 2 * precision * recall / (precision + recall)
+    print('precision:', precision)
+    print('recall:   ', recall)
+    print('F1:       ', F1)
 
 
 
 if __name__ == '__main__':
-    model = AlbertTripleExtractor('../model_transformer/models/argument_extraction_albert-v2_17_03_2022',
-                                  '../model_transformer/models/scorer_albert-v2_17_03_2022')
-    evaluate('../annotation_tool/dev_annotations', model)  # TODO: test set
+    MODEL = 'albert'
+
+    if MODEL == 'reverb':
+        model = ReVerbBaseline()
+    elif MODEL == 'ollie':
+        model = OLLIEBaseline()
+    elif MODEL == 'openie':
+        model = OpenIEBaseline()
+    elif MODEL == 'albert':
+        model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_31_03_2022',
+                                      '../../model_transformer/models/scorer_albert-v2_31_03_2022')
+    else:
+        raise Exception('model %s not recognized' % MODEL)
+
+    evaluate('annotations', model)

@@ -34,10 +34,12 @@ class ReVerbBaseline:
         triples = []
         for line in lines:
             items = line.split('\t')
+            if len(items) < 3:
+                continue
             subj, pred, obj = items[-3:]
             conf = float(items[-7])
             polarity, pred = self._negation_in_predicate(pred)
-            triples.append((conf, subj, pred, obj, polarity))
+            triples.append((conf, (subj, pred, obj, polarity)))
         return triples
 
 
@@ -73,7 +75,7 @@ class OLLIEBaseline:
                 conf, subj, pred, obj = re.findall(self._pattern, line)[0]
                 polar, pred = self._negation_in_predicate(pred)
                 conf = float(conf.replace(',', '.'))
-                triples.append((conf, subj, pred, obj, polar))
+                triples.append((conf, (subj, pred, obj, polar)))
         return triples
 
 
@@ -110,7 +112,7 @@ class OpenIEBaseline:
             conf, subj, pred, obj = line.split('\t')
             polar, pred = self._negation_in_predicate(pred)
             conf = float(conf)
-            triples.append((conf, subj, pred, obj, polar))
+            triples.append((conf, (subj, pred, obj, polar)))
         return triples
 
 
