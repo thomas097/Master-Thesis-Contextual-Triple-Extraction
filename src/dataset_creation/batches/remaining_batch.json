@@ -1,7 +1,7 @@
 [
     {
         "id": "daily_dialogs-valid-008577",
-        "triplet": "Yeah , I ' m going for a hike in the southern Rocky Mountains .<eos>Oh , do you go hiking often ?<eos>I go as much as I can . I love hiking because you can really get in touch with nature .",
+        "triplet": "Yeah , I'm going for a hike in the southern Rocky Mountains .<eos>Oh , do you go hiking often ?<eos>I go as much as I can . I love hiking because you can really get in touch with nature .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -20,7 +20,7 @@
     },
     {
         "id": "daily_dialogs-train-002794",
-        "triplet": "No , it ' s a dark brown suit .<eos>I see . Is this yours ?<eos>Right .",
+        "triplet": "No , it's a dark brown suit .<eos>I see . Is this yours ?<eos>Right .",
         "categories": [
             "ellipsis_pred",
             "yes_no_question",
@@ -60,7 +60,7 @@
     },
     {
         "id": "daily_dialogs-valid-007431",
-        "triplet": "That sounds interesting , but I can ' t drink alcohol with the medicine I ' m taking .<eos>Doesn ' t sound like that ' s be fun , then . Do you want to come here ?<eos>I don ' t have a car .",
+        "triplet": "That sounds interesting , but I can't drink alcohol with the medicine I'm taking .<eos>Doesn't sound like that's be fun , then . Do you want to come here ?<eos>I don't have a car .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -136,7 +136,7 @@
     },
     {
         "id": "daily_dialogs-valid-004006",
-        "triplet": "I think I'm making good progress .<eos>Is it harder than you thought ?<eos>At first it was , but now I've got the basics . It ' s fun .",
+        "triplet": "I think I'm making good progress .<eos>Is it harder than you thought ?<eos>At first it was , but now I've got the basics . It's fun .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -449,7 +449,7 @@
     },
     {
         "id": "daily_dialogs-valid-012404",
-        "triplet": "Jenny Madison .<eos>What ' s your nationality ?<eos>Nigerian .",
+        "triplet": "Jenny Madison .<eos>What's your nationality ?<eos>Nigerian .",
         "categories": [
             "ellipsis_pred",
             "wh_question",
@@ -560,7 +560,7 @@
     },
     {
         "id": "daily_dialogs-train-001573",
-        "triplet": "Can you hold the end of this tape measure ?<eos>Sure . What's this for ?<eos>I ' m taking some measurements for new curtains .",
+        "triplet": "Can you hold the end of this tape measure ?<eos>Sure . What's this for ?<eos>I'm taking some measurements for new curtains .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -843,7 +843,7 @@
     },
     {
         "id": "daily_dialogs-valid-007523",
-        "triplet": "That ' s fine ! Don ' t worry about it !<eos>What was that ?<eos>Relax , it was just a goat !",
+        "triplet": "That's fine ! Don't worry about it !<eos>What was that ?<eos>Relax , it was just a goat !",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -1298,7 +1298,7 @@
     },
     {
         "id": "daily_dialogs-valid-012038",
-        "triplet": "It was a nightmare .<eos>What ' s up ?<eos>Actually , the business trip itself was very successful . We arrived on time , we had nice conversations and we settled some important issues for the next year .",
+        "triplet": "It was a nightmare .<eos>What's up ?<eos>Actually , the business trip itself was very successful . We arrived on time , we had nice conversations and we settled some important issues for the next year .",
         "categories": [
             "plural_personal_prons",
             "wh_question",
@@ -1459,7 +1459,7 @@
     },
     {
         "id": "daily_dialogs-train-010072",
-        "triplet": "Here ' s my passport . I'm a visiting scholar .<eos>Do you have anything to declare ?<eos>No , these are all my personal effects .",
+        "triplet": "Here's my passport . I'm a visiting scholar .<eos>Do you have anything to declare ?<eos>No , these are all my personal effects .",
         "categories": [
             "possessive_prons",
             "demonstrative_dets",
@@ -1518,7 +1518,7 @@
     },
     {
         "id": "daily_dialogs-train-012481",
-        "triplet": "You usually qualify if you got laid off or are working a lot fewer hours .<eos>Do all jobs provide unemployment ?<eos>Most jobs provide unemployment , but some don ' t .",
+        "triplet": "You usually qualify if you got laid off or are working a lot fewer hours .<eos>Do all jobs provide unemployment ?<eos>Most jobs provide unemployment , but some don't .",
         "categories": [
             "yes_no_question",
             "length_11"
@@ -1584,7 +1584,7 @@
     },
     {
         "id": "daily_dialogs-train-004343",
-        "triplet": "I can ' t seem to make a decision .<eos>Where do you want to go ?<eos>I honestly have no idea .",
+        "triplet": "I can't seem to make a decision .<eos>Where do you want to go ?<eos>I honestly have no idea .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -1839,7 +1839,7 @@
     },
     {
         "id": "daily_dialogs-valid-012641",
-        "triplet": "I ' m from Channel 5 News .<eos>How ' s it going ?<eos>I was wondering if I could ask you a few questions .",
+        "triplet": "I'm from Channel 5 News .<eos>How's it going ?<eos>I was wondering if I could ask you a few questions .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -1974,7 +1974,7 @@
     },
     {
         "id": "daily_dialogs-train-000449",
-        "triplet": "Oh , A . Mom didn't tell you ?<eos>Didn't tell me what ? What ?<eos>This Bs ' school you're going to is going to make your life easy .",
+        "triplet": "Oh , A . Mom didn't tell you ?<eos>Didn't tell me what ? What ?<eos>This Bs'school you're going to is going to make your life easy .",
         "categories": [
             "possessive_prons",
             "demonstrative_dets",
@@ -1993,7 +1993,7 @@
     },
     {
         "id": "daily_dialogs-train-003834",
-        "triplet": "I know ! I hate it ! But I ' m taking this crash course in math .<eos>Why ?<eos>I have to take my exams for getting into the university , so I need to prepare .",
+        "triplet": "I know ! I hate it ! But I'm taking this crash course in math .<eos>Why ?<eos>I have to take my exams for getting into the university , so I need to prepare .",
         "categories": [
             "possessive_prons",
             "singular_personal_prons",
@@ -2233,7 +2233,7 @@
     },
     {
         "id": "daily_dialogs-valid-008821",
-        "triplet": "Not yet , I must water the garden first .<eos>Do you have to water it now ?<eos>I ' m afraid I must . Look at it ! It ' s terribly dry .",
+        "triplet": "Not yet , I must water the garden first .<eos>Do you have to water it now ?<eos>I'm afraid I must . Look at it ! It's terribly dry .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -2321,7 +2321,7 @@
     },
     {
         "id": "daily_dialogs-train-009715",
-        "triplet": "Excuse me . I would like to purchase some travelers ' checks .<eos>Sure . How much do you want ?<eos>5000 and I want them all in fifties .",
+        "triplet": "Excuse me . I would like to purchase some travelers'checks .<eos>Sure . How much do you want ?<eos>5000 and I want them all in fifties .",
         "categories": [
             "singular_personal_prons",
             "plural_personal_prons",
@@ -2400,7 +2400,7 @@
     },
     {
         "id": "daily_dialogs-train-005077",
-        "triplet": "Jenny , do you want to go to see a movie ?<eos>What's on tonight ?<eos>I want to see ' Click . '",
+        "triplet": "Jenny , do you want to go to see a movie ?<eos>What's on tonight ?<eos>I want to see'Click . '",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -2507,7 +2507,7 @@
     },
     {
         "id": "daily_dialogs-train-010078",
-        "triplet": "I ' m actually travelling around Asia .<eos>Oh , very nice . How long will you be in Beijing ?<eos>Probably another week .",
+        "triplet": "I'm actually travelling around Asia .<eos>Oh , very nice . How long will you be in Beijing ?<eos>Probably another week .",
         "categories": [
             "ellipsis_pred",
             "wh_question",
@@ -2696,7 +2696,7 @@
     },
     {
         "id": "daily_dialogs-valid-013047",
-        "triplet": "Could you cancel a check for me ?<eos>What ' s the problem ?<eos>I wrote the check out for way too much .",
+        "triplet": "Could you cancel a check for me ?<eos>What's the problem ?<eos>I wrote the check out for way too much .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -2907,7 +2907,7 @@
     },
     {
         "id": "daily_dialogs-train-012618",
-        "triplet": "I hope you voted for him .<eos>Of course I did . Didn ' t you ?<eos>Of course !",
+        "triplet": "I hope you voted for him .<eos>Of course I did . Didn't you ?<eos>Of course !",
         "categories": [
             "ellipsis_pred",
             "yes_no_question",
@@ -2994,7 +2994,7 @@
     },
     {
         "id": "daily_dialogs-train-007499",
-        "triplet": "Sorry , I can ' t .<eos>Tomorrow night , then ?<eos>I ' d like to . But I ' m afraid I can ' t .",
+        "triplet": "Sorry , I can't .<eos>Tomorrow night , then ?<eos>I'd like to . But I'm afraid I can't .",
         "categories": [
             "ellipsis_pred",
             "singular_personal_prons",
@@ -3108,7 +3108,7 @@
     },
     {
         "id": "daily_dialogs-valid-010576",
-        "triplet": "Good morning , I would like to make a doctor ' s appointment .<eos>Can you describe your health concern ?<eos>I have been having skin problems that aren ' t going away .",
+        "triplet": "Good morning , I would like to make a doctor's appointment .<eos>Can you describe your health concern ?<eos>I have been having skin problems that aren't going away .",
         "categories": [
             "demonstrative_dets",
             "singular_personal_prons",
@@ -3187,7 +3187,7 @@
     },
     {
         "id": "daily_dialogs-valid-010457",
-        "triplet": "I ' Ve been having trouble breathing lately .<eos>Have you had any type of cold lately ?<eos>No , I haven ' t had a cold . I just have a heavy feeling in my chest when I try to breathe .",
+        "triplet": "I'Ve been having trouble breathing lately .<eos>Have you had any type of cold lately ?<eos>No , I haven't had a cold . I just have a heavy feeling in my chest when I try to breathe .",
         "categories": [
             "possessive_prons",
             "singular_personal_prons",
@@ -3229,7 +3229,7 @@
     },
     {
         "id": "daily_dialogs-train-004180",
-        "triplet": "Was I ? Sorry , I didn ' t mean to be . I do apologize .<eos>And why are you yarning now ? Are you bored ?<eos>Forgive me darling . I'm very tired .",
+        "triplet": "Was I ? Sorry , I didn't mean to be . I do apologize .<eos>And why are you yarning now ? Are you bored ?<eos>Forgive me darling . I'm very tired .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -3489,7 +3489,7 @@
     },
     {
         "id": "daily_dialogs-train-010153",
-        "triplet": "not far . About 150 meters perhaps .<eos>ok . So I turn right at the traffic lights . Then ?<eos>then keep walking until you reach the war memorial . It ' s a big statue of a soldier . You can ' t miss it .",
+        "triplet": "not far . About 150 meters perhaps .<eos>ok . So I turn right at the traffic lights . Then ?<eos>then keep walking until you reach the war memorial . It's a big statue of a soldier . You can't miss it .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -3527,7 +3527,7 @@
     },
     {
         "id": "daily_dialogs-train-013034",
-        "triplet": "I need to make a deposit .<eos>Are you depositing cash or a check ?<eos>I ' m depositing a check .",
+        "triplet": "I need to make a deposit .<eos>Are you depositing cash or a check ?<eos>I'm depositing a check .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -3756,7 +3756,7 @@
     },
     {
         "id": "daily_dialogs-train-011501",
-        "triplet": "Well , you might be the person we ' Ve been looking for . Do you have any questions ?<eos>Yes , if I were hired , when would you like me to start ?<eos>At the end of this month .",
+        "triplet": "Well , you might be the person we'Ve been looking for . Do you have any questions ?<eos>Yes , if I were hired , when would you like me to start ?<eos>At the end of this month .",
         "categories": [
             "ellipsis_pred",
             "wh_question",
@@ -3833,7 +3833,7 @@
     },
     {
         "id": "daily_dialogs-valid-008974",
-        "triplet": "Yes , Mr . Emory . Thank you .<eos>When ' s the big day ?<eos>We ' re planning a June wedding , but we haven ' t picked a date yet .",
+        "triplet": "Yes , Mr . Emory . Thank you .<eos>When's the big day ?<eos>We're planning a June wedding , but we haven't picked a date yet .",
         "categories": [
             "ellipsis_pred",
             "plural_personal_prons",
@@ -3987,7 +3987,7 @@
     },
     {
         "id": "daily_dialogs-train-008396",
-        "triplet": "I haven ' t decided yet . But I may go out .<eos>Where have you planned to go ?<eos>I want to go to Shanghai , but I also want to visit Hainan .",
+        "triplet": "I haven't decided yet . But I may go out .<eos>Where have you planned to go ?<eos>I want to go to Shanghai , but I also want to visit Hainan .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -4219,7 +4219,7 @@
     },
     {
         "id": "daily_dialogs-valid-002048",
-        "triplet": "No , not out of order . But we seem to have a bad connection on the phone line . I can ' t hear you clearly .<eos>Ok . Let me call you later . Is that okay ?<eos>Sure . Thanks .",
+        "triplet": "No , not out of order . But we seem to have a bad connection on the phone line . I can't hear you clearly .<eos>Ok . Let me call you later . Is that okay ?<eos>Sure . Thanks .",
         "categories": [
             "ellipsis_pred",
             "act_confirm_elaborate",
@@ -4330,7 +4330,7 @@
     },
     {
         "id": "daily_dialogs-train-005998",
-        "triplet": "No , he isn ' t .<eos>Then why does he let himself be lead by the nose ?<eos>He is afraid of his father in law .",
+        "triplet": "No , he isn't .<eos>Then why does he let himself be lead by the nose ?<eos>He is afraid of his father in law .",
         "categories": [
             "possessive_prons",
             "singular_personal_prons",
@@ -4427,7 +4427,7 @@
     },
     {
         "id": "daily_dialogs-train-007071",
-        "triplet": "I ' Ve decided to go to the cinema alone this evening .<eos>What has caused you to make such a decision ? Didn ' t you used to go with Helen ?<eos>Helen is nice but she talks a lot .",
+        "triplet": "I'Ve decided to go to the cinema alone this evening .<eos>What has caused you to make such a decision ? Didn't you used to go with Helen ?<eos>Helen is nice but she talks a lot .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -4463,7 +4463,7 @@
     },
     {
         "id": "daily_dialogs-train-012490",
-        "triplet": "Hey there , how are you doing ?<eos>I am great . How are you ?<eos>Well , I got laid off , and I ' m looking for work .",
+        "triplet": "Hey there , how are you doing ?<eos>I am great . How are you ?<eos>Well , I got laid off , and I'm looking for work .",
         "categories": [
             "singular_personal_prons",
             "length_15"
@@ -4536,7 +4536,7 @@
     },
     {
         "id": "daily_dialogs-train-012465",
-        "triplet": "It ' s going to come together just fine . Trust me !<eos>Where do we begin ?<eos>We start at the top with our name and contact information . Make sure the information is current .",
+        "triplet": "It's going to come together just fine . Trust me !<eos>Where do we begin ?<eos>We start at the top with our name and contact information . Make sure the information is current .",
         "categories": [
             "possessive_prons",
             "plural_personal_prons",
@@ -4586,7 +4586,7 @@
     },
     {
         "id": "daily_dialogs-valid-003989",
-        "triplet": "Yes , I ' m sure .<eos>How much ?<eos>Your late fees come to 24 . 50 .",
+        "triplet": "Yes , I'm sure .<eos>How much ?<eos>Your late fees come to 24 . 50 .",
         "categories": [
             "possessive_prons",
             "wh_question",
@@ -4784,7 +4784,7 @@
     },
     {
         "id": "daily_dialogs-train-004324",
-        "triplet": "Not yet . I have an interview with a visa official today .<eos>I see . Is it your first interview ?<eos>No , I ' Ve already been here for 3 interviews .",
+        "triplet": "Not yet . I have an interview with a visa official today .<eos>I see . Is it your first interview ?<eos>No , I'Ve already been here for 3 interviews .",
         "categories": [
             "singular_personal_prons",
             "act_deny_elaborate",
@@ -4905,7 +4905,7 @@
     },
     {
         "id": "daily_dialogs-valid-008195",
-        "triplet": "Oh . is it . Thank you anyway .<eos>You ' re welcome . Why don ' t you ask the conductor when he comes by ?<eos>Thank you .",
+        "triplet": "Oh . is it . Thank you anyway .<eos>You're welcome . Why don't you ask the conductor when he comes by ?<eos>Thank you .",
         "categories": [
             "ellipsis_subj",
             "singular_personal_prons",
@@ -4932,7 +4932,7 @@
     },
     {
         "id": "daily_dialogs-train-003239",
-        "triplet": "They ' re keyboard operators . This is Michael Baker , and this is Jeremy Short .<eos>How do you do ? They aren ' t very busy ! What are their jobs ?<eos>They ' re sales reps . They are very lazy .",
+        "triplet": "They're keyboard operators . This is Michael Baker , and this is Jeremy Short .<eos>How do you do ? They aren't very busy ! What are their jobs ?<eos>They're sales reps . They are very lazy .",
         "categories": [
             "plural_personal_prons",
             "wh_question",
@@ -5226,7 +5226,7 @@
     },
     {
         "id": "daily_dialogs-train-001959",
-        "triplet": "It ' ll take about 20 minutes .<eos>The streets are heavy with traffic at this time of a day , are they ?<eos>Yes , they are .",
+        "triplet": "It'll take about 20 minutes .<eos>The streets are heavy with traffic at this time of a day , are they ?<eos>Yes , they are .",
         "categories": [
             "plural_personal_prons",
             "act_confirm_elaborate",
@@ -6145,7 +6145,7 @@
     },
     {
         "id": "daily_dialogs-train-002923",
-        "triplet": "No , I am not ill .<eos>Then , What ' s the matter with you my child ?<eos>Nothing .",
+        "triplet": "No , I am not ill .<eos>Then , What's the matter with you my child ?<eos>Nothing .",
         "categories": [
             "ellipsis_pred",
             "wh_question",
@@ -6204,7 +6204,7 @@
     },
     {
         "id": "daily_dialogs-valid-007100",
-        "triplet": "Don ' t say that . It looks like a dump now . I can ' t stand it .<eos>Have you taken a walk around your neighborhood yet ?<eos>Unfortunately , yes .",
+        "triplet": "Don't say that . It looks like a dump now . I can't stand it .<eos>Have you taken a walk around your neighborhood yet ?<eos>Unfortunately , yes .",
         "categories": [
             "ellipsis_pred",
             "yes_no_question",
@@ -6249,7 +6249,7 @@
     },
     {
         "id": "daily_dialogs-valid-004051",
-        "triplet": "We don ' t allow people to check out magazines .<eos>Why not ?<eos>It ' s just a policy of ours .",
+        "triplet": "We don't allow people to check out magazines .<eos>Why not ?<eos>It's just a policy of ours .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -6258,7 +6258,7 @@
     },
     {
         "id": "daily_dialogs-valid-013080",
-        "triplet": "Yes , it is the credit demand . Where can I cash travellers ' cheques ?<eos>You can cash them here , how much do you want to cash ?<eos>900 dollars .",
+        "triplet": "Yes , it is the credit demand . Where can I cash travellers'cheques ?<eos>You can cash them here , how much do you want to cash ?<eos>900 dollars .",
         "categories": [
             "ellipsis_pred",
             "length_3"
@@ -6742,7 +6742,7 @@
     },
     {
         "id": "daily_dialogs-valid-008644",
-        "triplet": "I'm going to my parents ' house for my father's birthday .<eos>how old is he today ?<eos>it's his 50th birthday .",
+        "triplet": "I'm going to my parents'house for my father's birthday .<eos>how old is he today ?<eos>it's his 50th birthday .",
         "categories": [
             "possessive_prons",
             "singular_personal_prons",
@@ -6882,7 +6882,7 @@
     },
     {
         "id": "daily_dialogs-train-001651",
-        "triplet": "Oh dear , I ' m late . I have to be in the office by 8am .<eos>Oh really what ' s happening ?<eos>Well there is an important meeting with a new client .",
+        "triplet": "Oh dear , I'm late . I have to be in the office by 8am .<eos>Oh really what's happening ?<eos>Well there is an important meeting with a new client .",
         "categories": [
             "ellipsis_subj",
             "wh_question",
@@ -7754,7 +7754,7 @@
     },
     {
         "id": "daily_dialogs-train-012639",
-        "triplet": "I can ' t tell you that .<eos>Why can ' t you tell me ?<eos>That is private information .",
+        "triplet": "I can't tell you that .<eos>Why can't you tell me ?<eos>That is private information .",
         "categories": [
             "demonstrative_dets",
             "length_5"
@@ -7917,7 +7917,7 @@
     },
     {
         "id": "daily_dialogs-train-012247",
-        "triplet": "Excuse me , sir ? I ' m afraid this is a no smoking area .<eos>What ' s that ?<eos>I ' m sorry , sir . Smoking is not permitted in this area .",
+        "triplet": "Excuse me , sir ? I'm afraid this is a no smoking area .<eos>What's that ?<eos>I'm sorry , sir . Smoking is not permitted in this area .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -8134,7 +8134,7 @@
     },
     {
         "id": "daily_dialogs-valid-001312",
-        "triplet": "A medium is fine for me .<eos>How about this one ?<eos>I don ' t like the color .",
+        "triplet": "A medium is fine for me .<eos>How about this one ?<eos>I don't like the color .",
         "categories": [
             "singular_personal_prons",
             "open_question",
@@ -8189,7 +8189,7 @@
     },
     {
         "id": "daily_dialogs-train-001944",
-        "triplet": "Could you hold my umbrella when I get my keys out , please ?<eos>Of course . It ' s a terrible night , isn ' t it ?<eos>Dreadful . There , the door is open now .",
+        "triplet": "Could you hold my umbrella when I get my keys out , please ?<eos>Of course . It's a terrible night , isn't it ?<eos>Dreadful . There , the door is open now .",
         "categories": [
             "yes_no_question",
             "length_10"
@@ -8391,7 +8391,7 @@
     },
     {
         "id": "daily_dialogs-valid-010087",
-        "triplet": "Did you get the camera ?<eos>Got it ! Did you fill up the tank ?<eos>Yup , it ' s all set .",
+        "triplet": "Did you get the camera ?<eos>Got it ! Did you fill up the tank ?<eos>Yup , it's all set .",
         "categories": [
             "singular_personal_prons",
             "act_confirm_elaborate",
@@ -8632,7 +8632,7 @@
     },
     {
         "id": "daily_dialogs-valid-010418",
-        "triplet": "Yes , sir . We try to anticipate all our guests ' needs , including fitness .<eos>Great ! Where is it ?<eos>Sir , the gym is just below the lobby . You can take the elevator or the stairs .",
+        "triplet": "Yes , sir . We try to anticipate all our guests'needs , including fitness .<eos>Great ! Where is it ?<eos>Sir , the gym is just below the lobby . You can take the elevator or the stairs .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -8885,7 +8885,7 @@
     },
     {
         "id": "daily_dialogs-train-010217",
-        "triplet": "Your luggage is two pounds over . I ' m afraid They'll be in excess luggage charge , Sir .<eos>How much must I pay ?<eos>It ' s ten yuan .",
+        "triplet": "Your luggage is two pounds over . I'm afraid They'll be in excess luggage charge , Sir .<eos>How much must I pay ?<eos>It's ten yuan .",
         "categories": [
             "ellipsis_pred",
             "singular_personal_prons",
@@ -9015,7 +9015,7 @@
     },
     {
         "id": "daily_dialogs-valid-008324",
-        "triplet": "Then , buy a bottle of soft drink .<eos>Would you like to buy a bottle for me in the shop ?<eos>It ' s a problem , because my boss is in that shop now .",
+        "triplet": "Then , buy a bottle of soft drink .<eos>Would you like to buy a bottle for me in the shop ?<eos>It's a problem , because my boss is in that shop now .",
         "categories": [
             "possessive_prons",
             "singular_personal_prons",
@@ -9044,7 +9044,7 @@
     },
     {
         "id": "daily_dialogs-train-010059",
-        "triplet": "Yes . I just checked in , but I need to change my room .<eos>What ' s the problem ?<eos>I reserved a non smoking room , but the smell of smoke in this room is so strong that I can ' t endure it .",
+        "triplet": "Yes . I just checked in , but I need to change my room .<eos>What's the problem ?<eos>I reserved a non smoking room , but the smell of smoke in this room is so strong that I can't endure it .",
         "categories": [
             "demonstrative_dets",
             "singular_personal_prons",
@@ -9063,7 +9063,7 @@
     },
     {
         "id": "daily_dialogs-valid-013067",
-        "triplet": "I have to use the ATM .<eos>Is there a problem ?<eos>I don ' t know how to use it .",
+        "triplet": "I have to use the ATM .<eos>Is there a problem ?<eos>I don't know how to use it .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -9325,7 +9325,7 @@
     },
     {
         "id": "daily_dialogs-valid-001600",
-        "triplet": "Don ' t worry . I ' Ve decided that for your birthday I ' m going to take you shopping for a new dress .<eos>Really ? I thought you hated shopping ?<eos>I do , that ' s why you should appreciate this gift !",
+        "triplet": "Don't worry . I'Ve decided that for your birthday I'm going to take you shopping for a new dress .<eos>Really ? I thought you hated shopping ?<eos>I do , that's why you should appreciate this gift !",
         "categories": [
             "demonstrative_dets",
             "singular_personal_prons",
@@ -9518,7 +9518,7 @@
     },
     {
         "id": "daily_dialogs-train-002201",
-        "triplet": "We ' re on our own tonight , dad ' s taking mom out .<eos>Out ? What do you mean out ?<eos>You know on a date , they are going out to dinner .",
+        "triplet": "We're on our own tonight , dad's taking mom out .<eos>Out ? What do you mean out ?<eos>You know on a date , they are going out to dinner .",
         "categories": [
             "singular_personal_prons",
             "plural_personal_prons",
@@ -9674,7 +9674,7 @@
     },
     {
         "id": "daily_dialogs-valid-002329",
-        "triplet": "No , you mustn't sit on the grass . Don't you see the notes ?<eos>Yes , I can see it . But what's on it ?<eos>It says ' Keep off the grass ! '",
+        "triplet": "No , you mustn't sit on the grass . Don't you see the notes ?<eos>Yes , I can see it . But what's on it ?<eos>It says'Keep off the grass ! '",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -9811,7 +9811,7 @@
     },
     {
         "id": "daily_dialogs-train-000270",
-        "triplet": "Oh , here . I ' m afraid it ' ll be difficult to repair .<eos>Can you do it ?<eos>Yes , I can . To tell you the truth , I ' m the best nearby .",
+        "triplet": "Oh , here . I'm afraid it'll be difficult to repair .<eos>Can you do it ?<eos>Yes , I can . To tell you the truth , I'm the best nearby .",
         "categories": [
             "singular_personal_prons",
             "act_confirm_elaborate",
@@ -10060,7 +10060,7 @@
     },
     {
         "id": "daily_dialogs-valid-008602",
-        "triplet": "Hold on a sec , his name is David ?<eos>Yeah ?<eos>That ' s my brother !",
+        "triplet": "Hold on a sec , his name is David ?<eos>Yeah ?<eos>That's my brother !",
         "categories": [
             "possessive_prons",
             "demonstrative_dets",
@@ -10099,7 +10099,7 @@
     },
     {
         "id": "daily_dialogs-valid-007013",
-        "triplet": "I ' m sorry that I was absent yesterday .<eos>I ' Ve already got your certificate for sick leave . How do you feel today ?<eos>I feel much better now .",
+        "triplet": "I'm sorry that I was absent yesterday .<eos>I'Ve already got your certificate for sick leave . How do you feel today ?<eos>I feel much better now .",
         "categories": [
             "singular_personal_prons",
             "length_6"
@@ -10229,7 +10229,7 @@
     },
     {
         "id": "daily_dialogs-train-004095",
-        "triplet": "The fee is 25 cents every day .<eos>I have to pay 25 cents a day ?<eos>And that ' s for each book that is late .",
+        "triplet": "The fee is 25 cents every day .<eos>I have to pay 25 cents a day ?<eos>And that's for each book that is late .",
         "categories": [
             "demonstrative_dets",
             "yes_no_question",
@@ -10335,7 +10335,7 @@
     },
     {
         "id": "daily_dialogs-train-007374",
-        "triplet": "Well . There was one type of plant that catches insects and eats them .<eos>Is that type of plant found in this country ?<eos>No , it isn ' t . it ' s a pity , because I ' d like to see it in action .",
+        "triplet": "Well . There was one type of plant that catches insects and eats them .<eos>Is that type of plant found in this country ?<eos>No , it isn't . it's a pity , because I'd like to see it in action .",
         "categories": [
             "singular_personal_prons",
             "act_deny_elaborate",
@@ -10493,7 +10493,7 @@
     },
     {
         "id": "daily_dialogs-valid-007277",
-        "triplet": "Yes , that ' s the exact thing we need . One for each .<eos>What should we do , now with Jack out of the game ?<eos>We should choose from the backups .",
+        "triplet": "Yes , that's the exact thing we need . One for each .<eos>What should we do , now with Jack out of the game ?<eos>We should choose from the backups .",
         "categories": [
             "plural_personal_prons",
             "length_7"
@@ -10617,7 +10617,7 @@
     },
     {
         "id": "daily_dialogs-valid-001770",
-        "triplet": "Yes , I ' m pretty sure .<eos>Do you have her address ?<eos>Yes , I do . It ' s 109 Locks Ave , L8V 4N9 .",
+        "triplet": "Yes , I'm pretty sure .<eos>Do you have her address ?<eos>Yes , I do . It's 109 Locks Ave , L8V 4N9 .",
         "categories": [
             "singular_personal_prons",
             "act_confirm_elaborate",
@@ -10683,7 +10683,7 @@
     },
     {
         "id": "daily_dialogs-train-001794",
-        "triplet": "Yes . I need a tow truck . My car is broken down .<eos>Where are you now ?<eos>I ' m on the Highway 401 , close to the Lipton Link .",
+        "triplet": "Yes . I need a tow truck . My car is broken down .<eos>Where are you now ?<eos>I'm on the Highway 401 , close to the Lipton Link .",
         "categories": [
             "ellipsis_pred",
             "singular_personal_prons",
@@ -10894,7 +10894,7 @@
     },
     {
         "id": "daily_dialogs-train-006955",
-        "triplet": "Quite well , Tom . And you ?<eos>Just fine , thank you . How ' s your father today ?<eos>He's much better today .",
+        "triplet": "Quite well , Tom . And you ?<eos>Just fine , thank you . How's your father today ?<eos>He's much better today .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -11420,7 +11420,7 @@
     },
     {
         "id": "daily_dialogs-valid-007631",
-        "triplet": "Can we talk ?<eos>Sure , honey , we ' re talking now , aren ' t we ?<eos>You know what I mean .",
+        "triplet": "Can we talk ?<eos>Sure , honey , we're talking now , aren't we ?<eos>You know what I mean .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -11497,7 +11497,7 @@
     },
     {
         "id": "daily_dialogs-valid-008164",
-        "triplet": "It ' s exactly twelve minutes past seven .<eos>When will you lecture begin ?<eos>Begin at 9 o ' clock sharp .",
+        "triplet": "It's exactly twelve minutes past seven .<eos>When will you lecture begin ?<eos>Begin at 9 o'clock sharp .",
         "categories": [
             "ellipsis_subj",
             "wh_question",
@@ -11804,7 +11804,7 @@
     },
     {
         "id": "daily_dialogs-valid-000981",
-        "triplet": "It was made in Jingdezhen .<eos>Jingdezhen ? Isn't it called ' the capital of porcelain ' ?<eos>You are right .",
+        "triplet": "It was made in Jingdezhen .<eos>Jingdezhen ? Isn't it called'the capital of porcelain'?<eos>You are right .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -11859,7 +11859,7 @@
     },
     {
         "id": "daily_dialogs-valid-001999",
-        "triplet": "It is . Hurry up ! You ' ll be late for school .<eos>What ' s the time ?<eos>It ' s nearly half past seven .",
+        "triplet": "It is . Hurry up ! You'll be late for school .<eos>What's the time ?<eos>It's nearly half past seven .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -11982,7 +11982,7 @@
     },
     {
         "id": "daily_dialogs-train-003273",
-        "triplet": "I ' m going to paint it .<eos>What colour are you going to paint it ?<eos>I ' m going to paint it pink .",
+        "triplet": "I'm going to paint it .<eos>What colour are you going to paint it ?<eos>I'm going to paint it pink .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
@@ -12011,7 +12011,7 @@
     },
     {
         "id": "daily_dialogs-train-001342",
-        "triplet": "Hi , I ' m Ray , your tenant in Room 209 .<eos>Hi . What ' s up ?<eos>There ' re some problems in my apartment . First , the faucet in the bathtub drips constantly .",
+        "triplet": "Hi , I'm Ray , your tenant in Room 209 .<eos>Hi . What's up ?<eos>There're some problems in my apartment . First , the faucet in the bathtub drips constantly .",
         "categories": [
             "possessive_prons",
             "wh_question",
@@ -12055,7 +12055,7 @@
     },
     {
         "id": "daily_dialogs-train-002282",
-        "triplet": "No , it ' s 3725019281 .<eos>3725015281 ?<eos>No , it ' s 3725019281 , it ' s a 9 , not a 5 .",
+        "triplet": "No , it's 3725019281 .<eos>3725015281 ?<eos>No , it's 3725019281 , it's a 9 , not a 5 .",
         "categories": [
             "singular_personal_prons",
             "act_deny_elaborate",
@@ -12451,7 +12451,7 @@
     },
     {
         "id": "daily_dialogs-train-003084",
-        "triplet": "I don ' t think that ' s gonna cut it . I need something bigger and better !<eos>I ' m sorry sir but , what exactly did you do ?<eos>Well , I may have accidentally insinuated that she is getting chubbier .",
+        "triplet": "I don't think that's gonna cut it . I need something bigger and better !<eos>I'm sorry sir but , what exactly did you do ?<eos>Well , I may have accidentally insinuated that she is getting chubbier .",
         "categories": [
             "demonstrative_dets",
             "singular_personal_prons",
@@ -12495,7 +12495,7 @@
     },
     {
         "id": "daily_dialogs-train-010555",
-        "triplet": "I try to go to sleep , but I just can ' t stay asleep .<eos>How late do you try to go to sleep ?<eos>I go to bed when I finish my work .",
+        "triplet": "I try to go to sleep , but I just can't stay asleep .<eos>How late do you try to go to sleep ?<eos>I go to bed when I finish my work .",
         "categories": [
             "possessive_prons",
             "singular_personal_prons",
@@ -12660,7 +12660,7 @@
     },
     {
         "id": "daily_dialogs-train-003182",
-        "triplet": "I honestly don ' t know what else to tell you .<eos>You can ' t go any lower than that ?<eos>If you can ' t afford 1050 , then we have no deal .",
+        "triplet": "I honestly don't know what else to tell you .<eos>You can't go any lower than that ?<eos>If you can't afford 1050 , then we have no deal .",
         "categories": [
             "singular_personal_prons",
             "plural_personal_prons",
@@ -12690,7 +12690,7 @@
     },
     {
         "id": "daily_dialogs-valid-010005",
-        "triplet": "Here ' s my passport . I'm a visiting scholar .<eos>Do you have anything to declare ?<eos>No , these are all my personal effects .",
+        "triplet": "Here's my passport . I'm a visiting scholar .<eos>Do you have anything to declare ?<eos>No , these are all my personal effects .",
         "categories": [
             "possessive_prons",
             "demonstrative_dets",
@@ -12864,7 +12864,7 @@
     },
     {
         "id": "daily_dialogs-train-003110",
-        "triplet": "Sorry , it ' s all sold out .<eos>Well , do you have any for tomorrow ?<eos>We have tickets for the matinee . It starts at 3p . m .",
+        "triplet": "Sorry , it's all sold out .<eos>Well , do you have any for tomorrow ?<eos>We have tickets for the matinee . It starts at 3p . m .",
         "categories": [
             "singular_personal_prons",
             "plural_personal_prons",
@@ -13283,7 +13283,7 @@
     },
     {
         "id": "daily_dialogs-valid-005537",
-        "triplet": "The Canada Day is on the 1st of July .<eos>What is its national anthem ?<eos>The national anthem of Canada is ' O Canada ' .",
+        "triplet": "The Canada Day is on the 1st of July .<eos>What is its national anthem ?<eos>The national anthem of Canada is'O Canada'.",
         "categories": [
             "wh_question",
             "length_11"
@@ -13291,7 +13291,7 @@
     },
     {
         "id": "daily_dialogs-train-006914",
-        "triplet": "Um . It ' s delicious .<eos>And do you like English food ?<eos>Not all of it .",
+        "triplet": "Um . It's delicious .<eos>And do you like English food ?<eos>Not all of it .",
         "categories": [
             "ellipsis_pred",
             "singular_personal_prons",
@@ -13367,7 +13367,7 @@
     },
     {
         "id": "daily_dialogs-valid-006340",
-        "triplet": "Ok , I will . You have said that many times .<eos>Are you hungry ? Do you want me to buy something for you to eat ?<eos>No , there ' s no need . Thank you all the same .",
+        "triplet": "Ok , I will . You have said that many times .<eos>Are you hungry ? Do you want me to buy something for you to eat ?<eos>No , there's no need . Thank you all the same .",
         "categories": [
             "ellipsis_subj",
             "singular_personal_prons",
@@ -13378,7 +13378,7 @@
     },
     {
         "id": "daily_dialogs-train-006826",
-        "triplet": "Can you believe that Susan got married ?<eos>Really ? I remember she said if she would remain single . Is the man very rich ?<eos>No . That ' s what is surprising me .",
+        "triplet": "Can you believe that Susan got married ?<eos>Really ? I remember she said if she would remain single . Is the man very rich ?<eos>No . That's what is surprising me .",
         "categories": [
             "demonstrative_dets",
             "singular_personal_prons",
@@ -13460,7 +13460,7 @@
     },
     {
         "id": "daily_dialogs-train-002574",
-        "triplet": "Can I help you , madam ?<eos>Yes , can I see a few T shirts , Please ?<eos>Certainly . Here you are . They ' re the very latest fashion .",
+        "triplet": "Can I help you , madam ?<eos>Yes , can I see a few T shirts , Please ?<eos>Certainly . Here you are . They're the very latest fashion .",
         "categories": [
             "singular_personal_prons",
             "plural_personal_prons",
@@ -13497,7 +13497,7 @@
     },
     {
         "id": "daily_dialogs-valid-007521",
-        "triplet": "Nah , not too flashy .<eos>Hug ! And this sweater from my aunt ? Isn ' t it hideous ?<eos>I guess .",
+        "triplet": "Nah , not too flashy .<eos>Hug ! And this sweater from my aunt ? Isn't it hideous ?<eos>I guess .",
         "categories": [
             "singular_personal_prons",
             "yes_no_question",
@@ -13704,7 +13704,7 @@
     },
     {
         "id": "daily_dialogs-valid-009998",
-        "triplet": "Good morning . I ' d like to book a room for Friday night and Saturday night .<eos>Certainly . What kind of room would you like ?<eos>A single room please . I hope you ' re not fully booked .",
+        "triplet": "Good morning . I'd like to book a room for Friday night and Saturday night .<eos>Certainly . What kind of room would you like ?<eos>A single room please . I hope you're not fully booked .",
         "categories": [
             "singular_personal_prons",
             "wh_question",
