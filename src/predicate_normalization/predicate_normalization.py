@@ -73,5 +73,8 @@ class PredicateNormalizer:
 
 if __name__ == '__main__':
     pred_norm = PredicateNormalizer('canonical_exemplars.txt')
-    example = ('I', 'have', 'a good mood')
-    print(pred_norm.normalize(*example))  # -> has_attribute (not owns!)
+    while True:
+        subj = input('subj: ')
+        pred = input('pred: ')
+        obj_ = input(' obj: ')
+        print(pred_norm.normalize(subj, pred, obj_))  # -> has_attribute (not owns!)
