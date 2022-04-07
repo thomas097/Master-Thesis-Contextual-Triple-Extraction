@@ -57,7 +57,7 @@ class OLLIEBaseline:
                 return 'negative', pred
         return 'positive', pred
 
-    def extract_triples(self, dialogue):
+    def extract_triples(self, dialogue, verbose):
         # Write dialogue out to file
         with open('tmp.txt', 'w', encoding='utf-8') as file:
             lines = [l.strip() for l in dialogue.split(self._sep) if l.strip()]
@@ -79,7 +79,7 @@ class OLLIEBaseline:
         return triples
 
 
-class OpenIEBaseline:
+class StanfordOpenIEBaseline:
     def __init__(self, path="stanford-corenlp-latest/stanford-corenlp-4.4.0", sep='<eos>'):
         self._path = path
         self._sep = sep
@@ -92,7 +92,7 @@ class OpenIEBaseline:
                 return 'negative', pred
         return 'positive', pred
 
-    def extract_triples(self, dialogue):
+    def extract_triples(self, dialogue, verbose):
         # Write dialogue out to file
         with open('tmp.txt', 'w', encoding='utf-8') as file:
             lines = [l.strip() for l in dialogue.split(self._sep) if l.strip()]
@@ -105,6 +105,7 @@ class OpenIEBaseline:
                                       stderr=subprocess.PIPE)
         os.chdir(wd)
         lines = out.decode('UTF-8').strip().replace('\r', '').split('\n')
+        lines = [line for line in lines if line.strip() != '']
 
         # Extract triple and confidence
         triples = []
