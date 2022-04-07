@@ -1,52 +1,7 @@
-import json
-import glob
-import numpy as np
-from pathlib import Path
-import re
 import krippendorff
-
-
-def load_annotations(path):
-    annotations = dict()
-    for fname in glob.glob(path + '/*.json'):
-        with open(fname, 'r', encoding='utf-8') as file:
-            data = json.load(file)
-            if not data['skipped']:
-                filename = Path(fname).parts[-1]
-                annotations[filename] = data
-    return annotations
-
-
-def token_argument_assignments(annotation, arg='subj'):
-    # Flatten dialogue and assign O (outside) labels to each
-    tokens = [t for ts in annotation['tokens'] for t in ts]
-    labels = [0 for _ in tokens]
-
-    # Determine turn lengths
-    turn_lens = np.cumsum([0] + [len(t) for t in annotation['tokens']])
-
-    # Select triple index according to arg
-    indices = {'subj': 0, 'pred': 1, 'obj': 2, 'pol': 3, 'cert': 4}
-    idx = indices[arg]
-
-    # Populate sequence
-    for triple in annotation['annotations']:
-        for i, j in triple[idx]:
-            # Compute index in flattened sequence
-            k = turn_lens[i] + j
-            labels[k] = 1
-    return labels
-
-
-def triples(annotation):
-    tokens = annotation['tokens']
-    triples = []
-    for subj, pred, obj, pol, cert in annotation['annotations']:
-        subj = [tokens[i][j] for i, j in subj]
-        pred = [tokens[i][j] for i, j in pred]
-        obj = [tokens[i][j] for i, j in obj]
-        triples.append((subj, pred, obj))
-    return triples
+from metrics import *
+from utils import *
+import pandas as pd
 
 
 def average_krippendorff_token_assignments(path, arg):
@@ -79,23 +34,19 @@ def average_krippendorff_token_assignments(path, arg):
     print("Avg. agreement %ss: %s" % (arg, np.mean(alphas)))
 
 
-def pairwise_krippendorff_token_assignments(path, arg):
+def pairwise_argument_agreement(path, arg, metric='F1', corrected=False):
     # Load each annotator's annotations and convert to bin vector of token assignments to arg
     annotations = dict()
-    all_files = set()
-    for fname in glob.glob(path + '/*'):
+    all_annotators = list()
+    for fname in sorted(glob.glob(path + '/*')):
         annotator = Path(fname).parts[-1]
-        token_assignments = {file: token_argument_assignments(ann, arg) for file, ann in
-                             load_annotations(fname).items()}
-        annotations[annotator] = token_assignments
-
-        # Record list of all files annotated
-        all_files |= set(token_assignments.keys())
+        annotations[annotator] = load_annotations(fname)
+        all_annotators.append(annotator)
 
     # Compute pairwise agreement between annotators
     all_annotators = sorted(list(annotations.keys()))
     pairwise_mat = np.zeros((len(all_annotators), len(all_annotators)), dtype=np.float32)
-    pairwise_cnt = np.zeros((len(all_annotators), len(all_annotators)), dtype=np.uint8)
+    pairwise_cnt = np.zeros((len(all_annotators), len(all_annotators)), dtype=np.float32)
 
     for i, ann1 in enumerate(all_annotators):
         for j, ann2 in enumerate(all_annotators):
@@ -106,41 +57,87 @@ def pairwise_krippendorff_token_assignments(path, arg):
             overlap = files1.intersection(files2)
 
             if overlap:
-                # Create reliability matrix
-                ann1_annotations = [annotations[ann1][file] for file in overlap]
-                ann2_annotations = [annotations[ann2][file] for file in overlap]
-                rel_mat = np.array([[x for xs in ann1_annotations for x in xs],
-                                    [x for xs in ann2_annotations for x in xs]])
+                # Compute triple overlap on each file and annotator pair (that annotated the file)
+                for file in overlap:
+                    args1 = arguments(annotations[ann1][file], arg=arg, corrected=corrected)
+                    args2 = arguments(annotations[ann2][file], arg=arg, corrected=corrected)
 
-                # Compute Krippendorff alpha over two annotators
-                alpha = krippendorff.alpha(rel_mat, level_of_measurement='nominal')
+                    if not args1 and not args2:
+                        continue
 
-                pairwise_mat[i, j] += alpha
-                pairwise_cnt[i, j] += 1
+                    if metric == 'jaccard':
+                        pairwise_mat[i, j] += argument_jaccard(args1, args2)
+                        pairwise_cnt[i, j] += 1
+                    elif metric == 'F1':
+                        pairwise_mat[i, j] += argument_f1(args1, args2)
+                        pairwise_cnt[i, j] += 1
+                    else:
+                        raise Exception('no metric called', metric)
 
-    # Fix divide by zero
+    # Fix divide by zero if no overlap
     pairwise_cnt[pairwise_cnt == 0] = 1
 
     # Print results
-    print('Pairwise agreement %s:' % arg)
-    print(pairwise_mat / pairwise_cnt)
+    all_annotators = [t.replace('annotations_', '') for t in all_annotators]
+    print('Pairwise agreement %s: corrected=%s' % (arg, corrected))
+    df = pd.DataFrame(pairwise_mat / pairwise_cnt, columns=all_annotators, index=all_annotators).round(3)
+    print(df)
     print()
 
 
-def triple_jaccard(triples1, triples2):
-    # Format triples as strings, e.g. "I | like to go to | the gym"
-    triples1 = [' | '.join([' '.join(arg) for arg in triple]) for triple in triples1]
-    triples2 = [' | '.join([' '.join(arg) for arg in triple]) for triple in triples2]
+def pairwise_triple_agreement(path, metric='F1', corrected=False):
+    # Load each annotator's annotations and convert to bin vector of token assignments to arg
+    annotations = dict()
+    all_annotators = list()
+    for fname in sorted(glob.glob(path + '/*')):
+        annotator = Path(fname).parts[-1]
+        annotations[annotator] = load_annotations(fname)
+        all_annotators.append(annotator)
 
-    # Strip prepositions, determines and particles
-    triples1 = {re.sub(r' (a|the|to|at|of|\'|in|\.|\,) ', ' ', t) for t in triples1}
-    triples2 = {re.sub(r' (a|the|to|at|of|\'|in|\.|\,) ', ' ', t) for t in triples2}
+    # Compute pairwise agreement between annotators
+    all_annotators = sorted(list(annotations.keys()))
+    pairwise_mat = np.zeros((len(all_annotators), len(all_annotators)), dtype=np.float32)
+    pairwise_cnt = np.zeros((len(all_annotators), len(all_annotators)), dtype=np.float32)
 
-    # Jaccard = intersection / union
-    return len(triples1.intersection(triples2)) / len(triples1 | triples2)
+    for i, ann1 in enumerate(all_annotators):
+        for j, ann2 in enumerate(all_annotators):
+
+            # Do they have overlapping annotations?
+            files1 = set(annotations[ann1].keys())
+            files2 = set(annotations[ann2].keys())
+            overlap = files1.intersection(files2)
+
+            if overlap:
+                # Compute triple overlap on each file and annotator pair (that annotated the file)
+                for file in overlap:
+                    triples1 = triples(annotations[ann1][file], corrected=corrected)
+                    triples2 = triples(annotations[ann2][file], corrected=corrected)
+
+                    if not triples1 and not triples2:
+                        continue
+
+                    if metric == 'jaccard':
+                        pairwise_mat[i, j] += triple_jaccard(triples1, triples2)
+                    elif metric == 'F1':
+                        pairwise_mat[i, j] += triple_f1(triples1, triples2)
+                    elif metric == 'soft_F1':
+                        pairwise_mat[i, j] += triple_soft_f1(triples1, triples2)
+                    else:
+                        raise Exception('no metric called', metric)
+                    pairwise_cnt[i, j] += 1
+
+    # Fix divide by zero if no overlap
+    pairwise_cnt[pairwise_cnt == 0] = 1
+
+    # Print results
+    all_annotators = [t.replace('annotations_', '') for t in all_annotators]
+    print('Pairwise agreement triples: corrected=%s metric=%s' % (corrected, metric))
+    df = pd.DataFrame(pairwise_mat / pairwise_cnt, columns=all_annotators, index=all_annotators).round(3)
+    print(df)
+    print()
 
 
-def raw_triple_agreement(path):
+def avg_triple_agreement(path, metric='jaccard', corrected=False):
     # Load each annotator's annotations and convert to bin vector of token assignments to arg
     annotations = dict()
     all_annotators = list()
@@ -150,7 +147,47 @@ def raw_triple_agreement(path):
         all_annotators.append(annotator)
 
     # Compute average agreement over all files
-    jaccard_dists = []
+    scores = []
+    for i, ann1 in enumerate(all_annotators):
+        for j, ann2 in enumerate(all_annotators):
+
+            # Do they have overlapping annotations?
+            files1 = set(annotations[ann1].keys())
+            files2 = set(annotations[ann2].keys())
+            overlapping_files = files1.intersection(files2)
+
+            if overlapping_files and i != j:
+                # Compute triple overlap on each file and annotator pair (that annotated the file)
+                for file in overlapping_files:
+                    triples1 = triples(annotations[ann1][file], corrected=corrected)
+                    triples2 = triples(annotations[ann2][file], corrected=corrected)
+
+                    if not triples1 and not triples2:
+                        continue
+
+                    if metric == 'jaccard':
+                        scores.append(triple_jaccard(triples1, triples2))
+                    elif metric == 'F1':
+                        scores.append(triple_f1(triples1, triples2))
+                    elif metric == 'soft_F1':
+                        scores.append(triple_soft_f1(triples1, triples2))
+                    else:
+                        raise Exception('no metric called', metric)
+
+    print("Avg. pairwise agreement triples (%s): %s" % (metric, np.mean(scores)))
+
+
+def avg_argument_agreement(path, arg='subj', metric='jaccard', corrected=False):
+    # Load each annotator's annotations and convert to bin vector of token assignments to arg
+    annotations = dict()
+    all_annotators = list()
+    for fname in sorted(glob.glob(path + '/*')):
+        annotator = Path(fname).parts[-1]
+        annotations[annotator] = load_annotations(fname)
+        all_annotators.append(annotator)
+
+    # Compute average agreement over all files
+    scores = []
     for i, ann1 in enumerate(all_annotators):
         for j, ann2 in enumerate(all_annotators):
 
@@ -162,26 +199,45 @@ def raw_triple_agreement(path):
             if overlap and i != j:
                 # Compute triple overlap on each file and annotator pair (that annotated the file)
                 for file in overlap:
-                    triples1 = triples(annotations[ann1][file])
-                    triples2 = triples(annotations[ann2][file])
-                    jaccard_dists.append(triple_jaccard(triples1, triples2))
+                    args1 = arguments(annotations[ann1][file], arg=arg, corrected=corrected)
+                    args2 = arguments(annotations[ann2][file], arg=arg, corrected=corrected)
 
-    print("Mean pairwise Jaccard index of triple annotations: %s" % np.mean(jaccard_dists))
+                    if not args1 and not args2:
+                        continue
+
+                    if metric == 'jaccard':
+                        scores.append(argument_jaccard(args1, args2))
+                    elif metric == 'F1':
+                        scores.append(argument_f1(args1, args2))
+                    else:
+                        raise Exception('no metric called', metric)
+
+    print("Avg. pairwise agreement of %s (%s): %s" % (arg, metric, np.mean(scores)))
+
 
 
 if __name__ == '__main__':
-    print('\n##### Krippendorff alpha for token assignments #####\n')
-    average_krippendorff_token_assignments('annotations', arg='subj')
-    average_krippendorff_token_assignments('annotations', arg='pred')
-    average_krippendorff_token_assignments('annotations', arg='obj')
+    print('\n##### Arguments #####\n')
+    print('\n## average ##\n')
+    avg_argument_agreement('annotations', arg='subj', metric='F1', corrected=True)
+    avg_argument_agreement('annotations', arg='pred', metric='F1', corrected=True)
+    avg_argument_agreement('annotations', arg='obj', metric='F1', corrected=True)
 
-    print('\n##### Pairwise agreement between annotators #####\n')
-    pairwise_krippendorff_token_assignments('annotations', arg='subj')
-    pairwise_krippendorff_token_assignments('annotations', arg='pred')
-    pairwise_krippendorff_token_assignments('annotations', arg='obj')
+    print('\n## pairwise ##\n')
+    pairwise_argument_agreement('annotations', arg='subj', metric='F1', corrected=True)
+    pairwise_argument_agreement('annotations', arg='pred', metric='F1', corrected=True)
+    pairwise_argument_agreement('annotations', arg='obj', metric='F1', corrected=True)
 
-    print('\n##### Raw triple agreement #####\n')
-    raw_triple_agreement('annotations')
+    print('\n##### Triples #####\n')
+    print('\n## average ##\n')
+    avg_triple_agreement('annotations', metric='jaccard', corrected=True)
+    avg_triple_agreement('annotations', metric='F1', corrected=True)
+    avg_triple_agreement('annotations', metric='soft_F1', corrected=True)
+
+    print('\n## pairwise ##\n')
+    pairwise_triple_agreement('annotations', metric='jaccard', corrected=True)
+    pairwise_triple_agreement('annotations', metric='F1', corrected=True)
+    pairwise_triple_agreement('annotations', metric='soft_F1', corrected=True)
 
 
 
