@@ -9,12 +9,14 @@ from utils import *
 
 
 class TripleScoring(torch.nn.Module):
-    def __init__(self, base_model='albert-base-v2', path=None):
+    def __init__(self, base_model='albert-base-v2', path=None, max_len=80, sep='<eos>'):
         super().__init__()
         # Base model
         print('loading %s triple scorer' % base_model)
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._model = AutoModel.from_pretrained(base_model)
+        self._max_len = max_len
+        self._sep = sep
 
         # SPO candidate scoring head
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
@@ -29,50 +31,75 @@ class TripleScoring(torch.nn.Module):
         if path is not None:
             self.load_state_dict(torch.load(path, map_location=self._device))
 
-    def forward(self, input_ids, speaker_ids):
+    def forward(self, input_ids, speaker_ids, attn_mask):
         """ Computes the forward pass through the model
         """
-        out = self._model(input_ids=input_ids, token_type_ids=speaker_ids)
+        out = self._model(input_ids=input_ids, token_type_ids=speaker_ids, attention_mask=attn_mask)
         h = self._relu(out.last_hidden_state[:, 0])
         return self._softmax(self._head(h))
 
-    def _retokenize_tokens(self, tokens, triple, speaker=0):
+    def _retokenize_dialogue(self, tokens, speaker=0):
         # Tokenize each token individually (keeping track of subwords)
         f_input_ids = [self._tokenizer.cls_token_id]
         speaker_ids = [speaker]
-        for t in tokens:
-            if t != '<eos>':
-                token_ids = self._tokenizer.encode(t, add_special_tokens=False)
-                f_input_ids += token_ids
-                speaker_ids += [speaker] * len(token_ids)  # repeat speaker_id if subword tokenized
-            else:
-                f_input_ids.append(self._tokenizer.eos_token_id)
-                speaker_ids.append(speaker)
-                speaker = 1 - speaker
+        for t in ' '.join(tokens).split(self._sep):
+            token_ids = self._tokenizer.encode(t, add_special_tokens=True)[1:] # Strip [CLS] (keep [SEP])
+            f_input_ids += token_ids
+            speaker_ids += [speaker] * len(token_ids)
+            speaker = 1 - speaker
 
-        # Add [PAD] as spacer
-        f_input_ids[-1] = self._tokenizer.pad_token_id
+        # Remove last [SEP]
+        f_input_ids = f_input_ids[:-1]
+        speaker_ids = speaker_ids[:-1]
 
-        # Append triple
-        triple_ids = self._tokenizer.encode(' '.join(triple), add_special_tokens=False)
-        f_input_ids += triple_ids
-        speaker_ids += [0] * len(triple_ids)
-
-        f_input_ids = torch.LongTensor([f_input_ids]).to(self._device)
-        speaker_ids = torch.LongTensor([speaker_ids]).to(self._device)
         return f_input_ids, speaker_ids
+
+    def _retokenize_triple(self, triple, speaker=0):
+        # Append triple
+        f_input_ids = self._tokenizer.encode(' '.join(triple), add_special_tokens=False) # no [CLS] or [SEP]
+        speaker_ids = [0] * len(f_input_ids)
+        return f_input_ids, speaker_ids
+
+    def _add_padding(self, sequence, pad_token):
+        # If sequence is too long, cut off end :(
+        sequence = sequence[:self._max_len]
+
+        # Pad remainder to max_len
+        padding = self._max_len - len(sequence)
+        new_sequence = sequence + [pad_token] * padding
+
+        # Mask out [PAD] tokens
+        attn_mask = [1] * len(sequence) + [0] * padding
+        return new_sequence, attn_mask
 
     def fit(self, tokens, triples, labels, epochs=2, lr=1e-6):
         """ Fits the model to the annotations
         """
         X = []
         for tokens, triple_lst, triple_labels in zip(tokens, triples, labels):
+
+            # Tokenize dialogue
+            dialog_input_ids, dialog_speakers = self._retokenize_dialogue(tokens)
+
             for triple, label in zip(triple_lst, triple_labels):
-                # Put data on GPU
-                input_ids, speaker_ids = self._retokenize_tokens(tokens, triple)
+                # Tokenize triple
+                triple_input_ids, triple_speakers = self._retokenize_triple(triple)
+
+                # Concatenate dialogue + [UNK] + triple
+                input_ids = dialog_input_ids + [self._tokenizer.unk_token_id] + triple_input_ids
+                speakers = dialog_speakers + [0] + triple_speakers
+
+                # Pad sequence with [PAD] to max_len
+                input_ids, _ = self._add_padding(input_ids, self._tokenizer.pad_token_id)
+                speakers, attn_mask = self._add_padding(speakers, 0)
+
+                # Push Tensor to GPU
+                input_ids = torch.LongTensor([input_ids]).to(self._device)
+                speakers = torch.LongTensor([speakers]).to(self._device)
+                attn_mask = torch.FloatTensor([attn_mask]).to(self._device)
                 label_ids = torch.LongTensor([label]).to(self._device)
 
-                X.append((input_ids, speaker_ids, label_ids))
+                X.append((input_ids, speakers, attn_mask, label_ids))
 
         # Set up optimizer and objective
         optimizer = torch.optim.Adam(self.parameters(), lr=lr)
@@ -82,9 +109,9 @@ class TripleScoring(torch.nn.Module):
             random.shuffle(X)
 
             losses = []
-            for input_ids, speaker_ids, y in tqdm(X):
+            for input_ids, speaker_ids, attn_mask, y in tqdm(X):
                 # Was the triple entailed? Positively? Negatively?
-                y_hat = self(input_ids, speaker_ids)
+                y_hat = self(input_ids, speaker_ids, attn_mask)
                 loss = criterion(y_hat, y)
                 losses.append(loss.item())
 
@@ -95,9 +122,58 @@ class TripleScoring(torch.nn.Module):
             print("mean loss =", np.mean(losses))
 
     def predict(self, tokens, triple):
-        input_ids, speaker_ids = self._retokenize_tokens(tokens, triple)
-        label = self(input_ids, speaker_ids)
+        # Tokenize dialogue
+        dialog_input_ids, dialog_speakers = self._retokenize_dialogue(tokens)
+        triple_input_ids, triple_speakers = self._retokenize_triple(triple)
+
+        # Concatenate dialogue + [UNK] + triple
+        input_ids = dialog_input_ids + [self._tokenizer.unk_token_id] + triple_input_ids
+        speakers = dialog_speakers + [0] + triple_speakers
+
+        # Pad sequences to max_len
+        input_ids, _ = self._add_padding(input_ids, self._tokenizer.pad_token_id)
+        speakers, attn_mask = self._add_padding(speakers, 0)
+
+        # Push Tensor to GPU
+        input_ids = torch.LongTensor([input_ids]).to(self._device)
+        speakers = torch.LongTensor([speakers]).to(self._device)
+        attn_mask = torch.FloatTensor([attn_mask]).to(self._device)
+
+        label = self(input_ids, speakers, attn_mask)
         label = label.cpu().detach().numpy()[0]
+        return label
+
+    def predict_multi(self, tokens, triples):
+        # Tokenize dialogue
+        dialog_input_ids, dialog_speakers = self._retokenize_dialogue(tokens)
+
+        batch_input_ids = []
+        batch_speakers = []
+        batch_attn_mask = []
+
+        for triple in triples:
+            # Tokenize triple
+            triple_input_ids, triple_speakers = self._retokenize_triple(triple)
+
+            # Concatenate dialogue + [UNK] + triple
+            input_ids = dialog_input_ids + [self._tokenizer.unk_token_id] + triple_input_ids
+            speakers = dialog_speakers + [0] + triple_speakers
+
+            # Pad sequence with [PAD] to max_len
+            input_ids, _ = self._add_padding(input_ids, self._tokenizer.pad_token_id)
+            speakers, attn_mask = self._add_padding(speakers, 0)
+
+            batch_input_ids.append(input_ids)
+            batch_speakers.append(speakers)
+            batch_attn_mask.append(attn_mask)
+
+        # Push batches to GPU
+        batch_input_ids = torch.LongTensor(batch_input_ids).to(self._device)
+        batch_speakers = torch.LongTensor(batch_speakers).to(self._device)
+        batch_attn_mask = torch.FloatTensor(batch_attn_mask).to(self._device)
+
+        label = self(batch_input_ids, batch_speakers, batch_attn_mask)
+        label = label.cpu().detach().numpy()
         return label
 
 

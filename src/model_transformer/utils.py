@@ -2,9 +2,10 @@ import glob
 import json
 import re
 import random
-from collections import defaultdict
 import numpy as np
 
+from collections import defaultdict
+from copy import deepcopy
 
 ## IO
 
@@ -13,7 +14,8 @@ def load_annotations(path):
     for fname in glob.glob(path + '/*.json'):
         with open(fname, 'r', encoding='utf-8') as file:
             data = json.load(file)
-            if 'skipped' not in data or not data['skipped']:
+            if not data['skipped']:
+                data['tokens'] = [[t for t in seq if t != '[unk]'] for seq in data['tokens']]  # remove [unk]
                 annotations.append(data)
     return annotations
 
@@ -69,7 +71,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
 
 ## Triple Scoring
 
-def extract_triples(annotation, pol_oversampling=8, neg_undersampling=0.7, ellipsis_oversampling=3):
+def extract_triples(annotation, pol_oversampling=7, neg_undersampling=0.7, ellipsis_oversampling=3):
     turns = annotation['tokens']
     triple_ids = annotation['annotations']
 
@@ -92,20 +94,19 @@ def extract_triples(annotation, pol_oversampling=8, neg_undersampling=0.7, ellip
         pred = ' '.join(turns[i][j] for i, j in pred) if pred else ''
         obj = ' '.join(turns[i][j] for i, j in obj) if obj else ''
 
-        if subj or pred or obj:
+        if subj or pred or obj:  # No blank triples
 
             if not neg:
                 triples += [(subj, pred, obj)]
                 labels += [1]
             else:
-                triples += [(subj, pred, obj)] * pol_oversampling # oversampling
+                triples += [(subj, pred, obj)] * pol_oversampling # oversampling negative polarities
                 labels += [2] * pol_oversampling
 
             arguments['subjs'].append(subj)
             arguments['preds'].append(pred)
             arguments['objs'].append(obj)
 
-    # Empty annotation (skipped?)
     if not triples:
         return [], [], []
 
