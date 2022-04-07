@@ -67,8 +67,10 @@ def evaluate(annotation_file, model, decision_thres=0.7):
         y_true = triples_from_annotation(ann)
 
         # Predict triple
-        input_ = ' '.join([t for ts in ann['tokens'] for t in ts + ['<eos>']]).replace(' [unk] ', ' ')
+        input_ = ' '.join([t for ts in ann['tokens'] for t in ts + ['<eos>']])
+        print(input_)
         y_pred = [triple for ent, triple in model.extract_triples(input_) if ent > decision_thres]
+        print(y_pred)
 
         # Update confusion table
         conf_matrix += confusion_matrix(y_pred, y_true)
@@ -98,8 +100,8 @@ if __name__ == '__main__':
     elif MODEL == 'openie':
         model = OpenIEBaseline()
     elif MODEL == 'albert':
-        model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_31_03_2022',
-                                      '../../model_transformer/models/scorer_albert-v2_31_03_2022')
+        model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_6_04_2022',
+                                      '../../model_transformer/models/scorer_albert-v2_6_04_2022')
     else:
         raise Exception('model %s not recognized' % MODEL)
 
