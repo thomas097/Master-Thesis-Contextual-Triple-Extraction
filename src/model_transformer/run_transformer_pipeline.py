@@ -7,34 +7,57 @@ from itertools import product
 
 
 class AlbertTripleExtractor:
-    def __init__(self, arg_model_path, scorer_model_path, base_model='albert-base-v2', sep='<eos>'):
-        self._arg_model = ArgumentExtraction(base_model, path=arg_model_path)
-        self._scorer_model = TripleScoring(base_model, path=scorer_model_path)
+    def __init__(self, arg_model_path, scorer_model_path, base_model='albert-base-v2', sep='<eos>',
+                 speaker1='you', speaker2='I'):
+        self._argument_module = ArgumentExtraction(base_model, path=arg_model_path)
+        self._scoring_module = TripleScoring(base_model, path=scorer_model_path)
         self._nlp = spacy.load('en_core_web_sm')
         self._sep = sep
+
+        # Assign identities to speakers
+        self._speaker1 = speaker1
+        self._speaker2 = speaker2
 
     def _tokenize(self, inputs):
         # Tokenize each turn separately (and splitting "n't" off)
         tokens = []
         for turn in inputs.split(self._sep):
-            turn = turn.strip()
+            turn = turn.strip().lower()
             if turn:
                 tokens += [t.lower_ for t in self._nlp(turn)] + ['<eos>']
         return tokens
 
+    def _disambiguate_identity(self, token, turn_idx):
+        # Even turns -> speaker1
+        if turn_idx % 2 == 0:
+            if token in ['i', 'me', 'myself', 'we', 'us', 'ourselves']:
+                return self._speaker1
+            elif token in ['my', 'mine', 'our', 'ours']:
+                return self._speaker1 + "'s"
+            elif token in ['you', 'yourself', 'yourselves']:
+                return self._speaker2
+            elif token in ['your', 'yours']:
+                return self._speaker2 + "'s"
+        else:
+            if token in ['i', 'me', 'myself', 'we', 'us', 'ourselves']:
+                return self._speaker2
+            elif token in ['my', 'mine', 'our', 'ours']:
+                return self._speaker2 + "'s"
+            elif token in ['you', 'yourself', 'yourselves']:
+                return self._speaker1
+            elif token in ['your', 'yours']:
+                return self._speaker1 + "'s"
+        return token
+
     def extract_triples(self, inputs, verbose=True):
+        # 0. Assign speakers to ambiguous you/I
+        tokens = self._tokenize(inputs)
+
         # 1. Extract SPO arguments from token sequence
-        y_subjs, y_preds, y_objs, subwords = self._arg_model.predict(self._tokenize(inputs))
+        y_subjs, y_preds, y_objs, subwords = self._argument_module.predict(tokens)
         subjs = bio_tags_to_tokens(subwords, y_subjs.T, one_hot=True)
         preds = bio_tags_to_tokens(subwords, y_preds.T, one_hot=True)
         objs = bio_tags_to_tokens(subwords, y_objs.T, one_hot=True)
-
-        # 1b. add additional verbs to predicate using SpaCy
-        for turn in inputs.split(self._sep):
-            turn_tokens = self._nlp(turn)
-            subjs |= {t.lower_ for t in turn_tokens if t.pos_ in ['NOUN', 'ADJ', 'PROPN']}
-            preds |= {t.lower_ for t in turn_tokens if t.pos_ in ['VERB', 'AUX']}
-            objs |= {t.lower_ for t in turn_tokens if t.pos_ in ['NOUN', 'ADJ', 'PROPN']}
 
         if verbose:
             print('subjs: ', subjs)
@@ -43,9 +66,11 @@ class AlbertTripleExtractor:
 
         # 2. Compute all possible triples
         candidates = [list(triple) for triple in product(subjs, preds, objs)]
+        if not candidates:
+            return []
 
         # 3. Score candidate triples
-        predictions = self._scorer_model.predict_multi(inputs.split(), candidates)
+        predictions = self._scoring_module.predict_multi(inputs.split(), candidates)
 
         # 4. Rank candidates according to entailment predictions
         triples = []
