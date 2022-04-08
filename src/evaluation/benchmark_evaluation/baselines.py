@@ -166,7 +166,7 @@ class LeolaniBaseline:
 
     def _get_capsules(self, utterance):
         # Extract capsule from turn
-        self._chat.add_utterance(utterance)
+        self._chat.add_utterance(utterance.strip())
         self._analyzer.analyze(self._chat.last_utterance)
         return utterance_to_capsules(self._chat.last_utterance)
 
@@ -176,7 +176,7 @@ class LeolaniBaseline:
         for turn in dialogue.split(self._sep):
             capsules = self._get_capsules(turn)
             for capsule in capsules:
-                triples.append(self._triple_from_capsule(capsule))
+                triples.append((1, self._triple_from_capsule(capsule)))
         return triples
 
 

@@ -3,7 +3,7 @@ sys.path.insert(0, '../../model_dependency')
 sys.path.insert(0, '../../model_transformer')
 
 from run_transformer_pipeline import AlbertTripleExtractor
-from baselines import ReVerbBaseline, OLLIEBaseline, StanfordOpenIEBaseline
+from baselines import ReVerbBaseline, OLLIEBaseline, StanfordOpenIEBaseline, LeolaniBaseline
 
 
 def load_examples(path):
@@ -15,7 +15,7 @@ def load_examples(path):
                 data.append((dialogue, triple))
                 dialogue, triple = None, None
             elif dialogue is None:
-                dialogue = line.lower().strip()
+                dialogue = line.strip()
             else:
                 triple = tuple([arg.strip() for arg in line.lower().split(',')])
 
@@ -52,6 +52,7 @@ def evaluate(examples_file, model, threshold=0.5):
         # Precision: was there more found that we didn't want to find?
         precision += not [t for t in found_triples if t != expected_triple]
 
+    # Performance scores
     R = recall / len(examples)
     P = precision / len(examples)
     F1 = 2 * P * R / (P + R)
@@ -61,7 +62,7 @@ def evaluate(examples_file, model, threshold=0.5):
 
 
 if __name__ == '__main__':
-    MODEL = 'albert'
+    MODEL = 'leolani'
 
     if MODEL == 'reverb':
         model = ReVerbBaseline()
@@ -69,6 +70,8 @@ if __name__ == '__main__':
         model = OLLIEBaseline()
     elif MODEL == 'stanford':
         model = StanfordOpenIEBaseline()
+    elif MODEL == 'leolani':
+        model = LeolaniBaseline()
     elif MODEL == 'albert':
         model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_08_04_2022_multi',
                                       '../../model_transformer/models/scorer_albert-v2_06_04_2022_multi')
