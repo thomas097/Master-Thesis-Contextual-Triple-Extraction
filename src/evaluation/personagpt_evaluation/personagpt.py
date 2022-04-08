@@ -1,7 +1,5 @@
 from transformers import GPT2Tokenizer, AutoModelForCausalLM
 import torch
-import random
-import re
 
 
 class PersonaGPT:

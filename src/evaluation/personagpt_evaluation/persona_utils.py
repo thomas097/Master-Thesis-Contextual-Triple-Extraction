@@ -24,6 +24,27 @@ NEGATE_PERSONA = {'PRON VERB NOUN PUNCT': '0 do not 1 2 3',
                   'PRON NOUN AUX DET NOUN PUNCT': '0 1 2 not 3 4 5',
                   'PRON VERB DET ADJ NOUN PUNCT': '0 do not 1 2 3 4 5'}
 
+PERSONA_TRIPLES = {'PRON VERB NOUN PUNCT': ([0], [1], [2]),
+                   'PRON AUX DET NOUN PUNCT': ([0], [1], [2, 3]),
+                   'PRON VERB PART VERB PUNCT': ([0], [1, 2], [3]),
+                   'PRON VERB DET NOUN PUNCT': ([0], [1], [2, 3]),
+                   'PRON VERB PART VERB NOUN PUNCT': ([0], [1, 2, 3], [4]),
+                   'PRON VERB ADJ NOUN PUNCT': ([0], [1], [2, 3]),
+                   'PRON VERB ADP DET NOUN PUNCT': ([0], [1, 2], [3, 4]),
+                   'PRON ADJ NOUN AUX NOUN PUNCT': ([0, 1, 2], [3], [4]),
+                   'PRON ADJ NOUN AUX ADJ PUNCT': ([0, 1, 2], [3], [4]),
+                   'PRON AUX DET ADJ NOUN PUNCT': ([0], [1], [2, 3, 4]),
+                   'PRON AUX DET NOUN NOUN PUNCT': ([0], [1], [2, 3, 4]),
+                   'PRON VERB NUM NOUN PUNCT': ([0], [1], [2, 3]),
+                   'PRON VERB ADP DET NOUN NOUN PUNCT': ([0], [1, 2], [3, 4, 5]),
+                   'PRON AUX NUM NOUN PUNCT': ([0], [1], [2, 3]),
+                   'PRON VERB VERB PUNCT': ([0], [1], [2]),
+                   'PRON AUX ADJ PUNCT': ([0], [1], [2]),
+                   'PRON VERB NOUN NOUN PUNCT': ([0], [1], [2, 3]),
+                   'PRON VERB ADP NOUN PUNCT': ([0], [1, 2], [3]),
+                   'PRON NOUN AUX DET NOUN PUNCT': ([0, 1], [2], [3, 4]),
+                   'PRON VERB DET ADJ NOUN PUNCT': ([0], [1], [2, 3, 4])}
+
 PERSONA_QUESTIONS = {'PRON VERB NOUN PUNCT': ['Do you 1 2 ?',
                                               'What do you 1 ?'],
                      'PRON AUX DET NOUN PUNCT': ['Are you 2 3 ?',
@@ -121,9 +142,27 @@ class Persona:
 
         return self.persona
 
-    def sample_question(self):
+    def get_triple(self, i):
+        # Get for ith persona the argument indices into the persona tokens
+        category, simple_fact, final_fact = self._persona[i]
+        subj_idx, pred_idx, obj_idx = PERSONA_TRIPLES[category]
+
+        # Convert indices to subj-pred-obj triple
+        tokens = simple_fact.split(' ')
+        subj = ' '.join([tokens[i] for i in subj_idx])
+        pred = ' '.join([tokens[i] for i in pred_idx])
+        obj_ = ' '.join([tokens[i] for i in obj_idx])
+
+        # Determine polarity (check whether negated)
+        polarity = 'positive'
+        if simple_fact != final_fact:
+            polarity = 'negative'
+
+        return subj, pred, obj_, polarity
+
+    def sample_question(self, i):
         # Sample one persona line to ask about
-        category, simple_fact, fact = random.choice(self._persona)
+        category, simple_fact, fact = self._persona[i]
 
         # Sample question about persona
         question = random.choice(PERSONA_QUESTIONS[category])
