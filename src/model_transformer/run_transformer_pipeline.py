@@ -84,8 +84,8 @@ class AlbertTripleExtractor:
 
 
 if __name__ == '__main__':
-    model = AlbertTripleExtractor('models/argument_extraction_albert-v2_06_04_2022_multi',
-                                  'models/scorer_albert-v2_06_04_2022_multi')
+    model = AlbertTripleExtractor('models/argument_extraction_albert-v2_09_04_2022_multi',
+                                  'models/scorer_albert-v2_09_04_2022_multi')
     # Test!
     example = 'i enjoy watching sports but do not want to do homework <eos> what do you like ? <eos> animals , but not cats <eos>'
 

@@ -9,14 +9,15 @@ from utils import *
 
 
 class ArgumentExtraction(torch.nn.Module):
-    def __init__(self, base_model='albert-base-v2', path=None, output_dim=3):
+    def __init__(self, base_model='albert-base-v2', path=None, output_dim=3, sep='<eos>'):
         """ Inits a transformer with custom multi-span-extraction heads for SPO arguments
         """
         super().__init__()
         # Base model
-        print('loading %s argument extractor' % base_model)
+        print('loading %s for argument extraction' % base_model)
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._model = AutoModel.from_pretrained(base_model)
+        self._sep = sep
 
         # BIO classification heads
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
@@ -70,14 +71,23 @@ class ArgumentExtraction(torch.nn.Module):
         repeats = [len(ids) for ids in input_ids]
 
         # Determine speaker ids (0 or 1)
-        speaker_ids = [0] + [tokens[:i + 1].count('<eos>') % 2 for i in range(len(tokens))][:-1]  # TODO: make pretty
-        speaker_ids = self._repeat_labels(speaker_ids, repeats)
+        speaker_ids = [0] + [tokens[:i + 1].count(self._sep) % 2 for i in range(len(tokens))][:-1]  # TODO: make pretty
+        speaker_ids = self._repeat_speaker_ids(speaker_ids, repeats)
 
         return f_input_ids, speaker_ids, repeats
 
+    def _repeat_speaker_ids(self, speaker_ids, repeats):
+        rep_speaker_ids = np.repeat([0] + list(speaker_ids), repeats=repeats)
+        return torch.LongTensor([rep_speaker_ids]).to(self._device)
+
     def _repeat_labels(self, labels, repeats):
         # Repeat each label b the amount of subwords per token
-        rep_labels = np.repeat([0] + list(labels), repeats)
+        rep_labels = []
+        for label, rep in zip([0] + list(labels), repeats):
+            if label == 0:  # Outside
+                rep_labels += [label] * rep
+            else:  # Beginning + Inside
+                rep_labels += [label] + ([2] * (rep - 1))  # If label = B -> B-I-I-I...
         return torch.LongTensor([rep_labels]).to(self._device)
 
     def fit(self, tokens, labels, epochs=2, lr=1e-5, weight=3):
