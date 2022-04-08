@@ -42,7 +42,7 @@ def evaluate(examples_file, model, threshold=0.5):
 
         # Predict triples
         print('\n (%s/%s) input: %s' % (i + 1, len(examples), dialogue))
-        found_triples = [triple for ent, triple in model.extract_triples(dialogue, verbose=False) if ent > threshold]
+        found_triples = [triple for ent, triple in model.extract_triples(dialogue, verbose=True) if ent > threshold]
         print('expected:', expected_triple)
         print('found:   ', found_triples)
 
@@ -70,9 +70,9 @@ if __name__ == '__main__':
     elif MODEL == 'stanford':
         model = StanfordOpenIEBaseline()
     elif MODEL == 'albert':
-        model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_06_04_2022_multi',
+        model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_08_04_2022_multi',
                                       '../../model_transformer/models/scorer_albert-v2_06_04_2022_multi')
     else:
         raise Exception('model %s not recognized' % MODEL)
 
-    evaluate('test_examples/answer_ellipsis.txt', model)
+    evaluate('test_examples/simple_statements.txt', model)
