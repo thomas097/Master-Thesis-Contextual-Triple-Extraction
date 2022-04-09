@@ -38,10 +38,11 @@ class BERT:
 
 
 class PredicateNormalizer:
-    def __init__(self, exemplar_file, base_model='bert-base-uncased', k=3):
+    def __init__(self, exemplar_file, base_model='bert-base-uncased', k=3, min_conf=0.6):
         self._model = BERT(base_model)
         self._knn = KNeighborsClassifier(n_neighbors=k, metric=self._cosine_dist, weights='distance', algorithm='brute')
         self._fit_knn(exemplar_file)
+        self._min_conf = min_conf
 
     def _fit_knn(self, path):
         print('Fitting kNN')
@@ -66,9 +67,13 @@ class PredicateNormalizer:
         # Compute probability of each normalized predicate
         probs = self._knn.predict_proba([x])[0]
 
-        # Return normalized predicate with the highest likelihood
+        # Identify normalized predicate with the highest likelihood
         i = np.argmax(probs)
-        return self._knn.classes_[i], probs[i]
+
+        # Normalize only above minimum confidence
+        if probs[i] > self._min_conf:
+            return self._knn.classes_[i], probs[i]
+        return pred, probs[i]
 
 
 if __name__ == '__main__':

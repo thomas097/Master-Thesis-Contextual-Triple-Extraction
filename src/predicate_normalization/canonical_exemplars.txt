@@ -2,8 +2,14 @@ has_name, I, am, Thomas
 has_name, I, am, Jessica
 has_name, I, have name, Peter
 has_name, I, am, Robin
-has_name, my, name is, James
-has_name, me, they call, Eliza
+has_name, my, is, James
+has_name, me, call, Eliza
+has_age, I, am, 15
+has_age, I, 'm, nine
+has_age, I, have become, 25 years old
+has_age, I, am, sixteen years old
+has_age, I, am old, 90
+has_age, I, turned, twelve
 has_profession, I, have become, a banker
 has_profession, I, became, a gardener
 has_profession, I, work as, a waiter
