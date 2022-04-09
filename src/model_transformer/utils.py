@@ -54,7 +54,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
             pred = np.argmax(pred)
 
         if pred == 1: # Beginning
-            span = re.sub('[^\w\d\-]+', ' ', ''.join(span)).strip()
+            span = re.sub('[^\w\d\-\']+', ' ', ''.join(span)).strip()
             out.append(span)
             span = [token]
 
@@ -62,7 +62,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
             span.append(token)
 
     if span:
-        span = re.sub('[^\w\d\-]+', ' ', ''.join(span)).strip()
+        span = re.sub('[^\w\d\-\']+', ' ', ''.join(span)).strip()
         out.append(span)
 
     # Remove empty strings and duplicates

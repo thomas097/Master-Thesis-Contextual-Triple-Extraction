@@ -1,6 +1,8 @@
+import glob
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
+from datetime import date
 
 from transformers import logging
 logging.set_verbosity(40)  # only errors
@@ -10,14 +12,20 @@ from utils import *
 
 class ArgumentExtraction(torch.nn.Module):
     def __init__(self, base_model='albert-base-v2', path=None, output_dim=3, sep='<eos>'):
-        """ Inits a transformer with custom multi-span-extraction heads for SPO arguments
+        """ Init a transformer with custom multi-span-extraction heads for SPO arguments
         """
         super().__init__()
         # Base model
         print('loading %s for argument extraction' % base_model)
-        self._tokenizer = AutoTokenizer.from_pretrained(base_model)
+        # Load base model
         self._model = AutoModel.from_pretrained(base_model)
+        self._base = base_model
         self._sep = sep
+
+        # Load and extend tokenizer with SPEAKERS
+        self._tokenizer = AutoTokenizer.from_pretrained(base_model)
+        self._tokenizer.add_tokens(['SPEAKER1', 'SPEAKER2'], special_tokens=True)
+        self._model.resize_token_embeddings(len(self._tokenizer))
 
         # BIO classification heads
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
@@ -33,9 +41,11 @@ class ArgumentExtraction(torch.nn.Module):
         self._device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.to(self._device)
 
-        # Load model if enabled
+        # Load model / tokenizer if pretrained model is given
         if path:
-            self.load_state_dict(torch.load(path, map_location=self._device))
+            print('\t- Loading pretrained')
+            model_path = glob.glob(path + '/argument_extraction_*')[0]
+            self.load_state_dict(torch.load(model_path, map_location=self._device))
 
     def forward(self, input_ids, speaker_ids):
         """ Computes the forward pass through the model
@@ -109,6 +119,7 @@ class ArgumentExtraction(torch.nn.Module):
         class_weights = torch.Tensor([1] + [weight] * (self._output_dim - 1)).to(self._device)
         criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 
+        print('Training!')
         for epoch in range(epochs):
             losses = []
             random.shuffle(X)
@@ -126,6 +137,9 @@ class ArgumentExtraction(torch.nn.Module):
                 optim.step()
 
             print("mean loss =", np.mean(losses))
+
+        # Save model to file
+        torch.save(self.state_dict(), 'argument_extraction_%s_%s' % (self._base, date.today()))
 
     def predict(self, token_seq):
         # Retokenize token sequence

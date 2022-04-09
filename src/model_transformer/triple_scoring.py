@@ -1,6 +1,8 @@
+import glob
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
+from datetime import date
 
 from transformers import logging
 logging.set_verbosity(40)  # only errors
@@ -12,11 +14,17 @@ class TripleScoring(torch.nn.Module):
     def __init__(self, base_model='albert-base-v2', path=None, max_len=80, sep='<eos>'):
         super().__init__()
         # Base model
-        print('loading %s triple scorer' % base_model)
-        self._tokenizer = AutoTokenizer.from_pretrained(base_model)
+        print('loading %s for argument extraction' % base_model)
+        # Load base model
         self._model = AutoModel.from_pretrained(base_model)
         self._max_len = max_len
+        self._base = base_model
         self._sep = sep
+
+        # Load and extend tokenizer with SPEAKERS
+        self._tokenizer = AutoTokenizer.from_pretrained(base_model)
+        self._tokenizer.add_tokens(['SPEAKER1', 'SPEAKER2'], special_tokens=True)
+        self._model.resize_token_embeddings(len(self._tokenizer))
 
         # SPO candidate scoring head
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
@@ -28,8 +36,11 @@ class TripleScoring(torch.nn.Module):
         self._device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.to(self._device)
 
-        if path is not None:
-            self.load_state_dict(torch.load(path, map_location=self._device))
+        # Load model / tokenizer if pretrained model is given
+        if path:
+            print('\t- Loading pretrained')
+            model_path = glob.glob(path + '/candidate_scorer_*')[0]
+            self.load_state_dict(torch.load(model_path, map_location=self._device))
 
     def forward(self, input_ids, speaker_ids, attn_mask):
         """ Computes the forward pass through the model
@@ -121,27 +132,8 @@ class TripleScoring(torch.nn.Module):
 
             print("mean loss =", np.mean(losses))
 
-    def predict(self, tokens, triple):
-        # Tokenize dialogue
-        dialog_input_ids, dialog_speakers = self._retokenize_dialogue(tokens)
-        triple_input_ids, triple_speakers = self._retokenize_triple(triple)
-
-        # Concatenate dialogue + [UNK] + triple
-        input_ids = dialog_input_ids + [self._tokenizer.unk_token_id] + triple_input_ids
-        speakers = dialog_speakers + [0] + triple_speakers
-
-        # Pad sequences to max_len
-        input_ids, _ = self._add_padding(input_ids, self._tokenizer.pad_token_id)
-        speakers, attn_mask = self._add_padding(speakers, 0)
-
-        # Push Tensor to GPU
-        input_ids = torch.LongTensor([input_ids]).to(self._device)
-        speakers = torch.LongTensor([speakers]).to(self._device)
-        attn_mask = torch.FloatTensor([attn_mask]).to(self._device)
-
-        label = self(input_ids, speakers, attn_mask)
-        label = label.cpu().detach().numpy()[0]
-        return label
+        # Save model to file
+        torch.save(self.state_dict(), 'candidate_scorer_%s_%s' % (self._base, date.today()))
 
     def predict_multi(self, tokens, triples):
         # Tokenize dialogue
