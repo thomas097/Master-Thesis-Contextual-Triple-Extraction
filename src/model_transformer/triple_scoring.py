@@ -2,10 +2,10 @@ import glob
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
-from datetime import date
 
+# Capture errors
 from transformers import logging
-logging.set_verbosity(40)  # only errors
+logging.set_verbosity(40)
 
 from utils import *
 
@@ -39,7 +39,7 @@ class TripleScoring(torch.nn.Module):
         # Load model / tokenizer if pretrained model is given
         if path:
             print('\t- Loading pretrained')
-            model_path = glob.glob(path + '/candidate_scorer_*')[0]
+            model_path = glob.glob(path + '/candidate_scorer_' + base_model)[0]
             self.load_state_dict(torch.load(model_path, map_location=self._device))
 
     def forward(self, input_ids, speaker_ids, attn_mask):
@@ -49,30 +49,26 @@ class TripleScoring(torch.nn.Module):
         h = self._relu(out.last_hidden_state[:, 0])
         return self._softmax(self._head(h))
 
-    def _retokenize_dialogue(self, tokens, speaker=0):
+    def _retokenize_dialogue(self, tokens, speaker=1):
         # Tokenize each token individually (keeping track of subwords)
         f_input_ids = [self._tokenizer.cls_token_id]
         speaker_ids = [speaker]
-        for t in ' '.join(tokens).split(self._sep):
-            token_ids = self._tokenizer.encode(t, add_special_tokens=True)[1:] # Strip [CLS] (keep [SEP])
+        for turn in ' '.join(tokens).split(self._sep):
+            token_ids = self._tokenizer.encode(turn, add_special_tokens=True)[1:]  # strip [CLS]
             f_input_ids += token_ids
             speaker_ids += [speaker] * len(token_ids)
             speaker = 1 - speaker
 
-        # Remove last [SEP]
-        f_input_ids = f_input_ids[:-1]
-        speaker_ids = speaker_ids[:-1]
-
         return f_input_ids, speaker_ids
 
-    def _retokenize_triple(self, triple, speaker=0):
+    def _retokenize_triple(self, triple):
         # Append triple
-        f_input_ids = self._tokenizer.encode(' '.join(triple), add_special_tokens=False) # no [CLS] or [SEP]
+        f_input_ids = self._tokenizer.encode(' '.join(triple), add_special_tokens=False)
         speaker_ids = [0] * len(f_input_ids)
         return f_input_ids, speaker_ids
 
     def _add_padding(self, sequence, pad_token):
-        # If sequence is too long, cut off end :(
+        # If sequence is too long, cut off end
         sequence = sequence[:self._max_len]
 
         # Pad remainder to max_len
@@ -97,8 +93,8 @@ class TripleScoring(torch.nn.Module):
                 triple_input_ids, triple_speakers = self._retokenize_triple(triple)
 
                 # Concatenate dialogue + [UNK] + triple
-                input_ids = dialog_input_ids + [self._tokenizer.unk_token_id] + triple_input_ids
-                speakers = dialog_speakers + [0] + triple_speakers
+                input_ids = dialog_input_ids[:-1] + [self._tokenizer.unk_token_id] + triple_input_ids
+                speakers = dialog_speakers[:-1] + [0] + triple_speakers
 
                 # Pad sequence with [PAD] to max_len
                 input_ids, _ = self._add_padding(input_ids, self._tokenizer.pad_token_id)
@@ -133,10 +129,10 @@ class TripleScoring(torch.nn.Module):
             print("mean loss =", np.mean(losses))
 
         # Save model to file
-        torch.save(self.state_dict(), 'candidate_scorer_%s_%s' % (self._base, date.today()))
+        torch.save(self.state_dict(), 'candidate_scorer_%s' % self._base)
 
-    def predict_multi(self, tokens, triples):
-        # Tokenize dialogue
+    def predict(self, tokens, triples):
+        # Re-tokenize dialogue
         dialog_input_ids, dialog_speakers = self._retokenize_dialogue(tokens)
 
         batch_input_ids = []
@@ -147,7 +143,7 @@ class TripleScoring(torch.nn.Module):
             # Tokenize triple
             triple_input_ids, triple_speakers = self._retokenize_triple(triple)
 
-            # Concatenate dialogue + [UNK] + triple
+            # Concatenate dialogue tokens, [UNK] and triple
             input_ids = dialog_input_ids + [self._tokenizer.unk_token_id] + triple_input_ids
             speakers = dialog_speakers + [0] + triple_speakers
 

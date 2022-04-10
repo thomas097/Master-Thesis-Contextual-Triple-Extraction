@@ -1,48 +1,74 @@
+import re
 import glob
 import json
-import re
 import random
 import numpy as np
 
 from collections import defaultdict
 from copy import deepcopy
 
-## IO
 
-def load_annotations(path):
+def load_annotations(path, remove_unk=True, keep_skipped=False):
+    """ Reads all annotation files from path. By default, it filters skipped
+        files and removes the [unk] tokens appended at the end of each turn.
+
+        params:
+        str path:           name of directory containing annotations
+        bool remove_unk:    whether to remove [unk] tokens (default: True)
+        bool keep_skipped:  whether to keep skipped annotations (default: False)
+
+        returns:    list of annotations dicts
+    """
     annotations = []
     for fname in glob.glob(path + '/*.json'):
         with open(fname, 'r', encoding='utf-8') as file:
             data = json.load(file)
-            if not data['skipped']:
-                data['tokens'] = [[t for t in seq if t != '[unk]'] for seq in data['tokens']]  # remove [unk]
-                annotations.append(data)
+
+            if data['skipped'] and not keep_skipped:
+                continue
+
+            if remove_unk:
+                data['tokens'] = [[t for t in turn if t != '[unk]'] for turn in data['tokens']]
+
+            annotations.append(data)
+
     return annotations
 
 
-## Argument Extraction
-
 def triple_to_bio_tags(annotation, arg):
-    """ Converts the index-based annotation scheme to a vector of BIO tags
-        for some argument (arg=0->subj, arg=1->pred, arg=2->obj).
+    """ Converts the token indices of the annotations to a vector of BIO labels
+        for an argument.
+
+        params:
+        dict annotation:    loaded annotation file (see load_annotations)
+        int arg:            argument to create tag sequence for (subj=0, pred=1, obj=2)
+
+        returns:    ndarray with BIO labels (I=2, B=1, O=0)
     """
+    # Determine length of dialogue
     turns = annotation['tokens']
     triples = annotation['annotations']
-    num_tokens = sum([len(turn) + 1 for turn in turns])  #+1 for <eos>
+    num_tokens = sum([len(turn) + 1 for turn in turns])  # +1 for <eos>
 
-    # Create label vector containing a value for each token in dialogue
+    # Create vector same size as dialogue
     mask = np.zeros(num_tokens, dtype=np.uint8)
 
     # Label annotated arguments as BIO tags
     for triple in triples:
         for j, (turn_id, token_id) in enumerate(triple[arg]):
-            k = sum([len(t) + 1 for t in turns[:turn_id]]) + token_id # index k of token in dialog
+            k = sum([len(t) + 1 for t in turns[:turn_id]]) + token_id  # k = index of token in dialogue
             mask[k] = 1 if j == 0 else 2
     return mask
 
 
 def bio_tags_to_tokens(tokens, mask, one_hot=False):
-    """ Converts a vector of BIO-tags into spans of tokens.
+    """ Converts a vector of BIO-tags into spans of tokens. If BIO-tags are one-hot encoded,
+        one_hot=True will first perform an argmax to obtain the BIO labels.
+
+        params:
+        list tokens:    list of subwords or tokens (as tokenized by Albert/AutoTokenizer)
+        ndarray mask:   list of bio labels (one for each subword or token in 'tokens')
+        bool one_hot:   whether to interpret mask as a one-hot encoded sequence of shape |sequence|x3
     """
     out = []
     span = []
@@ -53,12 +79,12 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
         if one_hot:
             pred = np.argmax(pred)
 
-        if pred == 1: # Beginning
+        if pred == 1:  # B
             span = re.sub('[^\w\d\-\']+', ' ', ''.join(span)).strip()
             out.append(span)
             span = [token]
 
-        elif pred == 2: # Inside
+        elif pred == 2:  # I
             span.append(token)
 
     if span:
@@ -69,61 +95,68 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
     return set([span for span in out if span.strip()])
 
 
-## Triple Scoring
+def extract_triples(annotation, neg_oversampling=7, contr_oversampling=0.7, ellipsis_oversampling=3):
+    """ Extracts plain-text triples from an annotation file and samples 'negative' examples by
+        crossover. By default, the function will over-extract triples with negative polarity and
+        elliptical constructions to counter class imbalance.
 
-def extract_triples(annotation, pol_oversampling=7, neg_undersampling=0.7, ellipsis_oversampling=3):
+        params:
+        dict annotation:            loaded annotation file (see load_annotations)
+        int neg_oversampling:       how much to over-sample triples with negative polarity
+        float contr_oversampling:   how much to sample contrast/invalid triples relative to true triples
+        int ellipsis_oversampling:  how much to over-sample elliptical triples
+    """
     turns = annotation['tokens']
-    triple_ids = annotation['annotations']
+    triple_ids = [t[:4] for t in annotation['annotations']]
 
     arguments = defaultdict(list)
     triples = []
     labels = []
 
-    triple_ids = [t[:4] for t in triple_ids]
-
     # Oversampling of elliptical triples
     for triple in deepcopy(triple_ids):
-        turn_ids = set([i for i, _ in triple[0]]) | set([i for i, _ in triple[2]])
-        if len(turn_ids) > 1:
-            triple_ids += [triple] * ellipsis_oversampling
+        subj_obj_turns = set([i for i, _ in triple[0] + triple[2]])
+        if len(subj_obj_turns) > 1:
+            triple_ids += [triple] * int(ellipsis_oversampling)
 
-    for subj, pred, obj, neg in triple_ids:
+    # Extract 'True' triples
+    for subj, pred, obj, polar in triple_ids:
 
-        # Extract tokens belonging to triple arguments
         subj = ' '.join(turns[i][j] for i, j in subj) if subj else ''
         pred = ' '.join(turns[i][j] for i, j in pred) if pred else ''
         obj = ' '.join(turns[i][j] for i, j in obj) if obj else ''
 
-        if subj or pred or obj:  # No blank triples
+        if subj or pred or obj:
 
-            if not neg:
+            if not polar:
                 triples += [(subj, pred, obj)]
                 labels += [1]
             else:
-                triples += [(subj, pred, obj)] * pol_oversampling # oversampling negative polarities
-                labels += [2] * pol_oversampling
+                triples += [(subj, pred, obj)] * neg_oversampling  # Oversampling negative polarities
+                labels += [2] * neg_oversampling
 
             arguments['subjs'].append(subj)
             arguments['preds'].append(pred)
             arguments['objs'].append(obj)
 
+    # Skip if the annotation file was blank
     if not triples:
         return [], [], []
 
-    # Create negative examples (i.e. not entailed)
-    n = int(len(triples) * neg_undersampling)
-    for i in range(100):
+    # Sample fake contrast examples (invalid extractions)
+    n = int(len(triples) * contr_oversampling)
+    for i in range(50):
         s = random.choice(arguments['subjs'])
         p = random.choice(arguments['preds'])
         o = random.choice(arguments['objs'])
 
-        # Check if the triple was already generated
+        # Ensure samples are new (and not actually valid!)
         if (s, p, o) not in triples and s and p and o:
-            triples += [(s, p, o)] # not entailed
+            triples += [(s, p, o)]
             labels += [0]
             n -= 1
 
-        # Create as many on-entailed examples as entailed ones
+        # Create as many fake examples as there were 'real' triples
         if n == 0:
             break
 

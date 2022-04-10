@@ -2,53 +2,54 @@ import glob
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
-from datetime import date
 
+# Catch warnings
 from transformers import logging
-logging.set_verbosity(40)  # only errors
+logging.set_verbosity(40)
 
 from utils import *
 
 
 class ArgumentExtraction(torch.nn.Module):
-    def __init__(self, base_model='albert-base-v2', path=None, output_dim=3, sep='<eos>'):
-        """ Init a transformer with custom multi-span-extraction heads for SPO arguments
+    def __init__(self, base_model='albert-base-v2', path=None, sep='<eos>'):
+        """ Init model with multi-span extraction heads for SPO arguments.
+
+            params:
+            str base_model: Transformer architecture to use (default: albert-base-v2)
+            str path:       Path to pretrained model
         """
         super().__init__()
-        # Base model
         print('loading %s for argument extraction' % base_model)
-        # Load base model
         self._model = AutoModel.from_pretrained(base_model)
         self._base = base_model
         self._sep = sep
 
-        # Load and extend tokenizer with SPEAKERS
+        # Load and extend tokenizer with special SPEAKER tokens
         self._tokenizer = AutoTokenizer.from_pretrained(base_model)
         self._tokenizer.add_tokens(['SPEAKER1', 'SPEAKER2'], special_tokens=True)
         self._model.resize_token_embeddings(len(self._tokenizer))
 
-        # BIO classification heads
+        # Add token classification heads
         hidden_size = AutoConfig.from_pretrained(base_model).hidden_size
-        self._subj_head = torch.nn.Linear(hidden_size, output_dim)
-        self._pred_head = torch.nn.Linear(hidden_size, output_dim)
-        self._obj_head = torch.nn.Linear(hidden_size, output_dim)
-        self._output_dim = output_dim
+        self._subj_head = torch.nn.Linear(hidden_size, 3)
+        self._pred_head = torch.nn.Linear(hidden_size, 3)
+        self._obj_head = torch.nn.Linear(hidden_size, 3)
 
         self._relu = torch.nn.ReLU()
         self._softmax = torch.nn.Softmax(dim=-1)
 
-        # Enable support for GPU (optional)
+        # Set GPU if available
         self._device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.to(self._device)
 
         # Load model / tokenizer if pretrained model is given
         if path:
             print('\t- Loading pretrained')
-            model_path = glob.glob(path + '/argument_extraction_*')[0]
+            model_path = glob.glob(path + '/argument_extraction_' + base_model)[0]
             self.load_state_dict(torch.load(model_path, map_location=self._device))
 
     def forward(self, input_ids, speaker_ids):
-        """ Computes the forward pass through the model
+        """ Computes BIO label probabilities for each token
         """
         # Feed dialog through transformer
         y = self._model(input_ids=input_ids, token_type_ids=speaker_ids)
@@ -66,6 +67,8 @@ class ArgumentExtraction(torch.nn.Module):
         return y_subj, y_pred, y_obj_
 
     def _retokenize_tokens(self, tokens):
+        """ Re-tokenizes a sequence of tokens into a sequence of subwords and speaker_ids.
+        """
         # Tokenize each token individually (keeping track of subwords)
         input_ids = [[self._tokenizer.cls_token_id]]
         for t in tokens:
@@ -80,23 +83,30 @@ class ArgumentExtraction(torch.nn.Module):
         # Determine how often we need to repeat the labels
         repeats = [len(ids) for ids in input_ids]
 
-        # Determine speaker ids (0 or 1)
+        # Set speaker IDs
         speaker_ids = [0] + [tokens[:i + 1].count(self._sep) % 2 for i in range(len(tokens))][:-1]  # TODO: make pretty
         speaker_ids = self._repeat_speaker_ids(speaker_ids, repeats)
 
         return f_input_ids, speaker_ids, repeats
 
     def _repeat_speaker_ids(self, speaker_ids, repeats):
+        """ Repeats speaker IDs for oov tokens.
+        """
         rep_speaker_ids = np.repeat([0] + list(speaker_ids), repeats=repeats)
         return torch.LongTensor([rep_speaker_ids]).to(self._device)
 
     def _repeat_labels(self, labels, repeats):
+        """ Repeats BIO labels for OOV tokens. Ensure B-labeled tokens are repeated
+            as B-I-I etc.
+        """
         # Repeat each label b the amount of subwords per token
         rep_labels = []
         for label, rep in zip([0] + list(labels), repeats):
-            if label == 0:  # Outside
+            # Outside
+            if label == 0:
                 rep_labels += [label] * rep
-            else:  # Beginning + Inside
+            # Beginning + Inside
+            else:
                 rep_labels += [label] + ([2] * (rep - 1))  # If label = B -> B-I-I-I...
         return torch.LongTensor([rep_labels]).to(self._device)
 
@@ -116,7 +126,7 @@ class ArgumentExtraction(torch.nn.Module):
         optim = torch.optim.Adam(self.parameters(), lr=lr)
 
         # Higher weight for B- and I-tags to account for class imbalance
-        class_weights = torch.Tensor([1] + [weight] * (self._output_dim - 1)).to(self._device)
+        class_weights = torch.Tensor([1] + [weight] * 2).to(self._device)
         criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 
         print('Training!')
@@ -127,9 +137,10 @@ class ArgumentExtraction(torch.nn.Module):
                 # Forward pass
                 subj_y_hat, pred_y_hat, obj_y_hat = self(input_ids, speaker_ids)
 
-                loss = criterion(subj_y_hat, subj_y)  # Subj error
-                loss += criterion(pred_y_hat, pred_y)  # Pred error
-                loss += criterion(obj_y_hat, obj_y)  # Obj error
+                # Compute loss
+                loss = criterion(subj_y_hat, subj_y)
+                loss += criterion(pred_y_hat, pred_y)
+                loss += criterion(obj_y_hat, obj_y)
                 losses.append(loss.item())
 
                 optim.zero_grad()
@@ -139,9 +150,10 @@ class ArgumentExtraction(torch.nn.Module):
             print("mean loss =", np.mean(losses))
 
         # Save model to file
-        torch.save(self.state_dict(), 'argument_extraction_%s_%s' % (self._base, date.today()))
+        torch.save(self.state_dict(), 'argument_extraction_%s' % self._base)
 
     def predict(self, token_seq):
+        """ Predicts """
         # Retokenize token sequence
         input_ids, speaker_ids, _ = self._retokenize_tokens(token_seq)
 
@@ -149,11 +161,16 @@ class ArgumentExtraction(torch.nn.Module):
         subwords = self._tokenizer.convert_ids_to_tokens(input_ids[0])
 
         # Forward-pass
-        subj_y_hat, pred_y_hat, _obj_y_hat = self(input_ids, speaker_ids)
-        subj = subj_y_hat.cpu().detach().numpy()[0]
-        pred = pred_y_hat.cpu().detach().numpy()[0]
-        _obj = _obj_y_hat.cpu().detach().numpy()[0]
-        return subj, pred, _obj, subwords
+        predictions = self(input_ids, speaker_ids)
+        subjs = predictions[0].cpu().detach().numpy()[0]
+        preds = predictions[1].cpu().detach().numpy()[0]
+        objs = predictions[2].cpu().detach().numpy()[0]
+
+        # Decode predictions into strings
+        subj_args = bio_tags_to_tokens(subwords, subjs.T, one_hot=True)
+        pred_args = bio_tags_to_tokens(subwords, preds.T, one_hot=True)
+        obj_args = bio_tags_to_tokens(subwords, objs.T, one_hot=True)
+        return subj_args, pred_args, obj_args
 
 
 if __name__ == '__main__':

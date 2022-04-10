@@ -62,10 +62,7 @@ class AlbertTripleExtractor:
 
         # Extract SPO arguments from token sequence
         print('Extracting arguments:')
-        y_subjs, y_preds, y_objs, subwords = self._argument_module.predict(tokens)
-        subjs = bio_tags_to_tokens(subwords, y_subjs.T, one_hot=True)
-        preds = bio_tags_to_tokens(subwords, y_preds.T, one_hot=True)
-        objs = bio_tags_to_tokens(subwords, y_objs.T, one_hot=True)
+        subjs, preds, objs = self._argument_module.predict(tokens)
 
         if verbose:
             print('subjects:   %s' % subjs)
@@ -78,7 +75,7 @@ class AlbertTripleExtractor:
             return []
 
         # Score candidate triples
-        predictions = self._scoring_module.predict_multi(tokens, candidates)
+        predictions = self._scoring_module.predict(tokens, candidates)
         print('Scored candidates:')
 
         # Rank candidates according to entailment predictions
