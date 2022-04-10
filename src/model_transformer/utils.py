@@ -161,3 +161,30 @@ def extract_triples(annotation, neg_oversampling=7, contr_oversampling=0.7, elli
             break
 
     return turns, triples, labels
+
+
+def pronoun_to_speaker_id(token, turn_idx):
+    # Even turns -> speaker1
+    if turn_idx % 2 == 0:
+        if token in ['i', 'me', 'myself', 'we', 'us', 'ourselves']:
+            return 'SPEAKER1'
+        elif token in ['my', 'mine', 'our', 'ours']:
+            return "SPEAKER1's"
+        elif token in ['you', 'yourself', 'yourselves']:
+            return 'SPEAKER2'
+        elif token in ['your', 'yours']:
+            return "SPEAKER2's"
+    else:
+        if token in ['i', 'me', 'myself', 'we', 'us', 'ourselves']:
+            return "SPEAKER2"
+        elif token in ['my', 'mine', 'our', 'ours']:
+            return "SPEAKER2's"
+        elif token in ['you', 'yourself', 'yourselves']:
+            return 'SPEAKER1'
+        elif token in ['your', 'yours']:
+            return "SPEAKER1's"
+    return token
+
+
+def speaker_id_to_speaker(string, speaker1, speaker2):
+    return string.replace('SPEAKER1', speaker1).replace('SPEAKER2', speaker2)

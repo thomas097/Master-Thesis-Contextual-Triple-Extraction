@@ -60,7 +60,6 @@ REMOVE_AUXILIARIES = {"am VERB": [0],
 
 REPLACE_CONTR = {"'m": 'am',
                  "' m": 'am',
-                 "'s": 'is',
                  "'ll": 'will',
                  "'re": 'are',
                  "'ve": 'have',
