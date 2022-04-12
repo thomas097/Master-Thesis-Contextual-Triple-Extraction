@@ -20,7 +20,7 @@
 
 Soft f1: Agreement where arguments are considered to match when their are subsets of one another (e.g. "the green ball" and "the ball"). This accounts for the possibility of adding optional prepositional phrases to the objects/predicates or forgotten determiners (something that some seemed to do).
 
-## Pairwise (F1)##
+## Pairwise (F1)
 
 ### Subjects
 |    | he  | is    | ja    | jo    | pi    | se    | th    | we    |
