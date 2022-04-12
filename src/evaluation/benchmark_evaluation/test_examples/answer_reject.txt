@@ -1,8 +1,0 @@
-Do you love animals ? <eos> no, not a fan <eos>
-you, love, animals, negative
-
-Do you have a dark past ? <eos> not at all <eos>
-you, have, a dark past, negative
-
-Did you receive my letter ? <eos> haven't seen it <eos>
-you, receive, my letter, negative
