@@ -64,8 +64,8 @@ def arguments(annotation, arg, corrected=False):
         if corrected:
             arg_tokens = correct_auxs_and_particles(arg_tokens)
 
-        if arg_tokens: # check whether they are empty
-            args.append(' '.join(arg_tokens))
+        if arg_tokens:  # check whether they are empty
+            args.append(arg_tokens)
     return args
 
 
