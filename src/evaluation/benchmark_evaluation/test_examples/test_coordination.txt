@@ -6,7 +6,7 @@ brother,doing,that
 personachat-valid-000839
 i do ! and , i still sew my clothes myself .<eos>that's the way to do it . are you strong and healthy still ?<eos>yes . i am now cancer free , and feeling great .
 speaker1,am,cancer free
-speaker1,am,feeling great
+speaker1,feeling, great
 
 personachat-train-002595
 i'm more of a chevy person , but they got me by .<eos>have you ever played basketball ?<eos>i played growing up and have about thirty trophies .
@@ -80,8 +80,8 @@ it,'s,boring
 
 personachat-train-015039
 hello , what are you up to ?<eos>i am just watching netflix , you ?<eos>i am playing piano , practicing
-speaker1,am,playing piano
-speaker1,am,practicing
+speaker1,playing,piano
+speaker1,practicing,piano
 
 personachat-valid-000549
 but i do have a lot of friends<eos>that's great . what do you guys do together ?<eos>we have all sorts of fun and go out and play .
@@ -91,12 +91,10 @@ we,go,out
 personachat-valid-000099
 i like to read and play video games . i mostly just spend time with my family .<eos>that's cool . what do you read ?<eos>mostly fiction and biographies . i like those two genres the best .
 speaker1,like to,read
-speaker1,like to,play video games
+speaker1,play, video games
 
 daily_dialogs-train-002878
-Is there anything else you need help finding ?
-Could you point me toward the dishwashing detergent ?
-That's over by the paper towels and toilet paper .
+Is there anything else you need help finding ?<eos>Could you point me toward the dishwashing detergent ?<eos>That's over by the paper towels and toilet paper .
 that,'s over by,the paper towels
 that,'s over by,toilet paper
 
@@ -112,7 +110,7 @@ speaker1,like,country music
 
 circa-train-012211
 alot really , i enjoy going out to eat with family , going to the movies<eos>have you been to the movies lately ?<eos>yes , i go a couple of times a month .
-speaker1,enjoy going out to,eat with family
+speaker1,going out to,eat with family
 speaker1,going to,the movies
 
 personachat-train-015275
@@ -132,8 +130,8 @@ we,cook together at,the antique store
 
 personachat-valid-000397
 i'll probably end up going to the gym . have any animals ?<eos>no , i'm only in college . what do you do ?<eos>in between jobs right now so you can find me on the treadmill or rowing machine .
-speaker2,find speaker1 on,the treadmill
-speaker2,find speaker1 on,rowing machine
+speaker2,can find,speaker1 on the treadmill
+speaker2,can find,speaker1 on rowing machine
 
 daily_dialogs-valid-000327
 So that we can sit down together and listen to some music .<eos>Listen to the music ? And who will cook dinner , will you ?<eos>I will , but let's go to the disco after dinner .
@@ -147,8 +145,8 @@ speaker1,love,speaker1 's cats
 
 daily_dialogs-valid-011276
 I am calling to apply to work in your agency of entry .<eos>OK . Do you have any advantages to work in our entry agency ?<eos>Yes . I know many ambassadors in Chinese Embassy and British Embassy in China .
-speaker1,know,many ambassadors in Chinese Embassy
-speaker1,know,British Embassy in China
+speaker1,know,many ambassadors in chinese embassy
+speaker1,know,british embassy in china
 
 personachat-train-007124
 i am going to a concert and maybe try the new italian place after .<eos>oh , great ! what kind of concert ? what kind of music ?<eos>5 star symphony , its orchestra .
