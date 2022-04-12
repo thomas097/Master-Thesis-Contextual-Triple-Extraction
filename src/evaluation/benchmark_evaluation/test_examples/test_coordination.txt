@@ -1,0 +1,550 @@
+daily_dialogs-train-011266
+No , my father and brother are doing that .<eos>Have you finished school ?<eos>Yes , I have already graduated .
+speaker1 's father,doing,that
+brother,doing,that
+
+personachat-valid-000839
+i do ! and , i still sew my clothes myself .<eos>that's the way to do it . are you strong and healthy still ?<eos>yes . i am now cancer free , and feeling great .
+speaker1,am,cancer free
+speaker1,am,feeling great
+
+personachat-train-002595
+i'm more of a chevy person , but they got me by .<eos>have you ever played basketball ?<eos>i played growing up and have about thirty trophies .
+speaker1,played,growing up
+speaker1,have,about thirty trophies
+
+circa-valid-017204
+cool beans . i am a 1980 kid and love new kids on the block<eos>do your remember our block fondly ?<eos>yes
+speaker1,am,a 1980 kid
+speaker1,love,new kids on the block
+
+daily_dialogs-train-001774
+It's exactly what I asked for .<eos>Nothing wrong with it ?<eos>It's the right material . And the right color . I have to have it .
+it,'s,the right material
+it,'s,the right color
+
+circa-train-001473
+oh i hate traffic and crowded parking lots myself . do you have any hobbies<eos>did you encounter a lot of traffic coming here ?<eos>it was quite busy with cars
+speaker1,hate,traffic
+speaker1,hate,crowded parking lots
+
+circa-valid-011157
+i grew up in a small town but want to live in the city .<eos>did you move from somewhere else in town<eos>we used to live in hokkaido .
+speaker1,grew up in,a small town
+speaker1,want to,live in the city
+
+circa-train-029220
+yes , i tour breweries and the area .<eos>are your parents still living in the area ?<eos>no , they passed away .
+speaker1,tour,breweries
+speaker1,tour,the area
+
+personachat-train-007124
+i am going to a concert and maybe try the new italian place after .<eos>oh , great ! what kind of concert ? what kind of music ?<eos>5 star symphony , its orchestra .
+speaker1,going to,a concert
+speaker1,try,the new italian place
+
+circa-valid-022223
+i am currently a cleaning lady and do alot of work in the city .<eos>were you born in this city ?<eos>no , i was born in the countryside
+speaker1,am,a cleaning lady
+speaker1,do,alot of work in the city
+
+daily_dialogs-train-001980
+Yes , we have both the paperback and hardcover . which would you want to buy ?<eos>How about the price of the hardcover ?<eos>It's 25 .
+we,have,the paperback
+we,have,hardcover
+
+daily_dialogs-train-000994
+If you don't mind , I'd rather you didn't . I have a cold and feel chilly .<eos>Oh , that's too bad . Should I call a doctor ?<eos>I'd appreciate it if you would .
+speaker1,have,a cold
+speaker1,feel,chilly
+
+daily_dialogs-train-005972
+Sure , they do .<eos>But why do you choose cycling at first ?<eos>Because it is convenient and good for environmental protection .
+it,is,convenient
+it,good for,environmental protection
+
+daily_dialogs-train-002886
+And there are Cantonese cuisine and Kiangsu cuisine .. Most people like them .<eos>What about any special Beijing dishes ?<eos>There're Beijing roast duck .
+there,are,cantonese cuisine
+there,are,kiangsu cuisine
+
+daily_dialogs-train-007294
+Any way , in a word , panda is our friend .<eos>Do you know other famous animals in the world ?<eos>Yeah , let me think , the kangaroo and koala bear from Australia are very famous .
+the kangaroo,are,very famous
+koala bear from Australia,are,very famous
+
+circa-train-018189
+good , just tired from work<eos>do you like to do repetitive work ?<eos>no , it's unpleasant and boring .
+it,'s,unpleasant
+it,'s,boring
+
+personachat-train-015039
+hello , what are you up to ?<eos>i am just watching netflix , you ?<eos>i am playing piano , practicing
+speaker1,am,playing piano
+speaker1,am,practicing
+
+personachat-valid-000549
+but i do have a lot of friends<eos>that's great . what do you guys do together ?<eos>we have all sorts of fun and go out and play .
+we,have,all sorts of fun
+we,go,out
+
+personachat-valid-000099
+i like to read and play video games . i mostly just spend time with my family .<eos>that's cool . what do you read ?<eos>mostly fiction and biographies . i like those two genres the best .
+speaker1,like to,read
+speaker1,like to,play video games
+
+daily_dialogs-train-002878
+Is there anything else you need help finding ?
+Could you point me toward the dishwashing detergent ?
+That's over by the paper towels and toilet paper .
+that,'s over by,the paper towels
+that,'s over by,toilet paper
+
+daily_dialogs-train-010343
+Good morning .<eos>What's the problem ?<eos>I'm running a high fever and feeling terribly bad .
+speaker1,running,a high fever
+speaker1,feeling,terribly bad
+
+personachat-train-016839
+haha yeah , i like football and country music<eos>sounds like you are from the south , what is your favorite team ?<eos>the colts , from my home state
+speaker1,like,football
+speaker1,like,country music
+
+circa-train-012211
+alot really , i enjoy going out to eat with family , going to the movies<eos>have you been to the movies lately ?<eos>yes , i go a couple of times a month .
+speaker1,enjoy going out to,eat with family
+speaker1,going to,the movies
+
+personachat-train-015275
+what is your favorite pizza toppings ?<eos>i like mushroom and spinach what about you ?<eos>same , with feta cheese and onions
+speaker2,like,mushroom
+speaker2,like,spinach
+
+personachat-train-014794
+they're doing good . i'm the one who feels lost in who i'm .<eos>why is that ? why do you feel lost ?<eos>i have a good relationship with my husband but feel alone sometimes .
+speaker1,have,a good relationship with speaker1 's husband
+speaker1,feel,alone
+
+personachat-train-005245
+like the lil b cooking dance ? all the time . swag<eos>oh okay . your friends do this too ?<eos>yeah . we all cook together at starbucks and the antique store
+we,cook together at,starbucks
+we,cook together at,the antique store
+
+personachat-valid-000397
+i'll probably end up going to the gym . have any animals ?<eos>no , i'm only in college . what do you do ?<eos>in between jobs right now so you can find me on the treadmill or rowing machine .
+speaker2,find speaker1 on,the treadmill
+speaker2,find speaker1 on,rowing machine
+
+daily_dialogs-valid-000327
+So that we can sit down together and listen to some music .<eos>Listen to the music ? And who will cook dinner , will you ?<eos>I will , but let's go to the disco after dinner .
+we,can,sit down together
+we,can,listen to some music
+
+personachat-valid-000485
+i love the birds and my cats .<eos>how many do you have ?<eos>i've two cats . i watch the birds outside . it is getting close to holidays .
+speaker1,love,the birds
+speaker1,love,speaker1 's cats
+
+daily_dialogs-valid-011276
+I am calling to apply to work in your agency of entry .<eos>OK . Do you have any advantages to work in our entry agency ?<eos>Yes . I know many ambassadors in Chinese Embassy and British Embassy in China .
+speaker1,know,many ambassadors in Chinese Embassy
+speaker1,know,British Embassy in China
+
+personachat-train-007124
+i am going to a concert and maybe try the new italian place after .<eos>oh , great ! what kind of concert ? what kind of music ?<eos>5 star symphony , its orchestra .
+speaker1,going to,a concert
+speaker1,try,the new italian place
+
+circa-valid-026241
+hi there , i decided to pack up my belongings and move here from germany .<eos>has your move been easy ?<eos>it's been problem free .
+speaker1,decided to,pack up speaker1 's belongings
+speaker1,move here from,germany
+
+daily_dialogs-train-000994
+If you don't mind , I'd rather you didn't . I have a cold and feel chilly .<eos>Oh , that's too bad . Should I call a doctor ?<eos>I'd appreciate it if you would .
+speaker1,have,a cold
+speaker1,feel,chilly
+
+daily_dialogs-valid-010338
+I think you've got the flu . There's a lot of it about .<eos>What should I do ?<eos>Take some medicine and stay in bed for a day or two .
+speaker2,take,some medicine
+speaker2,stay in,bed
+
+daily_dialogs-train-000673
+It's fish steamed and served with our special sauce .<eos>Is it good ?<eos>Sure . It's a most popular dish .
+it,'s,fish steamed
+it,served with,our special sauce
+
+circa-train-012527
+we should hit up a bar and have a few drinks .<eos>shall we go for a drink at a bar ?<eos>no , i have to get home .
+we,should hit up,a bar
+we,have,a few drinks
+
+daily_dialogs-train-008322
+It seems that you will have a nice day tomorrow .<eos>How about you ? What are you going to do tomorrow ?<eos>I have a lot of work in the office and a lot of chores in the house . How I envy you , Robin !
+speaker1,have,a lot of work in the office
+speaker1,have,a lot of chores in the house
+
+circa-train-023090
+i try to avoid sugar and eat a somewhat balanced diet . that sounds good !<eos>do you have any special diet ?<eos>i can eat anything .
+speaker1,try to,avoid sugar
+speaker1,eat,a somewhat balanced diet
+
+daily_dialogs-train-008671
+I think it's either one or two gigs . I can't remember .<eos>how much do they cost ?<eos>not much at all . I think it's about 100 dollars .
+it,'s,one
+it,'s,two gigs
+
+personachat-train-005143
+karma is real , do you agree ?<eos>i do agree . ever notice in scary movies how the bad guy always gets killed ?<eos>i don't believe in dating and have never been
+speaker1,believe in,dating,negative
+speaker1,have,been,negative
+
+personachat-train-002143
+i mostly eat out and do not cook so that is also an issue haha<eos>oh i love to cook ! do you not like it or are you just too busy ?<eos>i'm just too busy but around the weekend i tend to make some stuff
+i,eat,out
+i,do,cook
+
+daily_dialogs-train-006540
+Well , she's tall and pretty .<eos>Is she like you ?<eos>I suppose so . We're both friendly and easy going .
+we,are,friendly
+we,are,easy going
+she,'s,pretty
+
+personachat-valid-000833
+hi i am very high class and conceited<eos>hello , just came back from my trip to europe . i go there twice a year ! you ?<eos>i travel everywhere and spend lots to go on luxurious trips
+speaker1,am,very high class
+speaker1,am,conceited
+speaker1,travel,everywhere
+speaker1,spend,lots
+
+personachat-train-006840
+hello how are you doing ?<eos>i am good . getting ready to use my new paddle board . you ?<eos>i'm great , i'm a developer and very wealthy
+speaker1,'m,a developer
+speaker1,'m,very wealthy
+
+daily_dialogs-valid-006900
+Terrible .<eos>Oh , what's the matter ?<eos>I've got a fever and really a bad headache .
+speaker1,got,a fever
+speaker1,got,a bad headache
+
+personachat-train-010754
+i know that but i want you can we be together ?<eos>no i've children to take care of are you going to do that ?<eos>yes . i want you and me in the future i will force you .
+speaker1,want,speaker2
+speaker1,want,speaker1
+
+daily_dialogs-valid-003730
+Congratulations !<eos>How about you ? Have you got any news from university ?<eos>No . But I am going to apply for some vocational schools . I like fashion design and want to study it .
+speaker1,like,fashion design
+speaker1,want to,study it
+
+circa-valid-031730
+yeah i actually play the violin , guitar , drums and piano .<eos>have you played guitar ?<eos>i played as a kid .
+speaker1,play,the violin
+speaker1,play,guitar
+speaker1,play,drums
+speaker1,play,piano
+
+personachat-valid-000704
+am fine and how is your life<eos>not too bad , just finished coaching swim practice . how about you ?<eos>am also good and planning to watch a movie tonight
+speaker1,am,good
+speaker1,planning to,watch a movie
+
+personachat-train-008158
+do you have any hobbies ?<eos>yes , i love to read , watch movies , food blogging ; to name a few . you ?<eos>i like anything having to do with tech stuff very fun
+speaker1,love to,read
+speaker1,love to,watch movies
+speaker1,love to,food blogging
+
+personachat-train-002133
+i will eat about anything .<eos>what do you usually knit ?<eos>i usually do scarves and blankets . i sell them on etsy .
+speaker1,do,scarves
+speaker1,do,blankets
+
+daily_dialogs-valid-005726
+I went to Jessie's birthday party yesterday . It was very good .<eos>I didn't know about it . What did you do ?<eos>We ate a lot of things . We played games and gave gifts to Jessie . We had a lot of fun .
+we,played,games
+we,gave,gifts to Jessie
+
+circa-train-023464
+sorry to hear that ! i like festivals and music !<eos>have you ever been a big music festival ?<eos>only in my dreams .
+speaker1,like,festivals
+speaker1,like,music
+
+circa-valid-001488
+i enjoy the great outdoors and being in the water .<eos>would you like a glass of water ?<eos>yes , i would thanks
+speaker1,enjoy,the great outdoors
+speaker1,enjoy,being in the water
+
+personachat-valid-000166
+i've heard that cutting meat out of your diet helps with cancer<eos>i run marathons and never ate meat . you sing or dance ?<eos>i don't . but i do ride horses competitively .
+speaker1,run,marathons,positive
+speaker1,ate,meat,negative
+
+personachat-train-000050
+nice to meet ya sally ! i am sean and am a student<eos>hey sean , what are you studying ?<eos>computer engineering and math . have an internship starting later this year i'm very excited for .
+speaker1,am,sean
+speaker1,am,a student
+speaker1,studying,computer engineering
+speaker1,studying,math
+
+circa-train-010351
+we could put on some christian edm and party once your taller to celebrate<eos>do you like edm ?<eos>no , i don't know them
+we,could,put on some christian edm
+we,could,party
+
+circa-valid-027823
+i've a german shepherd named king and an english bulldog named major .<eos>have you read any stephen king novels ?<eos>the stand is about my favorite book of his .
+speaker1,'ve,a german shepherd names King
+speaker1,'ve,an english bulldog named major
+
+personachat-valid-000943
+hello there ! how are you ?<eos>i'm doing well . do you have any hobbies ?<eos>well i am pretty busy with my two kids and preparing for twins in 2 months
+speaker1,am pretty busy with,speaker1 's two kids
+speaker1,preparing for,twins
+
+personachat-train-012294
+yea , i just love fries too much and eat them too often .<eos>i guess that's why you signed up for my class . are you new to vegas ?<eos>yea , wanted to experience the lights and all the excitement .
+speaker1,love too much,fries
+speaker1,eat too often,them
+speaker1,wanted to,experience the lights
+speaker1,wanted to,all the excitement
+
+personachat-valid-000076
+great . my father was a teacher too so<eos>did he hike like i do ?<eos>no he did not . he and i enjoyed time in the beach .
+he,enjoyed,time in the beach
+speaker1,enjoyed,time in the beach
+
+daily_dialogs-train-010266
+It sounds as if you have a virus .<eos>What do you think I should do ?<eos>I'll give you something . I want you to take it easy and come back in a couple of days .
+speaker2,want you to,take it easy
+speaker2,want you to,come back in a couple of days
+
+circa-valid-025749
+i grew up in a small town and want to live in the city .<eos>do you work here in town ?<eos>yes , i work in the town centre .
+speaker1,grew up in,a small town
+speaker1,want to,live in the city
+
+circa-train-029875
+no . i am close to my mom the hiker but not my dad who rides motorcycles .<eos>are you a hiker ?<eos>no , i prefer trail running over walking
+speaker1,am close to,speaker1 's mom the hiker
+speaker1,am close to,speaker1 's dad who rides motorcycles
+
+circa-train-002074
+yup been to new york city 3 times this year<eos>do you want to live in new york city ?<eos>the city is too busy and loud
+the city,is,too busy
+the city,is,loud
+
+personachat-train-004410
+no cats but my daughter is almost 8 and loves my little pony !<eos>do you like watching tv ? like anime ?<eos>my boyfriend doesn't work so he watches tv alot .
+speaker1 's daughter,is,almost 8
+speaker1 's daughter,loves,speaker1 's little pony
+
+personachat-valid-000860
+i recently moved to the us i am just renting for now<eos>oh okay . i teach in a school and pregnant with triplets . you have children ?<eos>wow that is exciting i do not have kids
+speaker2,teach in,a school
+speaker2,pregnant with,triplets
+
+personachat-valid-000229
+it sounds like you have a big family<eos>i sure do . do you have a big family ?<eos>i have four siblings and two loving parents
+speaker1,have,four siblings
+speaker1,have,two loving parents
+
+personachat-train-000789
+that's cool i like to bake<eos>do you make good meat ?<eos>i make cakes cookies and cup cakes
+speaker1,make,cakes
+speaker1,make,cookies
+speaker1,make,cup cakes
+
+personachat-train-000733
+i miss having fun hair . i had red , green , purple . . . its boring now<eos>whats stopping you from dying it now ?<eos>work . i worked primarily at home and in non client facing roles until recently
+speaker1,had,red
+speaker1,had,green
+speaker1,had,purple
+
+personachat-valid-000735
+hello , tracy . i'm anna . yes , i will be busy tomorrow cleaning out drains .<eos>my brother and three sister all live in alabama . any siblings ?<eos>i've two . i also have three kiddos and one wife , lol
+speaker2 's brother,live in,alabama
+three sister,live in,alabama
+i,have,three kiddos
+i,have,one wife
+
+circa-train-013146
+i wish for things too , like to go to paris and design clothes . good luck !<eos>have you ever been to paris ?<eos>yes
+speaker1,wish for,things
+speaker1,like to,go to paris
+speaker1,like to,design clothes
+
+personachat-train-014153
+i live in browns country . my dad and several other doctors have box seats .<eos>fantastic . i'm planning on becoming an english teacher . you going to be a doctor ?<eos>no , i'm going to be a vet .
+speaker1 's dad,have,box seats
+several other doctors,have,box seats
+
+personachat-valid-000494
+well when i am not hiking or climbing i work as an engineer<eos>i walk dogs and own the business , do you like dogs ?<eos>not at all , only hiking
+speaker2,walk,dogs
+speaker2,own,the business
+
+personachat-valid-000544
+for sure . what else do you like ?<eos>school keeps me pretty busy , what about you ?<eos>spending a lot of time running and getting resources for my new job
+speaker1,spending,a lot of time running
+speaker1,getting,resources for my new job
+
+circa-train-031815
+sometimes . usually non fiction sometimes some sci fi<eos>do you like non fiction ?<eos>yes , i like biographies and current events .
+speaker1,like,biographies
+speaker1,like,current events
+
+personachat-valid-000556
+i donate to locks of love if that counts<eos>that is great ! ok , now another random question what is your biggest fear ?<eos>spiders . . . i absolutely hate and fear them
+speaker1,hate,them
+speaker1,fear,them
+
+personachat-train-000888
+hi ! please tell me about yourself .<eos>hey there . i live in colorado and work in it . how about you ?<eos>i'm disabled and have many hobbies like photography .
+speaker2,live in,colorado
+speaker2,work in,it
+speaker1,'m,disabled
+speaker1,have,many hobbies like photography
+
+personachat-train-003906
+that sounds very enjoyable . maybe those would be easy for me to read<eos>yeah . do you love anyone ?<eos>no not at the moment . i live vicariously through foreign movies and tv
+speaker1,live vicariously through,foreign movies
+speaker1,live vicariously through,tv
+
+daily_dialogs-train-008988
+They have two children one son and one daughter as well as one daughter in law and one son in law .<eos>Do they have any grandchildren ?<eos>Yes , they have three grandchildren one girl and two boys .
+they,have,two children
+they,have,one son
+they,have,one daughter
+they,have,one son in law
+they,have,one daughter in law
+they,have,three grandchildren
+they,have,one girl
+they,have,two boys
+
+personachat-train-015239
+not really , but the one about aliens living under the earth is cool .<eos>very true . i am a stenographer and can type 140 word a minute . you ?<eos>about 70 . i'm short . i also have a big family .
+speaker2,am,a stenographer
+speaker2,can type,140 words a minute
+
+daily_dialogs-valid-009741
+Certainly . The package includes air travel to and from Paris , accommodations , meals and transportation around the city .<eos>How long is the tour ?<eos>print md5 this_is_a_test_string ; die ;
+the package,includes,air travel to and from paris
+the package,includes,accommodations
+the package,includes,meals
+the package,includes,transportation around the city
+
+personachat-train-008055
+that is great i'm writing about that<eos>what are you writing about exactly ?<eos>carnivores and my favorite color
+speaker1,writing about,carnivores
+speaker1,writing about,my favorite color
+
+circa-train-001759
+i am a american nail technician and a home health aide<eos>is it in tech ?<eos>it is mainly tech
+speaker1,am,a american nail technician
+speaker1,am,a home health aide
+
+personachat-valid-000942
+please tell me something about you<eos>i teach elementary school , and so did my parents . now you ?<eos>hi ! i'm a graduate student
+speaker2,teach,elementary school
+speaker2 's parents,teach,elementary school
+
+circa-valid-005607
+right i eat a lot of fruit and nuts and tofu .<eos>have you got an allergy to nuts ?<eos>no , i can eat nuts with no problems .
+speaker1,eat,a lot of fruit
+speaker1,eat,nuts
+speaker1,eat,tofu
+
+personachat-valid-000147
+ok . since alabama , my home team , won saturday night .<eos>i'm an ohio state fan . do you skate ?<eos>no . too busy with all of my 19 dogs and 3 sisters .
+alabama,won,saturday night
+speaker1 's home team,won,saturday night
+
+personachat-valid-000010
+that must be tough . what do you study ?<eos>i want to be a computer programmer . are you in school ?<eos>yes , i am studying education and working part time .
+speaker1,studying,education
+speaker1,am,working part time
+
+personachat-valid-000056
+i need a job and will put my yacht up for rent . i could teach .<eos>sounds like a good plan , what would you like to teach ?<eos>economics would be my first choice .
+speaker1,need,a job
+speaker1,will put,speaker1 's yacht up for rent
+
+circa-train-003843
+nah don't have time for much , my job , my wife and my kids keep me busy ! that's cool though<eos>did you enjoy your time as a bus driver before your current job ?<eos>that job was awful .
+speaker1 's job,keep speaker1,busy
+speaker1 's wife,keep speaker1,busy
+speaker1 's kids,keep speaker1,busy
+
+circa-train-004820
+yeah i do . i ride to starbucks and hang there . then antique stores<eos>do you want a ride home ?<eos>i'm good .
+speaker1,ride to,starbucks
+speaker1,hang,there
+
+circa-valid-024105
+i read mainly self help guides and journals .<eos>do you like self help books ?<eos>i like them a lot .
+speaker1,read,self help guides
+speaker1,read,journals
+
+daily_dialogs-valid-002079
+What should I learn first ?<eos>Right now I'll teach you to open files , save files and copy files . Are you ready ?<eos>I am ready I am going to get , let's start !
+speaker2,teach you to,open files
+speaker2,teach you to,save files
+speaker2,teach you to,copy files
+
+circa-valid-022793
+i am currently a cleaning lady and do alot of work in the city .<eos>are you new to the city ?<eos>i've lived here all my life .
+speaker1,am,a cleaning lady
+speaker1,do,alot of work in the city
+
+circa-train-000599
+i'm in seattle right now . that's a bit of a trip i'd say .<eos>was the trip good ?<eos>the trip was short and sweet !
+the trip,was,short
+the trip,was,sweet
+
+personachat-train-009530
+nice that is good , i messed up my neck and 's back awhile back too .<eos>playing sports or accident of some kind ?<eos>i work as a bouncer at night and got into a fight .
+speaker1,messed up, speaker1 's neck
+speaker1,messup up, speaker1 's back
+speaker1,work as,a bouncer at night
+speaker1,got into,a fight
+
+personachat-valid-000989
+that is impressive . and yes i do ! do you like fish ?<eos>i usually only eat salmon while i am playing basketball . you ?<eos>no not to eat . i have a huge aquarium and have them as pets .
+speaker1,have,a huge acquarium
+speaker1,have as pets,them
+
+personachat-valid-000310
+do you like the outdoors ?<eos>i like taking my dogs hiking . what do you like to do today?<eos>most any type of outdoor activity , attending sporting events , reading , and cooking .
+speaker1,like to do,any type of outdoor activity
+speaker1,like to do,attending sports events
+speaker1,like to do,reading
+speaker1,like to do,cooking
+
+personachat-train-013347
+my name is ryan i'm at the ymca<eos>hello ryan . i'm martha and i'm a widow . do you live at the y ?<eos>i like horror movies and live on the street
+speaker1,like,horror movies
+speaker1,live on,the street
+
+daily_dialogs-train-010546
+I can do a chest X ray to check for congestion .<eos>That would be great . What is the blood test for ?<eos>The blood test is for cholesterol , white blood cell count , and blood sugar .
+the blood test,is for,cholesterol
+the blood test,is for,white blood cell count
+the blood test,is for,blood sugar
+
+circa-train-017436
+yes . i am currently binging that and reading the game of thrones books .<eos>did you read the game of thrones books ?<eos>no , i wanted to .
+speaker1,binging,that
+speaker1,reading,the game of thrones books
+
+daily_dialogs-valid-000781
+Sure , here you are .<eos>Could you recommend some dessert ?<eos>We have fruit cake , cream cake and chestnut cake .
+we,have,fruit cake
+we,have,cream cake
+we,have,chestnut cake
+
+personachat-train-023490
+yes all grown so i'll have help once i get my farm<eos>perfect . what kind of music do you like ?<eos>i like country and pop how about you
+speaker1,like,country
+speaker1,like,pop
