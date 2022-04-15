@@ -3,69 +3,76 @@ sys.path.insert(0, '../../model_dependency')
 sys.path.insert(0, '../../model_transformer')
 
 from run_transformer_pipeline import AlbertTripleExtractor
-from baselines import ReVerbBaseline, OLLIEBaseline, StanfordOpenIEBaseline, LeolaniBaseline
+from LeolaniTripleExtraction import LeolaniBaseline
+from OLLIE import OLLIEBaseline
+from OpenIE5 import OpenIE5Baseline
+from StanfordOpenIE import StanfordOpenIEBaseline
 
 
 def load_examples(path):
     data = []
     with open(path, 'r', encoding='utf-8') as file:
-        dialogue, triple = None, None
+        block = []
         for line in file:
-            if len(line.strip()) == 0:  # empty line -> new example
-                data.append((dialogue, triple))
-                dialogue, triple = None, None
-            elif dialogue is None:
-                dialogue = line.strip()
+            if line.strip() == '':
+                text = block[1]
+                triples = [string_to_triple(t) for t in block[2:]]
+                data.append((text, triples))
+                block = []
             else:
-                triple = tuple([arg.strip() for arg in line.lower().split(',')])
+                block.append(line.strip())
 
-    # If no space at the end of the file, this one would be missed
-    if dialogue is not None and triple is not None:
-        data.append((dialogue, triple))
-
+        if block:
+            text = block[1]
+            triples = [string_to_triple(t) for t in block[2:]]
+            data.append((text, triples))
     return data
 
 
-def evaluate(examples_file, model, threshold=0.5):
+def string_to_triple(triple):
+    return tuple([x.strip() for x in triple.split(',')])
+
+
+def evaluate(examples_file, model, num_samples=1000000, threshold=0.9):
     # Where the triples found? Where there more we didn't want?
     recall = 0
-    precision = 0
+    total = 0
 
     # Extract triples from annotations
-    examples = load_examples(examples_file)
-    for i, (dialogue, expected_triple) in enumerate(examples):
+    examples = load_examples(examples_file)[:num_samples]
 
-        # Add <eos> if dialogue <3 turns
-        if dialogue.count('<eos>') < 3:
-            n = 3 - dialogue.count('<eos>')
-            dialogue = '<eos> ' * n + dialogue
+    for i, (text, exp_triples) in enumerate(examples):
 
         # Predict triples
-        print('\n (%s/%s) input: %s' % (i + 1, len(examples), dialogue))
-        found_triples = [triple for ent, triple in model.extract_triples(dialogue, verbose=True) if ent > threshold]
-        print('expected:', expected_triple)
+        print('\n (%s/%s) input: %s' % (i + 1, len(examples), text))
+        found_triples = [triple for ent, triple in model.extract_triples(text, verbose=True) if ent > threshold]
+
+        # Strip negation/certainty of not in test set
+        nx = len(exp_triples[0])
+        found_triples = [t[:nx] for t in found_triples]
+
+        print('expected:', exp_triples)
         print('found:   ', found_triples)
 
         # Recall: was the expected triple found?
-        recall += expected_triple in found_triples
-
-        # Precision: was there more found that we didn't want to find?
-        precision += not [t for t in found_triples if t != expected_triple]
+        for exp_triple in exp_triples:
+            if exp_triple in found_triples:
+                recall += 1
+                print('+', exp_triple)
+            else:
+                print('-', exp_triple)
+            total += 1
 
     # Performance scores
-    R = recall / len(examples)
-    P = precision / len(examples)
-    F1 = 2 * P * R / (P + R)
+    R = recall / total
     print('\nrecall:   ', R)
-    print('precision:', P)
-    print('f-measure:', F1)
 
 
 if __name__ == '__main__':
-    MODEL = 'leolani'
+    MODEL = 'albert'
 
-    if MODEL == 'reverb':
-        model = ReVerbBaseline()
+    if MODEL == 'openie5':
+        model = OpenIE5Baseline()
     elif MODEL == 'ollie':
         model = OLLIEBaseline()
     elif MODEL == 'stanford':
@@ -73,9 +80,8 @@ if __name__ == '__main__':
     elif MODEL == 'leolani':
         model = LeolaniBaseline()
     elif MODEL == 'albert':
-        model = AlbertTripleExtractor('../../model_transformer/models/argument_extraction_albert-v2_08_04_2022_multi',
-                                      '../../model_transformer/models/scorer_albert-v2_06_04_2022_multi')
+        model = AlbertTripleExtractor('../../model_transformer/models/2022-04-11', speaker1='speaker1', speaker2='speaker2')
     else:
         raise Exception('model %s not recognized' % MODEL)
 
-    evaluate('test_examples/simple_statements.txt', model)
+    evaluate('test_examples/test_yes_answers.txt', model, num_samples=30)
