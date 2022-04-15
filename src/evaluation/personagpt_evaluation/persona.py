@@ -3,26 +3,26 @@ from tqdm import tqdm
 import random
 import json
 
-NEGATE_PERSONA = {'PRON VERB NOUN PUNCT': '0 do not 1 2 3',
+NEGATE_PERSONA = {'PRON VERB NOUN PUNCT': "0 don't 1 2 3",
                   'PRON AUX DET NOUN PUNCT': '0 1 not 2 3 4',
-                  'PRON VERB PART VERB PUNCT': '0 do not 1 2 3 4',
-                  'PRON VERB DET NOUN PUNCT': '0 do not 1 2 3 4',
-                  'PRON VERB PART VERB NOUN PUNCT': '0 do not 1 2 3 4 5',
-                  'PRON VERB ADJ NOUN PUNCT': '0 do not 1 2 3 4',
-                  'PRON VERB ADP DET NOUN PUNCT': '0 do not 1 2 3 4 5',
+                  'PRON VERB PART VERB PUNCT': "0 don't 1 2 3 4",
+                  'PRON VERB DET NOUN PUNCT': "0 don't 1 2 3 4",
+                  'PRON VERB PART VERB NOUN PUNCT': "0 don't 1 2 3 4 5",
+                  'PRON VERB ADJ NOUN PUNCT': "0 don't 1 2 3 4",
+                  'PRON VERB ADP DET NOUN PUNCT': "0 don't 1 2 3 4 5",
                   'PRON ADJ NOUN AUX NOUN PUNCT': '0 1 2 3 not 4 5',
                   'PRON ADJ NOUN AUX ADJ PUNCT': '0 1 2 3 not 4 5',
                   'PRON AUX DET ADJ NOUN PUNCT': '0 1 not 2 3 4 5',
                   'PRON AUX DET NOUN NOUN PUNCT': '0 1 not 2 3 4 5',
-                  'PRON VERB NUM NOUN PUNCT': '0 do not 1 2 3 4',
-                  'PRON VERB ADP DET NOUN NOUN PUNCT': '0 do not 1 2 3 4 5 6',
-                  'PRON AUX NUM NOUN PUNCT': '0 do not 1 2 3 4',
-                  'PRON VERB VERB PUNCT': '0 do not 1 2 3',
+                  'PRON VERB NUM NOUN PUNCT': "0 don't 1 2 3 4",
+                  'PRON VERB ADP DET NOUN NOUN PUNCT': "0 don't 1 2 3 4 5 6",
+                  'PRON AUX NUM NOUN PUNCT': "0 don't 1 2 3 4",
+                  'PRON VERB VERB PUNCT': "0 don't 1 2 3",
                   'PRON AUX ADJ PUNCT': '0 1 not 2 3',
-                  'PRON VERB NOUN NOUN PUNCT': '0 do not 1 2 3 4',
-                  'PRON VERB ADP NOUN PUNCT': '0 do not 1 2 3 4',
+                  'PRON VERB NOUN NOUN PUNCT': "0 don't 1 2 3 4",
+                  'PRON VERB ADP NOUN PUNCT': "0 don't 1 2 3 4",
                   'PRON NOUN AUX DET NOUN PUNCT': '0 1 2 not 3 4 5',
-                  'PRON VERB DET ADJ NOUN PUNCT': '0 do not 1 2 3 4 5'}
+                  'PRON VERB DET ADJ NOUN PUNCT': "0 don't 1 2 3 4 5"}
 
 PERSONA_TRIPLES = {'PRON VERB NOUN PUNCT': ([0], [1], [2]),
                    'PRON AUX DET NOUN PUNCT': ([0], [1], [2, 3]),
@@ -47,8 +47,7 @@ PERSONA_TRIPLES = {'PRON VERB NOUN PUNCT': ([0], [1], [2]),
 
 PERSONA_QUESTIONS = {'PRON VERB NOUN PUNCT': ['Do you 1 2 ?',
                                               'What do you 1 ?'],
-                     'PRON AUX DET NOUN PUNCT': ['Are you 2 3 ?',
-                                                 'What are you ?'],
+                     'PRON AUX DET NOUN PUNCT': ['Are you 2 3 ?'],
                      'PRON VERB PART VERB PUNCT': ['You 1 2 3 ?',
                                                    'Do you 1 2 3 ?',
                                                    'What do you 1 ?',
@@ -66,8 +65,7 @@ PERSONA_QUESTIONS = {'PRON VERB NOUN PUNCT': ['Do you 1 2 ?',
                                                       'Where do you 1 2 ?',
                                                       'Do you 1 2 3 4 ?'],
                      'PRON ADJ NOUN AUX NOUN PUNCT': ['What is 0 1 2 ?',
-                                                      'Do you have a 1 2 ?',
-                                                      'Is 4 your 1 2 ?'],
+                                                      'Do you have a 1 2 ?'],
                      'PRON ADJ NOUN AUX ADJ PUNCT': ['What is 0 1 2 ?',
                                                      'Do you have a 1 2 ?',
                                                      'Is 4 your 1 2 ?'],
@@ -86,8 +84,7 @@ PERSONA_QUESTIONS = {'PRON VERB NOUN PUNCT': ['Do you 1 2 ?',
                                                  'How many 3 do you have ?'],
                      'PRON VERB VERB PUNCT': ['Do you 1 2 ?',
                                               'What do you 1 ?'],
-                     'PRON AUX ADJ PUNCT': ['What are you ?',
-                                            'Are you 2 ?'],
+                     'PRON AUX ADJ PUNCT': ['Are you 2 ?'],
                      'PRON VERB NOUN NOUN PUNCT': ['Do you 1 2 3 ?',
                                                    'What do you 1 ?'],
                      'PRON VERB ADP NOUN PUNCT': ['What do you 1 ?',
@@ -120,7 +117,7 @@ def pronoun_to_speaker_id(triple):
 
 
 class Persona:
-    def __init__(self, persona_file='persona.json', neg_prob=0.3, num_facts=1):
+    def __init__(self, persona_file='persona.json', neg_prob=0.5, num_facts=1):
         # Load file
         with open(persona_file, 'r', encoding='utf-8') as file:
             self._persona_options = json.load(file)
@@ -160,6 +157,13 @@ class Persona:
 
         return self.persona
 
+    def get_polarity(self, i):
+        _, simple_fact, final_fact = self._persona[i]
+        polarity = 'positive'
+        if simple_fact != final_fact:
+            polarity = 'negative'
+        return polarity
+
     def get_triple(self, i):
         # Get for ith persona the argument indices into the persona tokens
         category, simple_fact, final_fact = self._persona[i]
@@ -188,7 +192,16 @@ class Persona:
         # Replace wildcards
         tokens = simple_fact.split(' ')
         question = ' '.join([t if not t.isnumeric() else tokens[int(t)] for t in question.split(' ')])
-        return question
+
+        # Swap 'my' for 'your'
+        question = ' %s ' % question.lower()
+        if ' my ' in question:
+            question = question.replace(' my ', ' your ')
+        if ' mine ' in question:
+            question = question.replace(' mine ', ' yours ')
+        if ' i ' in question:
+            question = question.replace(' i ', ' you ')
+        return question.strip()
 
 
 def categorize_personas(persona_file, outfile='personas.json'):
