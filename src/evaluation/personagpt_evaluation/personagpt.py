@@ -20,8 +20,8 @@ class PersonaGPT:
         return self._tokenizer.encode(''.join(['<|p2|>'] + facts + ['<|sep|>'] + ['<|start|>']))
 
     def _generate_response(self, input_ids, top_p=.92, max_length=640):
-        out = self._model.generate(input_ids, do_sample=True, top_k=10, top_p=top_p,
-                                   max_length=max_length, pad_token_id=self._tokenizer.eos_token_id)
+        out = self._model.generate(input_ids, do_sample=True, top_k=10, top_p=top_p, max_length=max_length,
+                                   pad_token_id=self._tokenizer.eos_token_id)
         msg = out.cpu().detach().numpy()[0][input_ids.shape[-1]:]
         return list(msg)
 
