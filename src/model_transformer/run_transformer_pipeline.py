@@ -9,7 +9,7 @@ import spacy
 
 
 class AlbertTripleExtractor:
-    def __init__(self, path, base_model='albert-base-v2', pred_file='', sep='<eos>', speaker1='Thomas', speaker2='Leolani'):
+    def __init__(self, path, base_model='albert-base-v2', pred_file='', sep='<eos>', speaker1='speaker1', speaker2='speaker2'):
         self._argument_module = ArgumentExtraction(base_model, path=path)
         self._scoring_module = TripleScoring(base_model, path=path)
         self._pred_normalizer = PredicateNormalizer(pred_file) if pred_file else None
@@ -32,12 +32,11 @@ class AlbertTripleExtractor:
                 tokens += [pronoun_to_speaker_id(t.lower_, speaker) for t in self._nlp(turn)] + ['<eos>']
         return tokens
 
-    def extract_triples(self, inputs, verbose=True):
+    def extract_triples(self, inputs, verbose=True, batch_size=32):
         # Assign unambiguous tokens to you/I
         tokens = self._tokenize(inputs)
 
         # Extract SPO arguments from token sequence
-        print('Extracting arguments:')
         subjs, preds, objs = self._argument_module.predict(tokens)
 
         if verbose:
@@ -51,8 +50,11 @@ class AlbertTripleExtractor:
             return []
 
         # Score candidate triples
-        predictions = self._scoring_module.predict(tokens, candidates)
-        print('Scored candidates:')
+        predictions = []
+        for i in range(0, len(candidates), batch_size):
+            batch = candidates[i:i+batch_size]
+            for y_hat in self._scoring_module.predict(tokens, batch):
+                predictions.append(y_hat)
 
         # Rank candidates according to entailment predictions
         triples = []
@@ -79,12 +81,13 @@ class AlbertTripleExtractor:
 
 
 if __name__ == '__main__':
-    model = AlbertTripleExtractor(path='models/2022-04-10',
-                                  pred_file='resources/canonical_exemplars.txt')
+    model = AlbertTripleExtractor(path='models/2022-04-11')
 
     # Test!
-    example = 'I love photography ! <eos> What do you do ? <eos> I am a janitor . <eos> My wife is a doctor . <eos>'
+    example = 'I am great <eos> I love chickens. Is your cat scared? <eos> No , he is a chicken'
 
-    print("Input: ", example, '\n')
-    for score, triple in model.extract_triples(example):
-        print(score, triple)
+    while True:
+        example = input('>> ')
+        print("Input: ", example, '\n')
+        for score, triple in model.extract_triples(example):
+            print(score, triple)

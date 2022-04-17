@@ -14,7 +14,7 @@ class TripleScoring(torch.nn.Module):
     def __init__(self, base_model='albert-base-v2', path=None, max_len=80, sep='<eos>'):
         super().__init__()
         # Base model
-        print('loading %s for argument extraction' % base_model)
+        print('loading %s for triple scoring' % base_model)
         # Load base model
         self._model = AutoModel.from_pretrained(base_model)
         self._max_len = max_len

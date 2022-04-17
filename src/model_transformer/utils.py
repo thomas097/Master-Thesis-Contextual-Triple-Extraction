@@ -187,4 +187,4 @@ def pronoun_to_speaker_id(token, turn_idx):
 
 
 def speaker_id_to_speaker(string, speaker1, speaker2):
-    return string.replace('SPEAKER1', speaker1).replace('SPEAKER2', speaker2)
+    return string.replace('SPEAKER1', ' ' + speaker1).replace('SPEAKER2', ' ' + speaker2).strip()

@@ -1,6 +1,7 @@
 from glob import glob
 import json
 import spacy
+import re
 
 
 def load_annotations(path):
@@ -23,11 +24,11 @@ def format_triple(subj, pred, obj, tokens):
     return subj, pred, obj
 
 
-MOVE_TO_OBJ = {'VERB VERB ADP': [1, 2],
+MOVE_TO_OBJ = {'VERB to VERB': [2],
+               'VERB VERB ADP': [1, 2],
                'VERB VERB PART': [1, 2],
                'VERB AUX ADP': [1, 2],
                'VERB to VERB ADP': [2, 3],
-               'VERB to VERB': [2],
                'VERB VERB': [1],
                'ADP VERB': [1],
                'VERB to VERB ADP VERB': [2, 3, 4],
@@ -58,14 +59,6 @@ REMOVE_AUXILIARIES = {"am VERB": [0],
                       "will VERB PRON": [0],
                       "been VERB ADP": [0]}
 
-REPLACE_CONTR = {"'m": 'am',
-                 "' m": 'am',
-                 "'ll": 'will',
-                 "'re": 'are',
-                 "'ve": 'have',
-                 "ca": 'can'}
-
-
 class PostProcessor:
     def __init__(self):
         self._nlp = spacy.load('en_core_web_sm')
@@ -91,12 +84,30 @@ class PostProcessor:
                 return rules[rule]
         return []
 
+    @staticmethod
+    def _decontract(phrase):
+        phrase = re.sub(r"n\'t", " not", phrase)
+        phrase = re.sub(r"\'re", " are", phrase)
+        phrase = re.sub(r"\'d", " would", phrase)
+        phrase = re.sub(r"\'ll", " will", phrase)
+        phrase = re.sub(r"\'t", " not", phrase)
+        phrase = re.sub(r"\'ve", " have", phrase)
+        phrase = re.sub(r"\'m", " am", phrase)
+        phrase = re.sub(r" wo ", "will ", ' ' + phrase + ' ')
+        phrase = re.sub(r" ca ", "can ", ' ' + phrase + ' ')
+        return phrase.strip()
+
     def format(self, triple):
+        # Fix contractions
+        subj = self._decontract(triple[0])
+        pred = self._decontract(triple[1])
+        obj_ = self._decontract(triple[2])
+
         # Get token sequence of arguments
-        subj = [t.lower_ for t in self._nlp(triple[0])]
-        pred = [t.lower_ for t in self._nlp(triple[1])]
-        obj_ = [t.lower_ for t in self._nlp(triple[2])]
-        pred_tags = [t.pos_ for t in self._nlp(triple[1])]
+        pred_tags = [t.pos_ for t in self._nlp(pred)]
+        subj = [t.lower_ for t in self._nlp(subj)]
+        pred = [t.lower_ for t in self._nlp(pred)]
+        obj_ = [t.lower_ for t in self._nlp(obj_)]
 
         # Are there any auxiliaries that need to go?
         remove_idx = self._apply_rule(pred, pred_tags, REMOVE_AUXILIARIES)
@@ -104,29 +115,8 @@ class PostProcessor:
         # What should be moved to the object
         move_idx = self._apply_rule(pred, pred_tags, MOVE_TO_OBJ)
 
-        # Apply remove, move and replace rules
-        subj = [REPLACE_CONTR[t] if t in REPLACE_CONTR else t for t in subj]
-        pred = [REPLACE_CONTR[t] if t in REPLACE_CONTR else t for t in pred]
-        obj_ = [REPLACE_CONTR[t] if t in REPLACE_CONTR else t for t in obj_]
-
+        # Apply remove and move rules
         subj2 = ' '.join(subj)
         pred2 = ' '.join([t for i, t in enumerate(pred) if i not in move_idx + remove_idx])
         obj2_ = ' '.join([t for i, t in enumerate(pred) if i in move_idx] + obj_)
         return subj2, pred2, obj2_
-
-
-if __name__ == '__main__':
-    annotations = load_annotations('annotations')
-
-    post = PostProcessor()
-
-    for i, annotation in enumerate(annotations):
-        for j, triple in get_triples(annotation):
-            print(triple)
-            new_triple = post.correct(triple)
-            if new_triple != triple:
-                print('NEW:', new_triple, '\n')
-
-        print()
-        if i == 100:
-            break
