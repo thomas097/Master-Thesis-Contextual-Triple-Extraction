@@ -2,9 +2,14 @@ import sys
 sys.path.insert(0, '../../model_dependency')
 sys.path.insert(0, '../../model_transformer')
 
+from pprint import pprint
 from personagpt import PersonaGPT
 from persona import Persona
 from run_transformer_pipeline import AlbertTripleExtractor
+
+
+# Suppresses greeting responses
+GREETINGS = ['hi', 'hi']
 
 
 def evaluate(persona, model, num_graphs=10, context_size=8, conf_threshold=0.5):
@@ -19,48 +24,28 @@ def evaluate(persona, model, num_graphs=10, context_size=8, conf_threshold=0.5):
         # Endow chatbot with graph
         bot = PersonaGPT(persona=persona.persona)
 
-        # Init history with greeting to prevent meaningless introduction after <|start|>
-        history = ['hi', 'hi']
-
-        # Store triples extracted from pairs
+        # Store triples extracted from QA-pairs
         outputs = []
 
         for i in range(len(persona_facts)):
-            fact = persona_facts[i]
-            print('FACT:', fact)
-
             # Sample question about personal fact
             question = persona.sample_question(i)
-            history.append(question)
             print('USER:', question)
 
             # Let PersonaGPT respond to last turns
-            response = bot.respond(history[-context_size:], polarity=persona.get_polarity(i))
-            history.append(response)
+            response = bot.respond(GREETINGS + [question], polarity=persona.get_polarity(i))
             print('BOT: ', response)
 
             # Extract last three turns
-            context_window = '<eos>'.join([''] + history[-2:])
+            context_window = ' <eos> '.join([GREETINGS[-1], question, response])
 
-            print('\nTRIPLES:')
-            triples = []
-            for conf, triple in model.extract_triples(context_window):
+            for conf, triple in model.extract_triples(context_window, verbose=False):
                 if conf > conf_threshold:
-                    triples.append(triple)
-                    print(conf, triple)
-
-            print('\nGROUND-TRUTH:')
-            ground_truth = persona.get_triple(i)
-            print(ground_truth)
-            print()
-
-            # Save to file to analyze
-            outputs.append((ground_truth, question, response) + tuple(triples))
-            with open('evaluation_results.txt', 'w', encoding='utf-8') as file:
-                for output in outputs:
-                    for item in output:
-                        file.write(str(item) + '\n')
-                    file.write('\n')
+                    outputs.append(triple)
+        print()
+        pprint(persona.triples())
+        print()
+        pprint(outputs)
 
 
 if __name__ == '__main__':
