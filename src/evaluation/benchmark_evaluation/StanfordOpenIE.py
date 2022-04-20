@@ -1,4 +1,9 @@
+import sys
+sys.path.append('../../model_transformer')
+from post_processing import PostProcessor
+
 import os
+import re
 import subprocess
 
 
@@ -13,6 +18,7 @@ NEG_TOKENS = ['not', "n't", 'never', "'t", 'neither']
 class StanfordOpenIEBaseline:
     def __init__(self, path="stanford-corenlp-latest/stanford-corenlp-4.4.0", speaker1='speaker1', speaker2='speaker2', sep='<eos>'):
         self._path = path
+        self._post_processor = PostProcessor()
         self._speaker1 = speaker1
         self._speaker2 = speaker2
         self._sep = sep
@@ -27,7 +33,9 @@ class StanfordOpenIEBaseline:
 
     @staticmethod
     def _disambuate_pronouns(turn, turn_id):
-        turn = ' %s ' % turn.lower()
+        # Split contractions and punctuation from tokens
+        turn = ' %s ' % ' '.join(re.findall("[\w\d-]+|'\w|[.,!?]", turn.lower()))
+
         for pronouns, speaker_id in PRONOUNS:
             # Swap speakers for uneven turns
             if turn_id % 2 == 1:
@@ -39,7 +47,7 @@ class StanfordOpenIEBaseline:
             # Replace pronoun occurrences with speaker_ids
             for pron in pronouns:
                 if ' %s ' % pron in turn:
-                    turn = turn.replace(' %s ' % pron, ' %s ' % speaker_id)
+                    turn = turn.replace(' %s ' % pron, ' ' + speaker_id + ' ')
         return turn
 
     def extract_triples(self, dialogue, verbose=False):
@@ -69,9 +77,9 @@ class StanfordOpenIEBaseline:
         triples = []
         for line in lines:
             conf, subj, pred, obj = line.split('\t')
-            polar, pred = self._negation_in_predicate(pred)
+            polar, rel = self._negation_in_predicate(pred)
             conf = float(conf)
-            triples.append((conf, (subj, pred, obj, polar)))
+            triples.append((conf, self._post_processor.format((subj, rel, obj)) + (polar,)))
         return triples
 
 

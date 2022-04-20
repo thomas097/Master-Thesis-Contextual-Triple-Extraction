@@ -33,7 +33,7 @@ def string_to_triple(triple):
     return tuple([x.strip() for x in triple.split(',')])
 
 
-def evaluate(examples_file, model, num_samples=1000000, threshold=0.9):
+def evaluate(examples_file, model, num_samples=1000000, threshold=0.0):
     # Where the triples found? Where there more we didn't want?
     recall = 0
     total = 0
@@ -69,7 +69,7 @@ def evaluate(examples_file, model, num_samples=1000000, threshold=0.9):
 
 
 if __name__ == '__main__':
-    MODEL = 'albert'
+    MODEL = 'stanford'
 
     if MODEL == 'openie5':
         model = OpenIE5Baseline()
@@ -84,4 +84,4 @@ if __name__ == '__main__':
     else:
         raise Exception('model %s not recognized' % MODEL)
 
-    evaluate('test_examples/test_yes_answers.txt', model, num_samples=30)
+    evaluate('test_examples/test_declarative_statements.txt', model)
