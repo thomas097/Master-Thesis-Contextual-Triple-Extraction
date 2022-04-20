@@ -441,3 +441,7 @@ speaker2,practicing,violin,positive
 personachat-valid-000778
 oh no . maybe when i was younger . do you have any pets ?<eos>i've a cat mouse and a dog biscuit . what about you ?<eos>one dog sugar . i named her after my famous sugar cookies !
 speaker1,have,one dog sugar,positive
+
+annotated_circa-003258
+good , i am pet sitting a dog right now for my neighbor .<eos>do you have a dog ?<eos>three cats .
+speaker1,have,thee cats,positive

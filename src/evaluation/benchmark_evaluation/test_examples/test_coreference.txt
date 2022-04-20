@@ -6,9 +6,17 @@ personachat-valid-000446
 oh i remember horse back riding when i was a kid . now my kids love it .<eos>do you have any horses ? are they in high school ?<eos>i've one we keep at a stable in kentucky 10 , 9 and 7
 speaker1,have,horses,positive
 
+circa-valid-020923
+hi there , i decided to pack up my belongings and move here from germany .<eos>is the flat move in ready ?<eos>yes , it's turnkey .
+the flat move,'s,turnkey
+
 circa-train-031921
 congratulations i heard the process is crazy i've a gym buddy who's a realtor<eos>do you have a realtor ?<eos>i found one online .
 speaker1,found,a realtor,positive
+
+circa-valid-009727
+that must be hard . i like a beer after driving my nissan pathfinder .<eos>can i get you a beer ?<eos>yes , i'm hankering for one .
+speaker1,hankering for,a beer,positive
 
 personachat-valid-000145
 my name is john . i am in my early thirties<eos>hi john . i like chocolate . do you ?<eos>no . i don't have money to spend on chocolate . my wife takes it all
