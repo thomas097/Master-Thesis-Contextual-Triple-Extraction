@@ -41,6 +41,8 @@ go_to, I, am going to, the store
 go_to, I, will leave to, my house
 go_to, I, have gone to, a festival
 go_to, I, go to, the movies
+helps, I, help, my neighbor
+helps, I, am helping, you
 go_to, I, will go to, the restaurant
 do_activity, I, am going to play, sports
 do_activity, I, am going to go, ski
@@ -50,13 +52,16 @@ do_activity, I, will be, partying
 likes, I, like, food
 likes, I, enjoy, good company
 likes, I, love, cats
+likes, I, would love to, see a movie
+likes, I, like to, get some lunch
 likes, I, admire, new artists
 hates, I, hate, animals
 hates, I, hate, partying
 hates, I, despise, homework
-born_in, I, am born in, Amsterdam
-born_in, I, was born in, Paris
-born_in, I, am from, Romania
+is_from, I, am born in, Amsterdam
+is_from, I, was born in, Paris
+is_from, I, am from, Romania
+is_from, I, are from, Spain
 live_in, I, live in, Amsterdam
 live_in, I, reside in, London
 live_in, I, have a house in, New York
@@ -82,3 +87,5 @@ knows, I, have, a sister
 knows, I, know, that guy
 knows, I, met, James
 knows, I, have met, your brother
+hears, I, heard, a new song
+hears, I, heard, a braking dog

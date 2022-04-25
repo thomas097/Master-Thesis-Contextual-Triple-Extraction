@@ -49,7 +49,8 @@ class PredicateNormalizer:
         X, y = [], []
         with open(path, 'r', encoding='utf-8') as file:
             for line in tqdm(file):
-                if line.strip() and not line.startwith('#'):
+                line = line.strip()
+                if line and not line.startswith('#'):
                     norm_pred, subj, pred, obj = [t.strip() for t in line.strip().split(',')]
                     # Precompute embeddings
                     X.append(self._model.get_embedding(subj, pred, obj))
@@ -74,11 +75,14 @@ class PredicateNormalizer:
         # Normalize only above minimum confidence
         if probs[i] > self._min_conf:
             return self._knn.classes_[i], probs[i]
+
+        # Replace spaces with underscores
+        pred = pred.replace(' ', '_')
         return pred, probs[i]
 
 
 if __name__ == '__main__':
-    pred_norm = PredicateNormalizer('resources/canonical_exemplars.txt')
+    pred_norm = PredicateNormalizer('canonical_exemplars.txt')
     while True:
         subj = input('subj: ')
         pred = input('pred: ')
