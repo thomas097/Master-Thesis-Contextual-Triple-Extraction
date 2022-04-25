@@ -1,6 +1,6 @@
 import spacy
+import re
 from itertools import product
-from pprint import pprint
 from copy import copy
 import networkx as nx
 from post_processing import PostProcessor
@@ -14,6 +14,11 @@ PATH_RULES = ['conj', 'ROOT', 'ROOT prep', 'ROOT xcomp prep']
 NEG_WORDS = ['no', 'nope', 'nah', 'neh', 'never', 'not']
 WH_WORDS = ['how', 'what', 'why', 'who', 'when', 'where', 'whose', 'that']
 
+PRONOUNS = [(("my", 'mine', 'our'), "speaker1 's"),
+            (('i', 'me', 'myself', 'we', 'us', 'ourselves', 'my'), 'speaker1'),
+            (('your', 'yours'), "speaker2 's"),
+            (('you', 'yourself', 'yourselves'), 'speaker2')]
+
 
 class SpacyTripleExtractor:
     def __init__(self, sep='<eos>'):
@@ -24,9 +29,9 @@ class SpacyTripleExtractor:
     # Utils
 
     def _format_triple(self, capsule):
-        subj = ' '.join([t.lower_ for t in capsule['subj']])
-        pred = ' '.join([t.lower_ for t in capsule['pred']])
-        obj_ = ' '.join([t.lower_ for t in capsule['obj']])
+        subj = ' '.join([t for t in capsule['subj']])
+        pred = ' '.join([t for t in capsule['pred']])
+        obj_ = ' '.join([t for t in capsule['obj']])
         polar = capsule['polar']
         return self._post_processing.format((subj, pred, obj_)) + (polar,)
 
@@ -39,6 +44,25 @@ class SpacyTripleExtractor:
     @staticmethod
     def _get_head(tokens):
         return min(tokens, key=lambda t: len(list(t.ancestors)))
+
+    @staticmethod
+    def _disambiguate_pronouns(turn, turn_id):
+        # Split contractions and punctuation from tokens
+        turn = ' %s ' % ' '.join(re.findall("[\w\d-]+|'\w|[.,!?]", turn))
+
+        for pronouns, speaker_id in PRONOUNS:
+            # Swap speakers for uneven turns
+            if turn_id % 2 == 1:
+                if 'speaker1' in speaker_id:
+                    speaker_id = speaker_id.replace('speaker1', 'speaker2')
+                else:
+                    speaker_id = speaker_id.replace('speaker2', 'speaker1')
+
+            # Replace pronoun occurrences with speaker_ids
+            for pron in pronouns:
+                if ' %s ' % pron in turn:
+                    turn = turn.replace(' %s ' % pron, ' ' + speaker_id + ' ')
+        return turn
 
     # Subjects/Objects
 
@@ -158,12 +182,17 @@ class SpacyTripleExtractor:
                         'feedback': feedback, 'turn': turn_id})
         return out
 
-    @staticmethod
-    def _interpret_with_context(triples):
+    def _interpret_with_context(self, triples):
         # Remove 'wh'-words from object positions (questions)
         for triple in triples:
             if len(triple['obj']) == 1 and triple['obj'][0].lower_ in WH_WORDS:
                 triple['obj'] = []
+
+        # Disambiguate you/i
+        for triple in triples:
+            triple['subj'] = [self._disambiguate_pronouns(t.lower_, triple['turn']) for t in triple['subj']]
+            triple['pred'] = [self._disambiguate_pronouns(t.lower_, triple['turn']) for t in triple['pred']]
+            triple['obj'] = [self._disambiguate_pronouns(t.lower_, triple['turn']) for t in triple['obj']]
 
         # If object is missing, inherit object from next turn (questions)
         for triple in triples:
@@ -181,15 +210,14 @@ class SpacyTripleExtractor:
                     triple['pred'] = candidates[-1]['pred']
                     triple['polar'] = candidates[-1]['polar']
 
-        # Negate previous triple if response denies
+        # Negate previous triple if response signals denial
         for triple in triples:
             if triple['feedback'] == 'negative':
                 candidates = [t for t in triples if t['turn'] == triple['turn'] - 1]
                 if candidates:
                     candidates[-1]['polar'] = 'negative'
 
-        # Discard everything but SPO and polarity
-        return triples
+        return [self._format_triple(t) for t in triples]
 
     def extract_triples(self, dialogue):
         # Analyze each dialog turn separately
@@ -201,9 +229,7 @@ class SpacyTripleExtractor:
             triples += self._triples_from_turn(turn, turn_id)
 
         # Resolve contextual ambiguities
-        triples = self._interpret_with_context(triples)
-
-        return [self._format_triple(triple) for triple in triples]
+        return self._interpret_with_context(triples)
 
 
 if __name__ == '__main__':
@@ -216,7 +242,10 @@ if __name__ == '__main__':
                 "Yes , I'd like to move to another room .<eos>Is there anything uncomfortable in your room ?<eos>No . The air conditioner in this room doesn't work .",
                 "Do you like cats ? <eos> No , I hate cats and I don't like dogs either",
                 "yes mostly i made some for others<eos>that's nice . are you taking fashion classes ?<eos>no i'm studying public relations",
-                "No , I am not ill . <eos> Then , What's the matter with your child ? <eos> Nothing ."]
+                "No , I am not ill . <eos> Then , What's the matter with your child ? <eos> Nothing .",
+                'I love photography and gaming, but not a fan of homework <eos> Me too! What do you like to do? <eos> Eating, a lot!',
+                'Good morning . I\'d like to book a room for Friday night and Saturday night .<eos>Certainly . What kind of room would you like ?<eos>A single room please . I hope you\'re not fully booked .'
+                ]
 
     parser = SpacyTripleExtractor()
     for example in examples:
