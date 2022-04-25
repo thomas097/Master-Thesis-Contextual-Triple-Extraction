@@ -1,0 +1,46 @@
+# originates from
+is_from,I,am from,Amsterdam
+is_from,I,'m from,Japan
+is_from,he,is from,Berlin
+is_from,she,comes from,New York
+is_from,he,originates from,Philadelphia
+is_from,she,came from,Africa
+
+# is located in
+is_located_in,
+
+# has profession
+has_profession,I,am,a janitor
+has_profession,I,am,a football player
+has_profession,I,do,mechanical engineer
+has_profession,I,am,a fisherman
+has_profession,I,like being,a store owner
+has_profession,he,is,a waiter
+has_profession,he,is,an accountant
+has_profession,she,does for a living,a painter
+has_profession,she,works as,a doctor
+
+# works for
+works_for,I,work for,a big IT firm
+works_for,I,am employed by,my boss
+works_for,he,works for,the local government
+works_for,she,has a job at,Microsoft
+works_for,he,is hired by,a clothing store
+works_for,she,is working for,a big company
+
+# part of
+is_part_of,I,am in,a football club
+is_part_of,I,am in,history
+is_part_of,I,am part of,a book club
+
+# likes
+likes,I,like,football
+likes,I,enjoy,watching sports
+likes,I,really enjoy,baking cakes
+likes,I,like,that new movie
+likes,I,enjoyed,the dance
+likes,she,loves,to party
+likes,he,likes,that
+likes,she,does like,skydiving
+likes,he,likes a lot,his job
+
