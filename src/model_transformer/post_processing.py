@@ -7,7 +7,8 @@ PRED_RULES = {'VERB PART VERB': [0, 1],           # "want to go"
               'VERB VERB PART': [0],              # "likes walking to"
               'VERB AUX ADP': [0],
               'VERB PART VERB ADP': [0, 1],       # "went to walk with"
-              'VERB VERB': [1],                   # "like walking"
+              'VERB VERB': [0],                   # "like walking"
+              'AUX VERB': [0],
               'VERB PART VERB PART': [0, 1],      # "like to walk with"
               'VERB ADP VERB PART': [0, 1],       # "feel like going to"
               'VERB PART VERB VERB': [0, 1],
@@ -64,7 +65,7 @@ class PostProcessor:
         pred = [t.lower_ for t in self._nlp(pred)]
         obj = [t.lower_ for t in self._nlp(obj)]
 
-        # Remove auxiliaries if there is an alternative verb or auxiliary
+        # Remove auxiliaries if there is a following verb or auxiliary
         if len(pred) > 1:
             for aux in AUXILIARIES:
                 if pred[0] == aux and pred_tags.split(' ')[1] in ['AUX', 'VERB']:

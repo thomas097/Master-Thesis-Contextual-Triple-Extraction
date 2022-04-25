@@ -1,3 +1,6 @@
+import sys
+sys.path.append('predicate_normalization')
+
 from argument_extraction import ArgumentExtraction
 from triple_scoring import TripleScoring
 from post_processing import PostProcessor
@@ -84,7 +87,7 @@ if __name__ == '__main__':
     model = AlbertTripleExtractor(path='models/2022-04-11')
 
     # Test!
-    example = 'I am great <eos> I love chickens. Is your cat scared? <eos> No , he is a chicken'
+    example = 'I like aliens but not dogs<eos> What did you do yesterday? <eos> I went to the movies with Mark'
 
     while True:
         example = input('>> ')
