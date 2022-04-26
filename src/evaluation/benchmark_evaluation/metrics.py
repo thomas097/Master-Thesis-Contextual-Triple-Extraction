@@ -41,6 +41,12 @@ def recall_at_k(y_true, y_pred, k=0.5):
     return tp / (tp + fn)
 
 
+def F_score_at_k(y_true, y_pred, k=0.5):
+    precision = precision_at_k(y_true, y_pred, k)
+    recall = recall_at_k(y_true, y_pred, k)
+    return 2 * precision * recall / (precision + recall)
+
+
 def precision_recall_auc(y_true, y_pred, steps=100, plot_pr=True):
     precision, recall = [], []
     for k in np.linspace(0, 1, steps):
@@ -80,4 +86,5 @@ if __name__ == '__main__':
 
     print('precision@k:', precision_at_k(true_triples, pred_triples, k=0.0))
     print('recall@k:   ', recall_at_k(true_triples, pred_triples, k=0.0))
+    print('F-score@k:  ', F_score_at_k(true_triples, pred_triples, k=0.0))
     print('AUC:        ', precision_recall_auc(true_triples, pred_triples))
