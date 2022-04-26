@@ -28,8 +28,9 @@ class StanfordOpenIEBaseline:
         self._speaker2 = speaker2
         self._path = path
         self._sep = sep
+        print('Stanford OpenIE ready!')
 
-    def _extract_perspective(self, subj, pred, obj):
+    def _extract_perspective(self, pred):
         """ Identifies negation of triple using SpaCy (not supported by Stanford OpenIE).
 
         :param subj: subject of the triple
@@ -37,16 +38,14 @@ class StanfordOpenIEBaseline:
         :param obj:  object of triple
         :return:
         """
-        # Identify tokens marking negation
-        doc = self._nlp('{} {} {}'.format(subj, pred, obj))
-        negations = [t.lower_ for t in doc if t.dep_ == 'neg']
-
+        negations = [t.lower_ for t in self._nlp(pred) if t.dep_ == 'neg']
         if not negations:
-            return subj, pred, obj, 'positive'
+            return pred, 'positive'
 
         # If negated, place negation in perspective
-        pred = ' '.join([t.lower_ for t in doc if t.dep_ != 'neg'])
-        return subj, pred, obj, 'negative'
+        for token in negations:
+            pred = pred.replace(token + ' ', '')
+        return pred, 'negative'
 
     def _disambiguate_pronouns(self, arg, turn_id):
         """ Replaces 'you' and 'I' by the corresponding referent (speaker1 or speaker2)
@@ -111,7 +110,7 @@ class StanfordOpenIEBaseline:
                     conf = float(conf)
 
                     # Determine polarity using SpaCy
-                    subj, pred, obj, polar = self._extract_perspective(subj, pred, obj)
+                    pred, polar = self._extract_perspective(pred)
 
                     # Disambiguate You/I
                     subj = self._disambiguate_pronouns(subj, turn_id)
@@ -127,4 +126,4 @@ class StanfordOpenIEBaseline:
 
 if __name__ == '__main__':
     baseline = StanfordOpenIEBaseline(speaker1='alice', speaker2='bob')
-    print(baseline.extract_triples('My beer is cold <eos> I am very tired', verbose=True))
+    print(baseline.extract_triples('My beer is cold <eos> I am not very tired', verbose=True))
