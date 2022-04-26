@@ -33,9 +33,7 @@ class StanfordOpenIEBaseline:
     def _extract_perspective(self, pred):
         """ Identifies negation of triple using SpaCy (not supported by Stanford OpenIE).
 
-        :param subj: subject of the triple
         :param pred: predicate of the triple, containing potential negation
-        :param obj:  object of triple
         :return:
         """
         negations = [t.lower_ for t in self._nlp(pred) if t.dep_ == 'neg']

@@ -11,7 +11,7 @@ PRONOUNS = {"speaker1": ['i', 'me', 'myself', 'we', 'us', 'ourselves'],
 
 class OpenIE5Baseline:
     def __init__(self, spacy_model='en_core_web_sm', speaker1='speaker1', speaker2='speaker2', sep='<eos>'):
-        """ Constructor of the Stanford OpenIE baseline.
+        """ Constructor of the OpenIE5 baseline.
 
         IMPORTANT: Before using OpenIE5Baseline().extract_triples(), initialize an OpenIE5 server:
         >> java -Xmx10g -XX:+UseConcMarkSweepGC -jar openie-assembly.jar --httpPort 8000

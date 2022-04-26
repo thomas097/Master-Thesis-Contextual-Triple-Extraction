@@ -12,7 +12,15 @@ PRONOUNS = {"speaker1": ['i', 'me', 'myself', 'we', 'us', 'ourselves'],
 
 
 class OllieBaseline:
-    def __init__(self, path='OLLIE-master', spacy_model='en_core_web_sm', sep='<eos>', speaker1='speaker1', speaker2='speaker2'):
+    def __init__(self, path='OLLIE-master', spacy_model='en_core_web_sm', speaker1='speaker1', speaker2='speaker2', sep='<eos>'):
+        """ Constructor of the OLLIE OpenIE baseline.
+
+        :param path:         Path to directory of OLLIe jar file
+        :param spacy_model:  SpaCy model (default: en_core_web_sm)
+        :param speaker1:     Name of the user (default: speaker1)
+        :param speaker2:     Name of the system (default: speaker2)
+        :param sep:          Separator used to delimit dialogue turns (default: <eos>)
+        """
         self._post_processor = PostProcessor()
         self._nlp = spacy.load(spacy_model)
         self._pattern = r'(\d,\d+): \(([\w\d\- ]+); ([\w\d\- ]+); ([\w\d\- ]+)\)'
