@@ -41,7 +41,7 @@ class BERT:
 
 
 class PredicateNormalizer:
-    def __init__(self, exemplar_file, base_model='bert-base-uncased', k=3, min_conf=0.3):
+    def __init__(self, exemplar_file, base_model='bert-base-uncased', k=3, min_conf=0.4):
         self._model = BERT(base_model)
         self._nlp = spacy.load('en_core_web_sm')
         self._knn = KNeighborsClassifier(n_neighbors=k, metric=self._cosine_dist, weights='distance', algorithm='brute')

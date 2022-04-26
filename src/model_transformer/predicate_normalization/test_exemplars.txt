@@ -1,8 +1,8 @@
 # daily_dialogs-valid-011973
 # i've got some great news for you !<eos>Did you get the position you wanted ?<eos>Yes , I'll be promoted to department manager .
 speaker1,got,great news for speaker2,positive,has_abstract
-speaker1,get,the position speaker1 wanted,positive,acceptsb
-speaker1,promoted to,department manager,positive,is_promoted_to
+speaker1,get,the position speaker1 wanted,positive,accepts
+speaker1,promoted to,department manager,positive,promoted_to
 
 # circa-valid-030645
 # you're rich , your welcome , now we can play basketball all day<eos>do you like basketball ?<eos>yes
@@ -36,8 +36,8 @@ speaker1,worked in,the human services field,negative,works_in
 # personachat-valid-000454
 # you'll know when the time is right . try a semester abroad<eos>that's awfully expensive though is it not ?<eos>totally worth it . i go to europe all the time
 speaker2,know,when the time is right,positive,knows
-a semester abroad,is,awfully expensive,positive,costs
-that,is,awfully expensive,positive,costs
+a semester abroad,is,awfully expensive,positive,is
+that,is,awfully expensive,positive,is
 it,is,totally worth it,positive,is
 a semester abroad,is,totally worth it,positive,is
 that,is,totally worth it,positive,is

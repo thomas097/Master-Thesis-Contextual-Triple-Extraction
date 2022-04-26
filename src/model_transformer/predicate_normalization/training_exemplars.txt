@@ -212,6 +212,7 @@ likes,I,am fond of,horses
 likes,we,are into,documentaries
 likes,I,like to,get some food
 likes,he,likes to,play games
+likes,I,like to,travel to other cities
 likes,she,enjoys,horse riding
 likes,Jim,likes,animals
 likes,I,love,dancing to music
