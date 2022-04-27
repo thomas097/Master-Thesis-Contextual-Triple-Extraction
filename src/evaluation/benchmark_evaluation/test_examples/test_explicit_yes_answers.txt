@@ -460,7 +460,7 @@ speaker1,have,children,positive
 
 daily_dialogs-valid-001982
 It's 1446 Pine Street .<eos>1446 Pine . That's in San Francisco , isn't it ?<eos>Yes , it is .
-that,'s in,san francisco,positive
+that,is in,san francisco,positive
 
 daily_dialogs-valid-010197
 Single , please .<eos>Do you have a reservation ?<eos>Yes . I made a reservation in shanghai .

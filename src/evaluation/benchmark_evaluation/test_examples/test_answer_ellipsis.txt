@@ -212,7 +212,7 @@ speaker1,have,a cat named mittens,positive
 
 personachat-train-015236
 i actually do not . i only leave my house to go to the movies .<eos>what's your favorite movie ? slackers ?<eos>horror movies !
-speaker1 's favorite movie,'s,horror movies,positive
+speaker1 's favorite movie,is,horror movies,positive
 
 daily_dialogs-train-002539
 Can we go somewhere nearby ? I don't feel like walking too far .<eos>Sure . What kind of food do you like ?<eos>I mean the food for something spicy .
@@ -254,7 +254,7 @@ speaker1,are from,daly city california,positive
 
 daily_dialogs-train-001621
 Here you are<eos>Where is the fitting room ?<eos>It's just around the corner .
-the fitting room,'s around,the corner,positive
+the fitting room,is around,the corner,positive
 
 personachat-valid-000885
 o ok i work out with my lab named trooper as well<eos>what do you do for a living ?<eos>mechanical engineer for chevy and nissan

@@ -21,11 +21,11 @@ speaker1,had,a job,negative
 personachat-train-004379
 she buys me what i want when i want . i do not want to work .<eos>that's not a good attitude to have . you do not want your own money ?<eos>i'm ease dropping on my neighbors they are fighting lol
 speaker1,want to,work,negative
-that,'s,a good attitude to have,negative
+that,is,a good attitude to have,negative
 
 daily_dialogs-valid-006909
 If you ask me , I don't think it's guilty .<eos>What do you mean by saying so ?<eos>I mean it's not his fault .
-it,'s,his fault,negative
+it,is,his fault,negative
 
 circa-valid-006129
 i don't have a job . i am a college student .<eos>do you need a college degree for the job ?<eos>yes
@@ -223,7 +223,7 @@ speaker1,could get,a sitter,negative
 
 circa-train-033094
 i can help watch them ! i'm in oregon though<eos>did you know there's no sales tax in oregon ?<eos>i read that somewhere .
-there,'s,sales tax in oregon,negative
+there,is,sales tax in oregon,negative
 
 personachat-train-002360
 good evening , how was your day ?<eos>hey , good , how was yours ? ready for the weekend ? what plans do you have ?<eos>my day was awful . i really don't like the school i go to .
@@ -285,7 +285,7 @@ speaker1,like,the colors that are too bright,negative
 
 daily_dialogs-valid-010839
 I quit work whenever I get finished , usually about six o'clock .<eos>Does your work involve a lot of paper filling and typing ?<eos>No , the secretary does this . It's not part of my job .
-it,'s,part of speaker1 's job,negative
+it,is,part of speaker1 's job,negative
 
 personachat-train-007062
 that's so cool . i have never been there myself .<eos>i definitely recommend it . what do you like to do for fun ?<eos>i like to play music . it is a passion of mine .
@@ -381,7 +381,7 @@ speaker1,am,very good at it,negative
 
 personachat-valid-000887
 oh , i just had surgery recently , that was rough<eos>that's not good are you doing ok ?<eos>yes i am doing ok but do feel weird
-that,'s,good,negative
+that,is,good,negative
 
 personachat-valid-000711
 i am saddened because my career choices are not supported by my family .<eos>i'm sorry to hear that . what do you do for a living ?<eos>i deal watches as my current work .
@@ -401,7 +401,7 @@ speaker2,left,ohio,negative
 
 daily_dialogs-valid-012217
 What do you do ?<eos>I work in a publishing house . How about you ?<eos>Mine isn't hard , but it's not interesting .
-it,'s,interesting
+it,is,interesting
 speaker1 's,is,hard
 
 personachat-valid-000299

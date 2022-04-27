@@ -20,8 +20,8 @@ speaker1,love,new kids on the block,positive
 
 daily_dialogs-train-001774
 It's exactly what I asked for .<eos>Nothing wrong with it ?<eos>It's the right material . And the right color . I have to have it .
-it,'s,the right material,positive
-it,'s,the right color,positive
+it,is,the right material,positive
+it,is,the right color,positive
 
 circa-train-001473
 oh i hate traffic and crowded parking lots myself . do you have any hobbies<eos>did you encounter a lot of traffic coming here ?<eos>it was quite busy with cars
@@ -75,8 +75,8 @@ koala bear from Australia,are,very famous,positive
 
 circa-train-018189
 good , just tired from work<eos>do you like to do repetitive work ?<eos>no , it's unpleasant and boring .
-it,'s,unpleasant,positive
-it,'s,boring,positive
+it,is,unpleasant,positive
+it,is,boring,positive
 
 personachat-train-015039
 hello , what are you up to ?<eos>i am just watching netflix , you ?<eos>i am playing piano , practicing
@@ -95,8 +95,8 @@ speaker1,like to,play video games,positive
 
 daily_dialogs-train-002878
 Is there anything else you need help finding ?<eos>Could you point me toward the dishwashing detergent ?<eos>That's over by the paper towels and toilet paper .
-that,'s over by,the paper towels,positive
-that,'s over by,toilet paper,positive
+that,is over by,the paper towels,positive
+that,is over by,toilet paper,positive
 
 daily_dialogs-train-010343
 Good morning .<eos>What's the problem ?<eos>I'm running a high fever and feeling terribly bad .
@@ -170,7 +170,7 @@ speaker2,stay in,bed,positive
 
 daily_dialogs-train-000673
 It's fish steamed and served with our special sauce .<eos>Is it good ?<eos>Sure . It's a most popular dish .
-it,'s,fish steamed,positive
+it,is,fish steamed,positive
 it,served with,our special sauce,positive
 
 circa-train-012527
@@ -190,8 +190,8 @@ speaker1,eat,a somewhat balanced diet,positive
 
 daily_dialogs-train-008671
 I think it's either one or two gigs . I can't remember .<eos>how much do they cost ?<eos>not much at all . I think it's about 100 dollars .
-it,'s,one,positive
-it,'s,two gigs,positive
+it,is,one,positive
+it,is,two gigs,positive
 
 personachat-train-005143
 karma is real , do you agree ?<eos>i do agree . ever notice in scary movies how the bad guy always gets killed ?<eos>i don't believe in dating and have never been
@@ -207,7 +207,7 @@ daily_dialogs-train-006540
 Well , she's tall and pretty .<eos>Is she like you ?<eos>I suppose so . We're both friendly and easy going .
 speaker1,are,friendly,positive
 speaker1,are,easy going,positive
-she,'s,pretty,positive
+she,is,pretty,positive
 
 personachat-valid-000833
 hi i am very high class and conceited<eos>hello , just came back from my trip to europe . i go there twice a year ! you ?<eos>i travel everywhere and spend lots to go on luxurious trips
@@ -573,8 +573,8 @@ speaker1,feel like,everyone is watching me,positive
 
 daily_dialogs-valid-009766
 Yes , here's my ticket and my drivers license .<eos>Are these your bags ?<eos>Yes , they are .
-here,'s,speaker1 's ticket,positive
-here,'s,speaker1 's drivers license,positive
+here,is,speaker1 's ticket,positive
+here,is,speaker1 's drivers license,positive
 
 circa-train-016201
 basketball and football games are in the weekend plans .<eos>do you have any plan for the weekend ?<eos>yes , i would like to go to the big sale at the mall .

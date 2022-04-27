@@ -9,7 +9,7 @@ speaker1,are from,the south,positive
 
 daily_dialogs-train-012081
 Yes , it's me .<eos>Do you have a cold ?<eos>No . Worse than that . I have a flu . I'm in bed with a fever .
-it,'s,speaker1,positive
+it,is,speaker1,positive
 speaker1,have,a flu,positive
 speaker1,am in,bed,positive
 
@@ -25,7 +25,7 @@ speaker2,like,mushroom,positive
 
 personachat-train-014679
 grandma babysits she's a lawyer<eos>she must be really progressive if she's a laywer , what do you do ?<eos>i like to dance on the weekends
-she,'s,a lawyer,positive
+she,is,a lawyer,positive
 she,must be,really progressive,positive
 speaker1,like to,dance,positive
 
@@ -44,7 +44,7 @@ speaker1,have,a good relationship with speaker1 's husband,positive
 circa-train-010889
 that kind of work does take creativity . i am not that fortunate .<eos>does your work require creativity ?<eos>it's mostly busywork .
 that kind of work,take,creativity,positive
-it,'s,busywork,positive
+it,is,busywork,positive
 
 circa-valid-007261
 nope i like all books but my last one was lord of the flies<eos>do you like lord of the rings ?<eos>yes , the movies are excellent .
@@ -108,7 +108,7 @@ daily_dialogs-valid-010749
 I'm afraid there isn't . My boss only pays lip service .<eos>What is your salary expectation for this position ?<eos>My expectation is in the 3800 to 4500 RIB range . That's the take home pay .
 speaker1 's boss,pays,lip service,positive
 speaker1 's expectation,is in,the 3800 to 4500 rib range,positive
-that,'s,the take home pay,positive
+that,is,the take home pay,positive
 
 daily_dialogs-valid-003604
 Well , that was an intelligent thing to do .<eos>You don't have any spare change ?<eos>No , I don't .
@@ -141,7 +141,7 @@ speaker1,work at,an india restaurant,positive
 daily_dialogs-train-000502
 It was hard at the beginning , but now feel it's really relaxing . It makes me flexible .<eos>Anything else ?<eos>Yes , I often go swimming .
 it,was,hard,positive
-it,'s,really relaxing,positive
+it,is,really relaxing,positive
 it,makes,flexible,positive
 speaker1,go,swimming,positive
 
@@ -164,7 +164,7 @@ circa-train-011386
 i enjoy it but when i do go out with friends no italian food please<eos>do you like italian food ?<eos>it's the best .
 speaker1,enjoy,it,positive
 speaker1,go out with,friends,positive
-it,'s,the best,positive
+it,is,the best,positive
 
 daily_dialogs-train-002683
 Or discuss what gifts they could buy together .<eos>Any other ideas ?<eos>We can also put a guest book on the website for people to sign and write comments .
@@ -188,7 +188,7 @@ speaker1,born in,the countryside,positive
 daily_dialogs-train-001980
 Yes , we have both the paperback and hardcover . which would you want to buy ?<eos>How about the price of the hardcover ?<eos>It's 25 .
 speaker1,have,the paperback,positive
-it,'s,25,positive
+it,is,25,positive
 
 personachat-valid-000313
 probably going to thrift stores .<eos>shopping is okay . what is your favorite thing to shop for ?<eos>fun toys for my nieces .
@@ -242,9 +242,9 @@ speaker1,appreciate,it,positive
 
 daily_dialogs-train-003171
 it's about 200 years old . It has a lot of history !<eos>sounds fascinating . Where is your new house located ?<eos>it's just off of the ring road .
-it,'s,about 200 years old,positive
+it,is,about 200 years old,positive
 it,has,a lot of history,positive
-it,'s just off of,the ring road,positive
+it,is just off of,the ring road,positive
 
 personachat-valid-000416
 i am doing okay . trying to figure out how to take a bath .<eos>have you tried filling the tub ?<eos>i've a water allergy , small amounts are all i can do .
@@ -274,8 +274,8 @@ speaker1,got,speaker2 's email,positive
 
 daily_dialogs-train-000673
 It's fish steamed and served with our special sauce .<eos>Is it good ?<eos>Sure . It's a most popular dish .
-it,'s,fish steamed,positive
-it,'s,a most popular dish,positive
+it,is,fish steamed,positive
+it,is,a most popular dish,positive
 
 daily_dialogs-train-008444
 Oh , no . Rocky is a pilot .<eos>Really ? Where does he fly ? Does he fly to other countries ?<eos>Yes . Mostly to England and France .
@@ -290,7 +290,7 @@ daily_dialogs-valid-012472
 Sure . My number is 545 8897 , and I live at 908 Mulbury Street .<eos>That's 545 8897 and your mailing address is 908 Mulbury Street . The zip code is 20310 , right ?<eos>That's right .
 speaker1 's number,is,545 8897,positive
 speaker1,live at,908 mulbury street,positive
-that,'s,545 8897,positive
+that,is,545 8897,positive
 speaker2 's mailing address,is,908 mulbury street,positive
 the zip code,is,20310,positive
 
@@ -374,7 +374,7 @@ karma,is,real,positive
 
 daily_dialogs-train-010008
 No , it's just the two of us .<eos>Would you like to pay for the room in cash or with a credit card ?<eos>Credit card . We don't like to carry much cash with us on our trips .
-it,'s,the two of us,positive
+it,is,the two of us,positive
 
 personachat-valid-000290
 my husband already has one child so we are happy i like food also .<eos>he has a child from a previous marriage ?<eos>well a previous relationship yes .
@@ -385,7 +385,7 @@ speaker1,like,food,positive
 
 daily_dialogs-valid-012842
 Yes , it is . Sayuri Beds , Tokyo , Japan .<eos>That's what I want ! Do you need me to sign anything ? Or fill in some forms ?<eos>Just sign right here , please . That's everything you need to do .
-that,'s,everything speaker1 need to know,positive
+that,is,everything speaker1 need to know,positive
 
 personachat-valid-000544
 for sure . what else do you like ?<eos>school keeps me pretty busy , what about you ?<eos>spending a lot of time running and getting resources for my new job
@@ -394,7 +394,7 @@ school,keeps,pretty busy,positive
 circa-train-005088
 that's true . i do like warm weather too though since that's rugby season<eos>do you like rugby ?<eos>no , i prefer football
 speaker1,like,warm weather,positive
-that,'s,rugby season,positive
+that,is,rugby season,positive
 speaker1,prefer,football,positive
 
 circa-train-031815
@@ -467,7 +467,7 @@ speaker1,in love with,him,positive
 
 daily_dialogs-train-001337
 Here 's the master bedroom .<eos>Wow , it 's nice . What did you say about the rent ?<eos>900 a month .
-it,'s,nice,positive
+it,is,nice,positive
 
 circa-valid-022862
 i do work ! i waitress during the day , then i do side jobs during the evening .<eos>will you be watching that new drama this evening ?<eos>i do not have any time to start a new series today
@@ -518,7 +518,7 @@ personachat-valid-000804
 i paid 262 , 000 but i'm a bank teller so i make a lot<eos>yes that's a lot of money , are you athletic ?<eos>kind of , i only eat meat so i am a protein monster
 speaker1,am,a bank teller,positive
 speaker1,make,a lot,positive
-that,'s,a lot of money,positive
+that,is,a lot of money,positive
 speaker1,eat,meat,positive
 speaker1,am,a protein monster,positive
 
@@ -563,7 +563,7 @@ speaker1 's favorite,is,tupac,positive
 
 daily_dialogs-valid-003254
 she's on the M40 , near Reading .<eos>is she alright ?<eos>I don't know , she didn't say . I'm so sorry about this .
-she,'s on,the m40,positive
+she,is on,the m40,positive
 
 circa-valid-020356
 maybe i should spend more money on trying to take a date out to a nice restaurant .<eos>would you need to earn more money ?<eos>i always need to earn more money .
@@ -684,7 +684,7 @@ speaker1,feel like,going out,positive
 daily_dialogs-valid-009768
 Ok . That will be 1400RMB please .<eos>How long is the flight ?<eos>It ' s about three hours .
 that,will be,1400rmb,positive
-it,'s about,three hours,positive
+it,is about,three hours,positive
 
 circa-train-016214
 no i don't know if dragons fly in that area<eos>have you checked the crime rate in that area ?<eos>i had a quick read about it

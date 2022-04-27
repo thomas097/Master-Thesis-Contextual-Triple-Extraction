@@ -8,7 +8,7 @@ speaker1,have,horses,positive
 
 circa-valid-020923
 hi there , i decided to pack up my belongings and move here from germany .<eos>is the flat move in ready ?<eos>yes , it's turnkey .
-the flat move,'s,turnkey
+the flat move,is,turnkey
 
 circa-train-031921
 congratulations i heard the process is crazy i've a gym buddy who's a realtor<eos>do you have a realtor ?<eos>i found one online .
@@ -49,12 +49,12 @@ speaker1 's family,are,really contented,positive
 
 daily_dialogs-train-001337
 Here 's the master bedroom .<eos>Wow , it 's nice . What did you say about the rent ?<eos>900 a month .
-the master bedroom,'s,nice,positive
+the master bedroom,is,nice,positive
 
 circa-train-010889
 that kind of work does take creativity . i am not that fortunate .<eos>does your work require creativity ?<eos>it's mostly busywork .
 that kind of work,take,creativity,positive
-speaker1 's work,'s,busywork,positive
+speaker1 's work,is,busywork,positive
 
 personachat-train-000888
 hi ! please tell me about yourself .<eos>hey there . i live in colorado and work in it . how about you ?<eos>i'm disabled and have many hobbies like photography .
@@ -109,7 +109,7 @@ jazz,helps with,speaker1 's boyfriend 's job at nasa,positive
 
 circa-train-018518
 lady gaga is cool . she's a substitute teacher sometimes too .<eos>do you still listen to lady gaga ?<eos>yes , she is brilliant
-lady gaga,'s,a substitute teacher,positive
+lady gaga,is,a substitute teacher,positive
 lady gaga,is,brilliant,positive
 
 daily_dialogs-valid-006925
@@ -186,7 +186,7 @@ speaker1,see,any of speaker2 's old friends,positive
 
 daily_dialogs-train-003171
 it's about 200 years old . It has a lot of history !<eos>sounds fascinating . Where is your new house located ?<eos>it's just off of the ring road .
-speaker1 's new house,'s off of, the ring road,positive
+speaker1 's new house,is off of, the ring road,positive
 
 personachat-valid-000852
 other than disney , you can find me on the playground with my friends .<eos>that is nice ! do you have a favorite activity ?<eos>i enjoy collecting disney movies , and singing along to them .
@@ -227,7 +227,7 @@ speaker1,been,drawing,positive
 
 personachat-valid-000051
 you are most welcome . the rowing machine is nice too .<eos>that's a full body work out right there . do you live in california ?<eos>sadly , no . my dogs and i are in ohio .
-the rowing machine,'s,a full body work out,positive
+the rowing machine,is,a full body work out,positive
 
 daily_dialogs-train-004012
 Why not ? I downloaded a beautiful song the other day . We can learn it together now .<eos>Great . Do you think we need a Chinese dictionary ?<eos>Yes , just in case we run into me new characters .
@@ -240,7 +240,7 @@ typing,is,part of speaker1 's job,negative
 
 daily_dialogs-train-001621
 Here you are<eos>Where is the fitting room ?<eos>It's just around the corner .
-the fitting room,'s around,the corner,positive
+the fitting room,is around,the corner,positive
 
 circa-valid-000131
 i just went to the movies , but there wasn't a thing good !<eos>would you like to go to the movies tonight ?<eos>i'm open to it .
@@ -334,7 +334,7 @@ speaker1 's home freezer,makes,a strange sound,positive
 
 daily_dialogs-valid-002642
 Excuse me , but I'm looking for a gift for my friend .<eos>Is it a Chinese New Year's gift or a birthday gift ?<eos>Well , it's a wedding gift .
-a gift for speaker1 's friend,'s,a wedding gift,positive
+a gift for speaker1 's friend,is,a wedding gift,positive
 
 daily_dialogs-valid-009764
 By the way , I want a large room .<eos>Right now we have a suite for 4 people , do you want to book it ?<eos>Yes , that's what I am looking for . I will take the room for 2 days .
@@ -362,8 +362,8 @@ country clubs,give,a headache,positive
 personachat-train-016229
 i love kevin spacey . my mother and grandmother do too !<eos>i've never heard of him what does he do ?<eos>he's the lead character who plays potus . he's so cool .
 speaker2,heard of,kevin spacey,negative
-kevin spacey,'s,the lead character who plays potus,positive
-kevin spacey,'s,so cool,positive
+kevin spacey,is,the lead character who plays potus,positive
+kevin spacey,is,so cool,positive
 
 personachat-valid-000298
 i am a home maker . i had an arranged marriage as a child<eos>your culture is diverse , all i have is a turtle companion , how did it work out ?<eos>it worked out well . i dance to keep busy
@@ -416,8 +416,8 @@ speaker1 's fish,is,a little dry,positive
 
 daily_dialogs-valid-000531
 80 yuan .<eos>It's rather expensive , isn't it ?<eos>It's a bit . But I can give you a discount .
-80 yuan,'s,rather expensive,positive
-80 yuan,'s,a bit,positive
+80 yuan,is,rather expensive,positive
+80 yuan,is,a bit,positive
 
 personachat-train-016330
 no it was a dare by my girlfriend . i just love her<eos>oh i see , do you have any hobbies ?<eos>i play disc golf with an older brother . you .
