@@ -81,6 +81,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
 
         if pred == 1:  # B
             span = re.sub('[^\w\d\-\']+', ' ', ''.join(span)).strip()
+            span = span.replace('SPEAKER', ' SPEAKER').replace('speaker', ' speaker').strip()
             out.append(span)
             span = [token]
 
@@ -89,6 +90,7 @@ def bio_tags_to_tokens(tokens, mask, one_hot=False):
 
     if span:
         span = re.sub('[^\w\d\-\']+', ' ', ''.join(span)).strip()
+        span = span.replace('SPEAKER', ' SPEAKER').replace('speaker', ' speaker').strip()
         out.append(span)
 
     # Remove empty strings and duplicates

@@ -8,12 +8,12 @@ PRED_RULES = {'VERB PART VERB': [0, 1],           # "want to go"
               'VERB AUX ADP': [0],
               'VERB PART VERB ADP': [0, 1],       # "went to walk with"
               'VERB VERB': [0],                   # "like walking"
-              'AUX VERB': [0],
               'VERB PART VERB PART': [0, 1],      # "like to walk with"
               'VERB ADP VERB PART': [0, 1],       # "feel like going to"
               'VERB PART VERB VERB': [0, 1],
               'VERB ADP VERB VERB': [0, 1],
-              'AUX ADP': [0, 1],                  # "If is about [a movie]"
+              'AUX VERB ADP': [0, 1, 2],          # "can give away"
+              'AUX ADP': [0, 1],                  # "is about [a movie]"
               'AUX VERB VERB': [0, 1],            # "Must be [having]"
               'VERB ADP VERB ADP': [0, 1],
               'VERB PART VERB PRON ADP': [0, 1]}
@@ -31,12 +31,17 @@ class PostProcessor:
     def _decontract(phrase, is_predicate=False):
         # Decontract of common contractions and fragments
         phrase = re.sub(r"n\'t", " not", phrase)
-        phrase = re.sub(r"\'re", " are", phrase)
-        phrase = re.sub(r"\'d", " would", phrase)
-        phrase = re.sub(r"\'ll", " will", phrase)
         phrase = re.sub(r"\'t", " not", phrase)
+        phrase = re.sub(r"\'re", " are", phrase)
+        phrase = re.sub(r"\' re", " are", phrase)
+        phrase = re.sub(r"\'d", " would", phrase)
+        phrase = re.sub(r"\' d", " would", phrase)
+        phrase = re.sub(r"\'ll", " will", phrase)
+        phrase = re.sub(r"\' ll", " will", phrase)
         phrase = re.sub(r"\'ve", " have", phrase)
+        phrase = re.sub(r"\' ve", " have", phrase)
         phrase = re.sub(r"\'m", " am", phrase)
+        phrase = re.sub(r"\' m", " am", phrase)
         phrase = re.sub(r" wo ", "will ", ' ' + phrase + ' ')
         phrase = re.sub(r" ca ", "can ", ' ' + phrase + ' ')
 
@@ -88,4 +93,4 @@ class PostProcessor:
 
 if __name__ == '__main__':
     pp = PostProcessor()
-    print(pp.format(('she', 'must be have a tremendously', 'progressive evening')))
+    print(pp.format(('speaker1', 'can eat', 'pizza')))
