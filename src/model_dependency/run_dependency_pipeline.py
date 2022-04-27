@@ -1,5 +1,7 @@
 import spacy
+import re
 from coreference_resolution import Coref
+from post_processing import PostProcessor
 from pprint import pprint
 
 SUBJ_DEPS = ['nsubj', 'nsubjpass', 'expl']
@@ -11,20 +13,26 @@ ROOT_POS = ['VERB', 'AUX', 'ADP']
 ROOT_DEPS = ['ROOT', 'conj', 'advcl', 'ccomp']
 
 OBJ_DEPS = ['dobj', 'pobj', 'attr', 'advmod', 'acomp', 'ccomp']
-NP_DEPS = ['det', 'compound', 'amod']
+NP_DEPS = ['det', 'compound', 'amod', 'poss']
 
+# Vocabulary of special words
 WH_WORDS = ['how', 'what', 'why', 'who', 'when', 'where', 'whose', 'that']
-
 POS_INTJS = ['yes', 'correct', 'yup', 'yea', 'yeah']
 NEG_INTJS = ['no', 'nope', 'nah', 'neh']
 
-PRONOUNS = ['it', 'he', 'his', 'him', 'her', 'she', 'they', 'them', 'their', 'our', 'us', 'we', 'there']
+PRONOUNS = [(("my", 'mine', 'our'), "speaker1 's"),
+            (('i', 'me', 'myself', 'we', 'us', 'ourselves', 'my'), 'speaker1'),
+            (('your', 'yours'), "speaker2 's"),
+            (('you', 'yourself', 'yourselves'), 'speaker2')]
 
 
 class SpacyTripleExtractor:
-    def __init__(self, embeddings_file=None):
+    def __init__(self, embeddings_file=None, speaker1='speaker1', speaker2='speaker2'):
         self._coref = Coref(embeddings_file) if embeddings_file is not None else None
+        self._post_processing = PostProcessor()
         self._nlp = spacy.load("en_core_web_sm")
+        self._speaker1 = speaker1
+        self._speaker2 = speaker2
 
     ## Subjects
 
@@ -135,7 +143,6 @@ class SpacyTripleExtractor:
 
                 # Complete predicate with nested objects (not main object)
                 predicate = self._predicate_with_nested_obj(predicate, object_)
-                print([subject, predicate, object_, polarity, feedback])
 
                 # Add subject to conjuncts (if needed)
                 if not subject:
@@ -160,21 +167,7 @@ class SpacyTripleExtractor:
 
         return triples
 
-    def _interpret_with__context(self, triples):
-        # # Co-reference resolution
-        # for i, (subj, pred, obj, _, _, sent_idx) in enumerate(triples):
-        #     # Resolve subject
-        #     if len(subj) == 1 and subj[0].lower_ in PRONOUNS:
-        #         context = turns[:sent_idx + 1]
-        #         pronoun = subj[0].lower_
-        #         triples[i][0] = self._coref.resolve(context, pronoun).split()
-        #
-        #     # Resolve object
-        #     if len(obj) == 1 and obj[0].lower_ in PRONOUNS:
-        #         context = turns[:sent_idx + 1]
-        #         pronoun = obj[0].lower_
-        #         triples[i][2] = self._coref.resolve(context, pronoun).split()
-
+    def _interpret_with_context(self, triples):
         # If object is missing, inherit object from next turn (questions)
         for triple in triples:
             if triple['subj'] and triple['pred'] and not triple['obj']:
@@ -198,44 +191,84 @@ class SpacyTripleExtractor:
                 if candidates:
                     candidates[-1]['polar'] = 'negative'
 
+        # Set subject to corresponding speaker if elided
+        for triple in triples:
+            if not triple['subj']:
+                if triple['turn'] % 2 == 0:
+                    triple['subj'] = [list(self._nlp('I'))[0]]  # [Token('I')]
+                else:
+                    triple['subj'] = [list(self._nlp('I'))[0]]
+
         return triples
 
-    @staticmethod
-    def _format_triple(triple):
+    def _disambiguate_pronouns(self, turn, turn_id):
+        """ Assigns speaker1/speaker2 to you/I depending on referent.
+        """
+        # Split contractions and punctuation from tokens
+        turn = ' %s ' % ' '.join(re.findall("[\w\d-]+|'\w|[.,!?]", turn))
+
+        for pronouns, speaker_id in PRONOUNS:
+            # Swap speakers for uneven turns
+            if turn_id % 2 == 1:
+                if 'speaker1' in speaker_id:
+                    speaker_id = speaker_id.replace('speaker1', 'speaker2')
+                else:
+                    speaker_id = speaker_id.replace('speaker2', 'speaker1')
+
+            # Replace by referent name
+            speaker_id = speaker_id.replace('speaker1', self._speaker1).replace('speaker2', self._speaker2)
+
+            # Replace pronoun occurrences with speaker_ids
+            for pron in pronouns:
+                if ' %s ' % pron in turn:
+                    turn = turn.replace(' %s ' % pron, ' ' + speaker_id + ' ')
+        return turn
+
+    def _format_triple(self, triple):
         subj = ' '.join([t.lower_ for t in triple['subj']])
         pred = ' '.join([t.lower_ for t in triple['pred']])
         obj = ' '.join([t.lower_ for t in triple['obj']])
         polar = triple['polar']
-        return subj, pred, obj, polar
 
-    def extract_triples(self, inputs):
+        subj = self._disambiguate_pronouns(subj, triple['turn'])
+        pred = self._disambiguate_pronouns(pred, triple['turn'])
+        obj = self._disambiguate_pronouns(obj, triple['turn'])
+
+        return self._post_processing.format((subj, pred, obj)) + (polar,)
+
+    def extract_triples(self, inputs, verbose=False):
         # Extract triples from each turn in the input
-        print('Raw triples:')
         triples = []
         for turn_idx, turn in enumerate(inputs.split('<eos>')):
             triples += self._get_triples(self._nlp(turn.strip()), turn_idx)
 
-        print('\nPreprocessed (no context):')
-        pprint([(t['subj'], t['pred'], t['obj'], t['polar'], t['feedback'], t['turn']) for t in triples])
-        print()
+        if verbose:
+            print('\nPreprocessed (no context):')
+            pprint([(t['subj'], t['pred'], t['obj'], t['polar'], t['feedback'], t['turn']) for t in triples])
+            print()
 
         # Contextually interpret these triples
-        triples = self._interpret_with__context(triples)
+        triples = self._interpret_with_context(triples)
 
         # Discard everything but SPO and polarity
         triples = set([self._format_triple(t) for t in triples])
-        return triples
+        return {t for t in triples if '' not in t}
 
 
 if __name__ == '__main__':
-    parser = SpacyTripleExtractor() #'embeddings/glove.10000.300d.txt'
+    examples = ["in my living room watching goodfellas <eos> what is goodfellas ? i have never heard of that <eos> best movie of all time",
+                "Yes , I'd like to move to another room .<eos>Is there anything uncomfortable in your room ?<eos>No . The air conditioner in this room doesn't work .",
+                "Do you like cats ? <eos> No , I hate cats, and dogs I don't adore",
+                "going over to a friends house tonight and watch some good old star wars movies .",
+                "yes mostly i made some for others<eos>that's nice . are you taking fashion classes ?<eos>no i'm studying public relations",
+                "are you going to watch star wars at the movies ?<eos>yes , i'm excited to see the newest instalment !",
+                "nice . having a home must be great . i like to cook at my place . anything but chicken .<eos>do your folks still live in the same place ?<eos>no , they both passed away .",
+                "No , I am not ill . <eos> Then , What's the matter with your child ? <eos> Nothing .",
+                "I went to the pool the other day<eos>How was it<eos>Fantastic"]
 
-    #example = "in my living room watching goodfellas <eos> what is goodfellas ? i have never heard of that <eos> best movie of all time"
-    #example = "Yes , I'd like to move to another room .<eos>Is there anything uncomfortable in your room ?<eos>No . The air conditioner in this room doesn't work ."
-    #example = "Do you like cats ? <eos> No , I hate cats, and dogs I don't adore"
-    example = "yes mostly i made some for others<eos>that's nice . are you taking fashion classes ?<eos>no i'm studying public relations"
-    #example = "No , I am not ill . <eos> Then , What's the matter with your child ? <eos> Nothing ."
-    result = parser.extract_triples(example)
-
-    print('Contextualized:')
-    pprint(result)
+    parser = SpacyTripleExtractor()
+    for example in examples:
+        res = parser.extract_triples(example)
+        print(example)
+        print(res)
+        print()
