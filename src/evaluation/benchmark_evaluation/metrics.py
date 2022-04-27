@@ -3,11 +3,11 @@ from sklearn.metrics import auc
 import numpy as np
 
 
-def precision_at_k(y_true, y_pred, k=0.5):
+def precision_at_k(y_true, y_pred, k):
     tp, fp, = 0, 0
     for triples_true, triples_pred in zip(y_true, y_pred):
         # Filter out triples below k
-        triples_pred = [triple for conf, triple in triples_pred if conf >= k]
+        triples_pred = set([triple for conf, triple in triples_pred if conf >= k])
 
         for triple in triples_pred:
             if triple in triples_true:
@@ -22,11 +22,11 @@ def precision_at_k(y_true, y_pred, k=0.5):
     return tp / (tp + fp)
 
 
-def recall_at_k(y_true, y_pred, k=0.5):
+def recall_at_k(y_true, y_pred, k):
     tp, fn, = 0, 0
     for triples_true, triples_pred in zip(y_true, y_pred):
         # Filter out triples below k
-        triples_pred = [triple for conf, triple in triples_pred if conf >= k]
+        triples_pred = set([triple for conf, triple in triples_pred if conf >= k])
 
         for triple in triples_true:
             if triple in triples_pred:
@@ -41,13 +41,13 @@ def recall_at_k(y_true, y_pred, k=0.5):
     return tp / (tp + fn)
 
 
-def f_score_at_k(y_true, y_pred, k=0.5):
+def f_score_at_k(y_true, y_pred, k):
     precision = precision_at_k(y_true, y_pred, k)
     recall = recall_at_k(y_true, y_pred, k)
     return 2 * precision * recall / (precision + recall)
 
 
-def precision_recall_auc(y_true, y_pred, steps=100, plot_pr=True):
+def precision_recall_auc(y_true, y_pred, steps=500, plot_pr=True):
     precision, recall = [], []
     for k in np.linspace(0, 1, steps):
         precision.append(precision_at_k(y_true, y_pred, k))
@@ -64,7 +64,7 @@ def precision_recall_auc(y_true, y_pred, steps=100, plot_pr=True):
     return auc(recall, precision)
 
 
-def classification_report(true_triples, pred_triples, k=0.5):
+def classification_report(true_triples, pred_triples, k):
     """ Computes precision@k, recall@k, F1@k and PR-AUC over gold
         triples and predictions.
 
@@ -75,7 +75,7 @@ def classification_report(true_triples, pred_triples, k=0.5):
     """
     precision = precision_at_k(true_triples, pred_triples, k)
     recall = recall_at_k(true_triples, pred_triples, k)
-    fscore = f_score_at_k(true_triples, pred_triples, k=0.0)
+    fscore = f_score_at_k(true_triples, pred_triples, k)
     auc = precision_recall_auc(true_triples, pred_triples)
 
     print('precision@k:', precision)
