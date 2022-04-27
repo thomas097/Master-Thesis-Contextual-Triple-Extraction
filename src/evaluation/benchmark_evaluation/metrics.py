@@ -41,7 +41,7 @@ def recall_at_k(y_true, y_pred, k=0.5):
     return tp / (tp + fn)
 
 
-def F_score_at_k(y_true, y_pred, k=0.5):
+def f_score_at_k(y_true, y_pred, k=0.5):
     precision = precision_at_k(y_true, y_pred, k)
     recall = recall_at_k(y_true, y_pred, k)
     return 2 * precision * recall / (precision + recall)
@@ -62,6 +62,27 @@ def precision_recall_auc(y_true, y_pred, steps=100, plot_pr=True):
         plt.show()
 
     return auc(recall, precision)
+
+
+def classification_report(true_triples, pred_triples, k=0.5):
+    """ Computes precision@k, recall@k, F1@k and PR-AUC over gold
+        triples and predictions.
+
+    :param true_triples:
+    :param pred_triples:
+    :param k:
+    :return:
+    """
+    precision = precision_at_k(true_triples, pred_triples, k)
+    recall = recall_at_k(true_triples, pred_triples, k)
+    fscore = f_score_at_k(true_triples, pred_triples, k=0.0)
+    auc = precision_recall_auc(true_triples, pred_triples)
+
+    print('precision@k:', precision)
+    print('recall@k:   ', recall)
+    print('F-score@k:  ', fscore)
+    print('AUC:        ', auc)
+    return precision, recall, fscore, auc
 
 
 if __name__ == '__main__':
@@ -86,5 +107,5 @@ if __name__ == '__main__':
 
     print('precision@k:', precision_at_k(true_triples, pred_triples, k=0.0))
     print('recall@k:   ', recall_at_k(true_triples, pred_triples, k=0.0))
-    print('F-score@k:  ', F_score_at_k(true_triples, pred_triples, k=0.0))
+    print('F-score@k:  ', f_score_at_k(true_triples, pred_triples, k=0.0))
     print('AUC:        ', precision_recall_auc(true_triples, pred_triples))

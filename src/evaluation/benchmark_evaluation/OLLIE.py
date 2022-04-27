@@ -23,7 +23,7 @@ class OllieBaseline:
         """
         self._post_processor = PostProcessor()
         self._nlp = spacy.load(spacy_model)
-        self._pattern = r'(\d,\d+): \(([\w\d\- ]+); ([\w\d\- ]+); ([\w\d\- ]+)\)'
+        self._pattern = r'(\d,\d+): \(([^;]+); ([^;]+); ([^;]+)\)'
         self._speaker1 = speaker1
         self._speaker2 = speaker2
         self._path = path
@@ -79,41 +79,36 @@ class OllieBaseline:
         """
         # Where to output warnings, messages, etc.
         stderr = subprocess.PIPE if not verbose else None
+
+        # Change working directory to run java from root
+        wd = os.getcwd()
+        os.chdir(self._path)
+
+        # Write turn out to file
+        with open('tmp.txt', 'w', encoding='utf-8') as file:
+            for turn_id, turn in enumerate(dialogue.split(self._sep)):
+                turn = self._disambiguate_pronouns(turn, turn_id)
+                file.write(turn + '\n')
+
+        out = subprocess.check_output('java -Xmx512m -jar ollie-app-latest.jar tmp.txt', stderr=stderr)
+        if verbose:
+            print('Output:', out)
+
+        os.chdir(wd)
+        lines = out.decode('UTF-8').strip().replace('\r', '').split('\n')
+
+        # Extract triples from output lines
         triples = []
+        for line in lines:
+            for conf, subj, pred, obj in re.findall(self._pattern, line):
+                # Determine polarity using SpaCy
+                pred, polar = self._extract_perspective(pred)
 
-        # Analyze turns separately
-        for turn_id, turn in enumerate(dialogue.split(self._sep)):
-            # Change working directory to run java from root
-            wd = os.getcwd()
-            os.chdir(self._path)
+                # Make sure the output conforms to standard
+                subj, pred, obj = self._post_processor.format((subj, pred, obj))
+                conf = float(conf.replace(',', '.'))
 
-            # Write turn out to file
-            with open('tmp.txt', 'w', encoding='utf-8') as file:
-                file.write(turn.strip())
-
-            out = subprocess.check_output('java -Xmx512m -jar ollie-app-latest.jar tmp.txt', stderr=stderr)
-            if verbose:
-                print('Output:', out)
-
-            os.chdir(wd)
-            lines = out.decode('UTF-8').strip().replace('\r', '').split('\n')
-
-            # Extract triples from output lines
-            for line in lines:
-                for conf, subj, pred, obj in re.findall(self._pattern, line):
-                    # Determine polarity using SpaCy
-                    pred, polar = self._extract_perspective(pred)
-
-                    # Disambiguate You/I
-                    subj = self._disambiguate_pronouns(subj, turn_id)
-                    pred = self._disambiguate_pronouns(pred, turn_id)
-                    obj = self._disambiguate_pronouns(obj, turn_id)
-
-                    # Make sure the output conforms to standard
-                    subj, pred, obj = self._post_processor.format((subj, pred, obj))
-                    conf = float(conf.replace(',', '.'))
-
-                    triples.append((conf, (subj, pred, obj, polar)))
+                triples.append((conf, (subj, pred, obj, polar)))
         return triples
 
 
