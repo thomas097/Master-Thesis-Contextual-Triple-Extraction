@@ -1,39 +1,35 @@
-import sys
-sys.path.insert(0, '../../model_dependency')
-sys.path.insert(0, '../../model_transformer')
-
 from pprint import pprint
 from personagpt import PersonaGPT
 from persona import Persona
 from run_transformer_pipeline import AlbertTripleExtractor
 
 
-# Suppresses greeting responses
+# Helps suppresses greeting responses
 GREETINGS = ['hi', 'hi']
 
 
-def evaluate(persona, model, num_graphs=10, context_size=8, conf_threshold=0.5):
+def evaluate(persona, model, num_graphs=10, conf_threshold=0.5):
     for _ in range(num_graphs):
         print('---------------------------------------')
         persona_facts = persona.sample_persona()
         print('\nPERSONA:')
-        for item in persona_facts:
-            print(item)
+        for _, triple in persona_facts:
+            print(triple)
         print()
 
         # Endow chatbot with graph
-        bot = PersonaGPT(persona=persona.persona)
+        bot = PersonaGPT(persona=persona.persona_lines)
 
         # Store triples extracted from QA-pairs
         outputs = []
 
         for i in range(len(persona_facts)):
-            # Sample question about personal fact
-            question = persona.sample_question(i)
+            # Sample question about i-th personal fact
+            question = persona.persona_question(i)
             print('USER:', question)
 
             # Let PersonaGPT respond to last turns
-            response = bot.respond(GREETINGS + [question], polarity=persona.get_polarity(i))
+            response = bot.respond(GREETINGS + [question], polarity=persona.persona_polarity(i))
             print('BOT: ', response)
 
             # Extract last three turns
@@ -43,12 +39,10 @@ def evaluate(persona, model, num_graphs=10, context_size=8, conf_threshold=0.5):
                 if conf > conf_threshold:
                     outputs.append(triple)
         print()
-        pprint(persona.triples())
-        print()
         pprint(outputs)
 
 
 if __name__ == '__main__':
-    model = AlbertTripleExtractor('../../model_transformer/models/2022-04-11')
-    persona = Persona('personas.json', num_facts=5)
+    model = AlbertTripleExtractor('../../model_transformer/models/2022-04-27')
+    persona = Persona('persona_triples.txt', num_facts=5)
     evaluate(persona, model, num_graphs=1)

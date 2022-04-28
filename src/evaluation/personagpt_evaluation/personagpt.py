@@ -1,4 +1,5 @@
 from transformers import GPT2Tokenizer, AutoModelForCausalLM
+from persona import Persona
 import torch
 
 NEGATION_WORDS = ['not', 'never', 'no', 'nah', "don't", 'nope']
@@ -28,6 +29,7 @@ class PersonaGPT:
         out = self._model.generate(inputs=input_ids, do_sample=True, top_k=10, top_p=top_p,
                                    max_length=max_length, pad_token_id=self._tokenizer.eos_token_id)
 
+        # Strip off dialogue context
         msg = out.cpu().detach().numpy()[0][input_ids.shape[-1]:]
 
         # Decode message into token string
@@ -43,8 +45,25 @@ class PersonaGPT:
 
         # If message likely has wrong polarity, generate again
         msg_polarity = 'negative' if any(x in msg for x in NEGATION_WORDS) else 'positive'
-        while msg_polarity != polarity:
+        i = 0
+        while msg_polarity != polarity and i < 5:
             msg = self._generate_response(bot_input_ids)
             msg_polarity = 'negative' if any(x in msg for x in NEGATION_WORDS) else 'positive'
+            i += 1
 
         return msg
+
+
+if __name__ == '__main__':
+    # Create and show persona
+    persona = Persona('persona_triples.txt', num_facts=10, perc_negated=0)
+    for line in persona.persona_lines:
+        print(line)
+    print()
+
+    # Provide agent gold graph
+    agent = PersonaGPT(persona=persona.persona_lines + persona.persona_lines)
+    while True:
+        input_ = input('>> ')
+        response = agent.respond([input_], 'positive')
+        print('BOT:', response)

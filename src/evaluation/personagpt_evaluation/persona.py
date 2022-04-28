@@ -1,231 +1,193 @@
-import spacy
-from tqdm import tqdm
 import random
-import json
-
-# Set seed
-#random.seed(2)
-
-
-NEGATE_PERSONA = {'PRON VERB NOUN PUNCT': "0 don't 1 2 3",
-                  'PRON AUX DET NOUN PUNCT': '0 1 not 2 3 4',
-                  'PRON VERB PART VERB PUNCT': "0 don't 1 2 3 4",
-                  'PRON VERB DET NOUN PUNCT': "0 don't 1 2 3 4",
-                  'PRON VERB PART VERB NOUN PUNCT': "0 don't 1 2 3 4 5",
-                  'PRON VERB ADJ NOUN PUNCT': "0 don't 1 2 3 4",
-                  'PRON VERB ADP DET NOUN PUNCT': "0 don't 1 2 3 4 5",
-                  'PRON ADJ NOUN AUX NOUN PUNCT': '0 1 2 3 not 4 5',
-                  'PRON ADJ NOUN AUX ADJ PUNCT': '0 1 2 3 not 4 5',
-                  'PRON AUX DET ADJ NOUN PUNCT': '0 1 not 2 3 4 5',
-                  'PRON AUX DET NOUN NOUN PUNCT': '0 1 not 2 3 4 5',
-                  'PRON VERB NUM NOUN PUNCT': "0 don't 1 2 3 4",
-                  'PRON VERB ADP DET NOUN NOUN PUNCT': "0 don't 1 2 3 4 5 6",
-                  'PRON AUX NUM NOUN PUNCT': "0 don't 1 2 3 4",
-                  'PRON VERB VERB PUNCT': "0 don't 1 2 3",
-                  'PRON AUX ADJ PUNCT': '0 1 not 2 3',
-                  'PRON VERB NOUN NOUN PUNCT': "0 don't 1 2 3 4",
-                  'PRON VERB ADP NOUN PUNCT': "0 don't 1 2 3 4",
-                  'PRON NOUN AUX DET NOUN PUNCT': '0 1 2 not 3 4 5',
-                  'PRON VERB DET ADJ NOUN PUNCT': "0 don't 1 2 3 4 5"}
-
-PERSONA_TRIPLES = {'PRON VERB NOUN PUNCT': ([0], [1], [2]),
-                   'PRON AUX DET NOUN PUNCT': ([0], [1], [2, 3]),
-                   'PRON VERB PART VERB PUNCT': ([0], [1, 2], [3]),
-                   'PRON VERB DET NOUN PUNCT': ([0], [1], [2, 3]),
-                   'PRON VERB PART VERB NOUN PUNCT': ([0], [1, 2], [3, 4]),
-                   'PRON VERB ADJ NOUN PUNCT': ([0], [1], [2, 3]),
-                   'PRON VERB ADP DET NOUN PUNCT': ([0], [1, 2], [3, 4]),
-                   'PRON ADJ NOUN AUX NOUN PUNCT': ([0, 1, 2], [3], [4]),
-                   'PRON ADJ NOUN AUX ADJ PUNCT': ([0, 1, 2], [3], [4]),
-                   'PRON AUX DET ADJ NOUN PUNCT': ([0], [1], [2, 3, 4]),
-                   'PRON AUX DET NOUN NOUN PUNCT': ([0], [1], [2, 3, 4]),
-                   'PRON VERB NUM NOUN PUNCT': ([0], [1], [2, 3]),
-                   'PRON VERB ADP DET NOUN NOUN PUNCT': ([0], [1, 2], [3, 4, 5]),
-                   'PRON AUX NUM NOUN PUNCT': ([0], [1], [2, 3]),
-                   'PRON VERB VERB PUNCT': ([0], [1], [2]),
-                   'PRON AUX ADJ PUNCT': ([0], [1], [2]),
-                   'PRON VERB NOUN NOUN PUNCT': ([0], [1], [2, 3]),
-                   'PRON VERB ADP NOUN PUNCT': ([0], [1, 2], [3]),
-                   'PRON NOUN AUX DET NOUN PUNCT': ([0, 1], [2], [3, 4]),
-                   'PRON VERB DET ADJ NOUN PUNCT': ([0], [1], [2, 3, 4])}
-
-PERSONA_QUESTIONS_POS = {'PRON VERB NOUN PUNCT': ['Do you 1 2 ?', 'What do you 1 ?'],
-                         'PRON AUX DET NOUN PUNCT': ['Are you 2 3 ?'],
-                         'PRON VERB PART VERB PUNCT': ['You 1 2 3 ?', 'Do you 1 2 3 ?', 'What do you 1 ?', 'Do you 3 ?'],
-                         'PRON VERB DET NOUN PUNCT': ['Do you 1 2 3 ?', 'You 1 2 3 ?', 'What do you 1 ?'],
-                         'PRON VERB PART VERB NOUN PUNCT': ['Do you 1 2 3 4 ?', 'You 3 4 ?', 'Do you 1 4 ?'],
-                         'PRON VERB ADJ NOUN PUNCT': ['Do you 1 2 3 ?', 'What do you 1 ?'],
-                         'PRON VERB ADP DET NOUN PUNCT': ['Where do you 1 ?', 'Where do you 1 2 ?', 'Do you 1 2 3 4 ?'],
-                         'PRON ADJ NOUN AUX NOUN PUNCT': ['What is 0 1 2 ?', 'Do you have a 1 2 ?', '3 your 1 2 4 ?', '3 4 your 1 2 ?'],
-                         'PRON ADJ NOUN AUX ADJ PUNCT': ['What is 0 1 2 ?', 'Do you have a 1 2 ?', 'Is 4 your 1 2 ?', '3 your 1 2 4 ?', '3 4 your 1 2 ?'],
-                         'PRON AUX DET ADJ NOUN PUNCT': ['Are you 2 3 4 ?', 'You are 2 3 4 ?'],
-                         'PRON AUX DET NOUN NOUN PUNCT': ['Are you 2 3 4 ?', 'You are 2 3 4 ?'],
-                         'PRON VERB NUM NOUN PUNCT': ['Do you 1 2 3 ?', 'Do you 1 3 ?'],
-                         'PRON VERB ADP DET NOUN NOUN PUNCT': ['Did you 1 2 3 4 5 ?', 'Do you 1 2 3 4 5 ?', 'What did you 1 2 ?'],
-                         'PRON AUX NUM NOUN PUNCT': ['Do you have 2 3 ?', 'Do you have 3 ?', 'How many 3 do you have ?'],
-                         'PRON VERB VERB PUNCT': ['Do you 1 2 ?', 'What do you 1 ?'],
-                         'PRON AUX ADJ PUNCT': ['Are you 2 ?'],
-                         'PRON VERB NOUN NOUN PUNCT': ['Do you 1 2 3 ?', 'What do you 1 ?'],
-                         'PRON VERB ADP NOUN PUNCT': ['What do you 1 ?', 'Do you 1 2 3 ?', 'You 1 2 3 ?'],
-                         'PRON NOUN AUX DET NOUN PUNCT': ['Is your 1 3 4 ?', 'What does your 1 do?'],
-                         'PRON VERB DET ADJ NOUN PUNCT': ['What do you 1 ?', 'Do you 1 2 3 4 ?', 'You 1 2 3 4 ?']}
-
-PERSONA_QUESTIONS_NEG = {'PRON VERB NOUN PUNCT': ['Do you 1 2 ?', 'What do you 1 ?'],
-                         'PRON AUX DET NOUN PUNCT': ['Are you 2 3 ?'],
-                         'PRON VERB PART VERB PUNCT': ['You 1 2 3 ?', 'Do you 1 2 3 ?', 'What do you 1 ?', 'Do you 3 ?'],
-                         'PRON VERB DET NOUN PUNCT': ['Do you 1 2 3 ?', 'You 1 2 3 ?', 'What do you 1 ?'],
-                         'PRON VERB PART VERB NOUN PUNCT': ['Do you 1 2 3 4 ?', 'You 3 4 ?', 'Do you 1 4 ?'],
-                         'PRON VERB ADJ NOUN PUNCT': ['Do you 1 2 3 ?', 'What do you 1 ?'],
-                         'PRON VERB ADP DET NOUN PUNCT': ['Where do you 1 ?', 'Where do you 1 2 ?', 'Do you 1 2 3 4 ?'],
-                         'PRON ADJ NOUN AUX NOUN PUNCT': ['3 your 1 2 4 ?', '3 4 your 1 2 ?'],
-                         'PRON ADJ NOUN AUX ADJ PUNCT': ['3 your 1 2 4 ?', '3 4 your 1 2 ?'],
-                         'PRON AUX DET ADJ NOUN PUNCT': ['Are you 2 3 4 ?', 'You are 2 3 4 ?'],
-                         'PRON AUX DET NOUN NOUN PUNCT': ['Are you 2 3 4 ?', 'You are 2 3 4 ?'],
-                         'PRON VERB NUM NOUN PUNCT': ['Do you 1 2 3 ?', 'Do you 1 3 ?'],
-                         'PRON VERB ADP DET NOUN NOUN PUNCT': ['Did you 1 2 3 4 5 ?', 'Do you 1 2 3 4 5 ?', 'What did you 1 2 ?'],
-                         'PRON AUX NUM NOUN PUNCT': ['Do you have 2 3 ?', 'Do you have 3 ?', 'How many 3 do you have ?'],
-                         'PRON VERB VERB PUNCT': ['Do you 1 2 ?', 'What do you 1 ?'],
-                         'PRON AUX ADJ PUNCT': ['Are you 2 ?'],
-                         'PRON VERB NOUN NOUN PUNCT': ['Do you 1 2 3 ?', 'What do you 1 ?'],
-                         'PRON VERB ADP NOUN PUNCT': ['What do you 1 ?', 'Do you 1 2 3 ?', 'You 1 2 3 ?'],
-                         'PRON NOUN AUX DET NOUN PUNCT': ['Is your 1 3 4 ?', 'What does your 1 do?'],
-                         'PRON VERB DET ADJ NOUN PUNCT': ['What do you 1 ?', 'Do you 1 2 3 4 ?', 'You 1 2 3 4 ?']}
-
-pronouns = {'i': 'speaker1', 'me': 'speaker1', 'myself': 'speaker1',
-            'ourselves': 'speaker1', 'my': "speaker1 's", 'mine': "speaker1 's", 'our': "speaker1 's",
-            'ours': "speaker1 's", 'you': 'speaker2', 'yourself': 'speaker2', 'yourselves': 'speaker2',
-            'your': "speaker2 's", 'yours': "speaker2 's"}
+import spacy
+import language_tool_python
+from pprint import pprint
 
 
-def pronoun_to_speaker_id(triple):
-    """ Takes a triple and replaces all occurrances of 'you' and 'i'
-        with the corresponding speaker.
-    """
-    new_triple = []
-    for argument in triple:
-        argument = ' %s ' % argument
-        for pronoun, speaker in pronouns.items():
-            if pronoun in argument:
-                argument = argument.replace(' %s ' % pronoun, ' %s ' % speaker)
-        new_triple.append(argument.strip())
-    return tuple(new_triple)
+PRON_SWAPS = {"i": "you", "my": "your", "me": "you", "mine": "your", "myself": "yourself",
+              "we": "you", "us": "you", "our": "your", "ours": "yours", "ourselves": "yourselves"}
+
+AUXILIARIES = ['do', 'does', 'am', 'is', 'are', 'can', 'could']
+
+
+class QuestionNLG:
+    def __init__(self):
+        # Load language corrector for NLG
+        self._checker = language_tool_python.LanguageTool('en-US')
+        self._nlp = spacy.load('en_core_web_sm')
+
+    @staticmethod
+    def _swap_pronouns(string):
+        """ Swaps person of pronouns, such as 'I' -> 'you' and 'my' -> 'your'
+        """
+        string = ' %s ' % string.lower()
+        for pron, repl in PRON_SWAPS.items():
+            if ' %s ' % pron in string:
+                string = string.replace(' %s ' % pron, ' %s ' % repl)
+        return string.strip()
+
+    def _correct_errors(self, question):
+        """ Corrects grammar mistakes in questions generated
+        """
+        # Identify mistakes
+        errors = []
+        for match in self._checker.check(question):
+            if match.replacements:
+                start = match.offset
+                stop = match.errorLength + match.offset
+                repl = match.replacements[0]
+                orig = question[start:stop]
+                errors.append((start, stop, repl, orig))
+
+        # Correct mistakes
+        question2 = list(question)
+        for start, stop, repl, orig in errors:
+            for i in range(len(question)):
+                question2[start] = repl
+                if start < i < stop:
+                    question2[i] = ""
+
+        return ''.join(question2)
+
+    def generate_polar_question(self, subj, pred, obj):
+        """ Generates a polar question from triple; e.g. (i, like cats) -> 'do you like cats?'
+        """
+        # Change person
+        subj = self._swap_pronouns(subj)
+        pred = self._swap_pronouns(pred)
+        obj = self._swap_pronouns(obj)
+
+        # Move auxiliaries forward
+        question = None
+        for aux in AUXILIARIES:
+            if pred.startswith(aux + ' ') and pred.count(' '):
+                pred = pred.replace(aux + ' ', '')
+                question = aux + " %s %s %s ?" % (subj, pred, obj)
+
+        # Fallback
+        if question is None:
+            question = "do %s %s %s ?" % (subj, pred, obj)
+
+        return self._correct_errors(question)
+
+    def generate_open_question(self, subj, pred, obj, polarity):
+        """ Generates an open question from triple; e.g. (i, like cats) -> 'what do you like?'
+        """
+        # Change person
+        subj = self._swap_pronouns(subj)
+        pred = self._swap_pronouns(pred)
+        obj = self._swap_pronouns(obj)
+
+        # Move auxiliaries forward
+        prefix_aux = 'do'
+        for aux in AUXILIARIES:
+            if pred.startswith(aux + ' ') and pred.count(' '):
+                pred = pred.replace(aux + ' ', '')
+                prefix_aux = aux
+
+        # Check if prefix auxiliary is correct inflectional form
+        if prefix_aux == 'am':
+            prefix_aux = 'are'
+
+        # Inherit verb complement from obj if there is any, e.g. "go to", "walking on"
+        obj_pos = [t.pos_ for t in self._nlp(obj)]
+        if len(obj_pos) > 2 and obj_pos[0] in 'AUX VERB' and obj_pos[1] in 'ADP PART':
+            pred = pred + ' ' + ' '.join(obj.split(' ')[:2])
+
+        # "go [eat]"
+        if len(obj_pos) > 1 and obj_pos[0] in 'AUX VERB':
+            pred = pred + ' ' + obj.split(' ')[0]
+
+        # Ask correct question depending on polarity
+        if polarity == 'positive':
+            question = "what %s %s %s ?" % (prefix_aux, subj, pred)
+        else:
+            # Add contractions to sound more natural
+            if prefix_aux in ['do', 'did', 'are', 'were', 'can', 'could', 'would']:
+                question = "what %sn't %s %s ?" % (prefix_aux, subj, pred)
+            else:
+                question = "what %s not %s %s ?" % (prefix_aux, subj, pred)
+
+        # Correct grammar
+        return self._correct_errors(question)
 
 
 class Persona:
-    def __init__(self, persona_file='persona.json', neg_prob=0.25, num_facts=1):
-        # Load file with possible persona lines
-        with open(persona_file, 'r', encoding='utf-8') as file:
-            self._persona_options = json.load(file)
+    def __init__(self, triple_file, num_facts=1, perc_negated=0.5, ):
+        # Parse triple_file
+        with open(triple_file, 'r', encoding='utf-8') as file:
+            triples = set([eval(line.strip()) for line in file])
 
-        # Set up initial persona
+        # Divide into positive and negative triples
+        self._pos_triples = [(l, t) for l, t in triples if t[3] == 'positive']
+        self._neg_triples = [(l, t) for l, t in triples if t[3] == 'negative']
+
+        # Sample an initial persona
         self._num_facts = num_facts
-        self._neg_prob = neg_prob
-        self._persona = []
-        self.sample_persona()
+        self._perc_negated = perc_negated
+        self._persona = self.sample_persona()
+
+        # Define NLG component for questions
+        self._question_nlg = QuestionNLG()
 
     @property
-    def persona(self):
-        return [fact for _, _, fact, _ in self._persona]  # only return facts
+    def persona_lines(self):
+        return [l for l, _ in self._persona]
 
-    def triples(self):
-        # Get for ith persona the argument indices into the persona tokens
-        result = []
-        for category, fact, fact2, polarity in self._persona:
-            subj_idx, pred_idx, obj_idx = PERSONA_TRIPLES[category]
+    def persona_line(self, i):
+        """ Returns the persona line from which the triple was extracted.
+        """
+        return self._persona[i][0]
 
-            # Convert indices to subj-pred-obj triple
-            tokens = fact.split(' ')
-            subj = ' '.join([tokens[i] for i in subj_idx])
-            pred = ' '.join([tokens[i] for i in pred_idx])
-            obj_ = ' '.join([tokens[i] for i in obj_idx])
+    def persona_polarity(self, i):
+        """ Returns the polarity of the persona line/triple.
+        """
+        return self._persona[i][1][3]
 
-            triple = pronoun_to_speaker_id((subj, pred, obj_)) + (polarity,)
-            result.append(triple)
-        return result
+    def persona_triple(self, i):
+        """ Returns the triple with polarity of persona line.
+        """
+        return self._persona[i][1]
+
+    def persona_question(self, i):
+        """ Uses simple rule-based NLG to generate a polar/open question for a given triple.
+        """
+        # Person from first to second: "I" -> "you"
+        subj, pred, obj_, polarity = self._persona[i][1]
+
+        # Open or polar question?
+        qtype = random.choice(['open', 'polar'])
+        if qtype == 'polar':
+            return self._question_nlg.generate_polar_question(subj, pred, obj_)
+
+        return self._question_nlg.generate_open_question(subj, pred, obj_, polarity)
 
     def sample_persona(self):
-        # Sample a number of persona 'types'
-        categories = random.sample(self._persona_options.keys(), self._num_facts)
+        """ Samples N persona lines randomly with corresponding triples. Ensures
+            the ratio of positive/negative is perc_negated (see constructor).
+        """
+        triples = []
 
-        # For each type, sample an instantiation of a fact
-        self._persona = []
-        for category in categories:
-            fact = random.choice(self._persona_options[category])
+        # Sample positive facts
+        num_pos = int(self._num_facts * (1 - self._perc_negated))
+        if num_pos > 0:
+            triples += random.sample(self._pos_triples, num_pos)
 
-            # Fix some grammar
-            fact = fact.replace("'ve", 'have').replace("'m", 'am').replace(" m ", ' am ')
+        # If facts left, sample negative triples
+        num_neg = self._num_facts - num_pos
+        if num_neg > 0:
+            triples += random.sample(self._neg_triples, num_neg)
 
-            # Negate fact with a probability of p
-            if random.random() < self._neg_prob:
-                pattern = NEGATE_PERSONA[category].split(' ')
-                tokens = fact.split(' ')
+        random.shuffle(triples)
 
-                # Insert "not" or "n't"
-                fact2 = ' '.join([tokens[int(p)] if p.isnumeric() else p for p in pattern])
-                polarity = 'negative'
-            else:
-                fact2 = fact
-                polarity = 'positive'
-
-            self._persona.append((category, fact, fact2, polarity))
-
-        return self.persona
-
-    def get_polarity(self, i):
-        return self._persona[i][3]
-
-    def sample_question(self, i):
-        # Sample one persona line to ask about
-        category, fact, fact2, polarity = self._persona[i]
-
-        # Sample question about persona
-        if polarity == 'positive':
-            question = random.choice(PERSONA_QUESTIONS_POS[category])
-        else:
-            question = random.choice(PERSONA_QUESTIONS_NEG[category])
-
-        # Generate a question for persona i
-        tokens = fact.split(' ')
-        question = ' '.join([t if not t.isnumeric() else tokens[int(t)] for t in question.split(' ')])
-
-        # Swap 'my' for 'your'
-        question = ' %s ' % question.lower()
-        if ' my ' in question:
-            question = question.replace(' my ', ' your ')
-        if ' mine ' in question:
-            question = question.replace(' mine ', ' yours ')
-        if ' i ' in question:
-            question = question.replace(' i ', ' you ')
-        return question.strip()
-
-
-def categorize_personas(persona_file, outfile='personas.json'):
-    nlp = spacy.load('en_core_web_sm')
-
-    # Limit the personas to those with the specific tag sequence in PERSONA_QUESTIONS
-    # to allow us to manually write rewrite rules to ask questions about them.
-    personas = {k: [] for k in PERSONA_QUESTIONS_POS.keys()}
-
-    with open(persona_file, 'r', encoding='utf-8') as file:
-        lines = file.readlines()
-        for parse in tqdm(nlp.pipe(lines)):
-            # Extract token and POS sequence
-            tags = ' '.join([t.pos_ for t in parse if t.pos_ != 'SPACE']).strip()
-            tokens = ' '.join([t.lower_ for t in parse if t.pos_ != 'SPACE']).strip()
-
-            # Assign persona to tag seq category if new
-            if tags in personas and tokens not in personas[tags]:
-                personas[tags].append(tokens)
-
-    # Write out persona categories to file
-    with open(outfile, 'w', encoding='utf-8') as file:
-        json.dump(personas, file)
+        self._persona = triples
+        return triples
 
 
 if __name__ == '__main__':
-    p = Persona('personas.json', num_facts=1)
-    for _ in range(5):
-        print(p.sample_persona())
-        print(p.sample_question())
+    p = Persona('persona_triples.txt', num_facts=15)
+    for i in range(15):
+        print(p.persona_line(i))
+        print(p.persona_triple(i))
+        print(p.persona_question(i))
         print()
-
