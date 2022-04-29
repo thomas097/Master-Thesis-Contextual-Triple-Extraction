@@ -385,7 +385,7 @@ speaker1,like,food,positive
 
 daily_dialogs-valid-012842
 Yes , it is . Sayuri Beds , Tokyo , Japan .<eos>That's what I want ! Do you need me to sign anything ? Or fill in some forms ?<eos>Just sign right here , please . That's everything you need to do .
-that,is,everything speaker1 need to know,positive
+that,is,everything speaker2 need to know,positive
 
 personachat-valid-000544
 for sure . what else do you like ?<eos>school keeps me pretty busy , what about you ?<eos>spending a lot of time running and getting resources for my new job
@@ -463,6 +463,7 @@ speaker1,go,round the world,positive
 personachat-train-003200
 i just off the phone with my ex . he just thinks he is my ex .<eos>he just thinks he's my ex what does that mean ?<eos>well he tried to break up but i'm still in love with him
 speaker1,got off,the phone with speaker1 's ex,positive
+speaker1,in love with,him,positive
 speaker1,in love with,him,positive
 
 daily_dialogs-train-001337
