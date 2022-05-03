@@ -1,10 +1,14 @@
 from run_transformer_pipeline import AlbertTripleExtractor
-from run_dependency_pipeline_v3 import SpacyTripleExtractor
 from LeolaniTripleExtraction import LeolaniBaseline
 from OLLIE import OllieBaseline
 from OpenIE5 import OpenIE5Baseline
 from StanfordOpenIE import StanfordOpenIEBaseline
-from metrics import classification_report
+from metrics import recall_at_k
+from nltk import word_tokenize
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
 import spacy
 
 
@@ -32,7 +36,6 @@ def load_examples(path):
         dialog = block[1]
         triples = [string_to_triple(triple) for triple in block[2:]]
         examples.append((dialog, triples))
-
     return examples
 
 
@@ -72,12 +75,18 @@ def evaluate(test_file, model, num_samples=-1, k=0.9, deduplication=True):
     # Predictions
     true_triples = []
     pred_triples = []
+    dialog_lengths = []
     for i, (dialog, triples) in enumerate(examples):
         # Print progress
         print('\n (%s/%s) input: %s' % (i + 1, len(examples), dialog))
 
+        # Make sure we have at least 3 turns
+        num_eos = dialog.count('<eos>')
+        if num_eos < 3:
+            dialog = '<eos>' * (3 - num_eos) + dialog
+
         # Predict triples
-        extractions = model.extract_triples(dialog, verbose=True)
+        extractions = list(model.extract_triples(dialog, verbose=True))
 
         # Check for error in test set formatting
         error = False
@@ -93,20 +102,38 @@ def evaluate(test_file, model, num_samples=-1, k=0.9, deduplication=True):
         if not error:
             true_triples.append(triples)
             pred_triples.append(extractions)
+            dialog_lengths.append(len(word_tokenize(dialog)))
 
-    # If lemmatize is enabled, map word forms to lemmas
+    # If deduplication is enabled, map word forms to lemmas
     if deduplication:
         print('\nPerforming de-duplication')
         nlp = spacy.load('en_core_web_sm')
         true_triples = [set([lemmatize_triple(*triple, nlp) for triple in lst]) for lst in true_triples]
-        pred_triples = [set([(conf, lemmatize_triple(*triple, nlp)) for conf, triple in lst]) for lst in pred_triples]
+        pred_triples = [set([(c, lemmatize_triple(*triple, nlp)) for c, triple in lst]) for lst in pred_triples]
 
-    # Compute performance metrics
-    return classification_report(true_triples, pred_triples, k=k)
+    # For each length, compute recall score
+    lengths = sorted(list(set(dialog_lengths)))
+    recalls = []
+    for l in lengths:
+        true_triples_length = [t for i, t in enumerate(true_triples) if dialog_lengths[i] == l]
+        pred_triples_length = [t for i, t in enumerate(pred_triples) if dialog_lengths[i] == l]
+
+        recall = recall_at_k(true_triples_length, pred_triples_length, k=k)
+        recalls.append(recall)
+
+    # Create a CSV to store plot into
+    df = pd.DataFrame(list(zip(lengths, recalls)), columns=['length', 'recall'])
+    df.to_csv('results/' + Path(test_file).stem + '_' + model.name + '_length_recall.csv')
+
+    # Compute recall
+    plt.plot(lengths, recalls)
+    plt.xlabel('Length (tokens)')
+    plt.ylabel('Recall')
+    plt.show()
 
 
 if __name__ == '__main__':
-    MODEL = 'leolani'
+    MODEL = 'ollie'
 
     if MODEL == 'openie5':
         model = OpenIE5Baseline()
@@ -117,10 +144,8 @@ if __name__ == '__main__':
     elif MODEL == 'leolani':
         model = LeolaniBaseline()
     elif MODEL == 'albert':
-        model = AlbertTripleExtractor('../../model_transformer/models/2022-04-27')
-    elif MODEL == 'spacy':
-        model = SpacyTripleExtractor()
+        model = AlbertTripleExtractor('../../model_transformer/models/2022-04-27', speaker1='speaker1', speaker2='speaker2')
     else:
         raise Exception('model %s not recognized' % MODEL)
 
-    evaluate('test_examples/test_full.txt', model, k=.25)
+    evaluate('test_examples/test_single_utterances.txt', model, k=.2, num_samples=10)

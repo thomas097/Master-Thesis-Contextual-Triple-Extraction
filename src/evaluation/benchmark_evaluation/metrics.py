@@ -1,6 +1,16 @@
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc
 import numpy as np
+from Levenshtein import distance as levenshtein_distance
+from sklearn.metrics import auc
+
+
+def is_in(x, lst, k=3):
+    """ Performs a soft matching to get rid of tokenization artifacts. """
+    for y in lst:
+        mean_dist = np.max([levenshtein_distance(x[i], y[i]) for i in range(len(x))])
+        if mean_dist <= k:
+            return True
+    return False
 
 
 def precision_at_k(y_true, y_pred, k):
@@ -10,7 +20,7 @@ def precision_at_k(y_true, y_pred, k):
         triples_pred = set([triple for conf, triple in triples_pred if conf >= k])
 
         for triple in triples_pred:
-            if triple in triples_true:
+            if is_in(triple, triples_true):
                 tp += 1
             else:
                 fp += 1
@@ -29,7 +39,7 @@ def recall_at_k(y_true, y_pred, k):
         triples_pred = set([triple for conf, triple in triples_pred if conf >= k])
 
         for triple in triples_true:
-            if triple in triples_pred:
+            if is_in(triple, triples_pred):
                 tp += 1
             else:
                 fn += 1
@@ -44,14 +54,20 @@ def recall_at_k(y_true, y_pred, k):
 def f_score_at_k(y_true, y_pred, k):
     precision = precision_at_k(y_true, y_pred, k)
     recall = recall_at_k(y_true, y_pred, k)
+    if precision + recall == 0:
+        return 0
     return 2 * precision * recall / (precision + recall)
 
 
-def precision_recall_auc(y_true, y_pred, steps=500, plot_pr=True):
+def precision_recall_auc(y_true, y_pred, steps=2000, plot_pr=True):
     precision, recall = [], []
-    for k in np.linspace(0, 1, steps):
+    for k in np.linspace(0, 0.999, steps):
         precision.append(precision_at_k(y_true, y_pred, k))
         recall.append(recall_at_k(y_true, y_pred, k))
+
+    # Ensure complete curve
+    precision.append(1)
+    recall.append(0)
 
     if plot_pr:
         plt.grid('on', c='lightgrey')

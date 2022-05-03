@@ -23,12 +23,16 @@ class LeolaniBaseline:
         :param speaker2:     Name of the system (default: speaker2)
         :param sep:          Separator used to delimit dialogue turns (default: <eos>)
         """
-        self._chat = Chat('I')
+        self._chat = Chat(speaker1)
         self._post_processor = PostProcessor()
         self._analyzer = CFGAnalyzer()
         self._speaker1 = speaker1
         self._speaker2 = speaker2
         self._sep = sep
+
+    @property
+    def name(self):
+        return "Leolani"
 
     def _disambiguate_pronouns(self, arg, turn_id):
         """ Replaces 'you' and 'I' by the corresponding referent (speaker1 or speaker2)
@@ -86,9 +90,19 @@ class LeolaniBaseline:
         :return:          a capsule
         """
         # Extract capsule from turn
-        self._chat.add_utterance(utterance.strip())
+        self._chat.add_utterance(utterance)
         self._analyzer.analyze(self._chat.last_utterance)
         return utterance_to_capsules(self._chat.last_utterance)
+
+    def _format_turn(self, turn):
+        """ Formats the input to make sure input can be parsed (cased).
+
+        :param turn: dialogue turn
+        :return:     dialogue turn with capitalized words
+        """
+        # Capitalize first word and I
+        turn = turn.capitalize().replace('i ', 'I ').replace("i'", "I'")
+        return turn
 
     def extract_triples(self, dialogue, verbose=False):
         """ Extracts a set of triples from an <eos>-delimited dialogue
@@ -100,6 +114,9 @@ class LeolaniBaseline:
         # Separate dialogue into individual sentences
         triples = []
         for turn_id, turn in enumerate(dialogue.split(self._sep)):
+
+            # Strip punctuation and trailing whitespace (throws off parser)
+            turn = self._format_turn(turn)
 
             for capsule in self._get_capsules(turn):
                 subj, pred, obj, polar = self._triple_from_capsule(capsule)
@@ -120,4 +137,4 @@ class LeolaniBaseline:
 
 if __name__ == '__main__':
     baseline = LeolaniBaseline(speaker1='alice', speaker2='bob')
-    print(baseline.extract_triples('My beer is cold <eos> I am not very tired <eos> My brother likes cold weather', verbose=True))
+    print(baseline.extract_triples('The national anthem of Canada is Merry Christmas', verbose=True))

@@ -29,11 +29,15 @@ class OllieBaseline:
         self._path = path
         self._sep = sep
 
+    @property
+    def name(self):
+        return "OLLIE"
+
     def _extract_perspective(self, pred):
         """ Identifies negation of triple using SpaCy (not supported by OLLIE).
 
         :param pred: predicate of the triple, containing potential negation
-        :return:
+        :return:     strips the polarity token from the predicate
         """
         negations = [t.lower_ for t in self._nlp(pred) if t.dep_ == 'neg']
         if not negations:

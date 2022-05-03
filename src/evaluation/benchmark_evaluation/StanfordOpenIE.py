@@ -2,7 +2,6 @@ import os
 import re
 import subprocess
 import spacy
-
 from post_processing import PostProcessor
 
 
@@ -29,6 +28,10 @@ class StanfordOpenIEBaseline:
         self._path = path
         self._sep = sep
         print('Stanford OpenIE ready!')
+
+    @property
+    def name(self):
+        return "StanfordOpenIE"
 
     def _extract_perspective(self, pred):
         """ Identifies negation of triple using SpaCy (not supported by Stanford OpenIE).

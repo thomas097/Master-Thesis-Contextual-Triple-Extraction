@@ -30,6 +30,10 @@ class OpenIE5Baseline:
         self._sep = sep
         print('OpenIE5 ready!')
 
+    @property
+    def name(self):
+        return "OpenIE5"
+
     def _strip_negation(self, pred):
         """ Strips negation in the predicate using SpaCy (OpenIE5 keeps it in the
         predicate as well as marking it as an attribute).
