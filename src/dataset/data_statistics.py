@@ -76,4 +76,4 @@ def show_stats(path):
 
 
 if __name__ == '__main__':
-    show_stats('annotations')
+    show_stats('final/trainval')
