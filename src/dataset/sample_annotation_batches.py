@@ -12,7 +12,7 @@ if __name__ == '__main__':
     NUM_SHARED_SAMPLES = 30
     PILOT_BATCH = 20
     NUM_BATCHES = 20
-    DATASET = 'merged_trainval_unannotated.json'
+    DATASET = 'batches/merged_trainval_unannotated.json'
 
     # Create directory to store batches into
     if not os.path.exists('batches'):
