@@ -5,6 +5,8 @@ from OLLIE import OllieBaseline
 from OpenIE5 import OpenIE5Baseline
 from StanfordOpenIE import StanfordOpenIEBaseline
 from metrics import classification_report
+from pathlib import Path
+import json
 import spacy
 
 
@@ -34,6 +36,13 @@ def load_examples(path):
         examples.append((dialog, triples))
 
     return examples
+
+
+def save_results(result, model, test_file, confidence):
+    outfile = 'results/{}_{}_k={}.json'.format(Path(test_file).stem, model, confidence)
+    with open(outfile, 'w', encoding='utf-8') as file:
+        dct = {'precision': result[0], 'recall': result[1], 'f1': result[2], 'auc': result[3], 'pr-curve': result[4]}
+        json.dump(dct, file)
 
 
 def string_to_triple(text_triple):
@@ -106,7 +115,9 @@ def evaluate(test_file, model, num_samples=-1, k=0.9, deduplication=True):
 
 
 if __name__ == '__main__':
-    MODEL = 'leolani'
+    MODEL = 'stanford'
+    TEST_FILE = '../../dataset/final/test/test_declarative_statements.txt'
+    MIN_CONF = 0.0
 
     if MODEL == 'openie5':
         model = OpenIE5Baseline()
@@ -123,4 +134,7 @@ if __name__ == '__main__':
     else:
         raise Exception('model %s not recognized' % MODEL)
 
-    evaluate('test_examples/test_full.txt', model, k=.25)
+    result = evaluate(TEST_FILE, model, k=MIN_CONF, deduplication=True)
+
+    # Save to file
+    save_results(result, MODEL, TEST_FILE, MIN_CONF)
