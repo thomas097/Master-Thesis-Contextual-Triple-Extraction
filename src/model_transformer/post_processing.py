@@ -13,6 +13,7 @@ PRED_RULES = {'VERB PART VERB': [0, 1],           # "want to go"
               'VERB PART VERB VERB': [0, 1],
               'VERB ADP VERB VERB': [0, 1],
               'AUX VERB ADP': [0, 1, 2],          # "can give away"
+              'AUX ADP ADP': [0, 1, 2],           # "are up to [watching a movie]"
               'AUX ADP': [0, 1],                  # "is about [a movie]"
               'AUX VERB VERB': [0, 1],            # "Must be [having]"
               'VERB ADP VERB ADP': [0, 1],
@@ -20,7 +21,7 @@ PRED_RULES = {'VERB PART VERB': [0, 1],           # "want to go"
 
 
 # Simplification rules which strip off auxiliaries from predicates (that signal certainty!)
-AUXILIARIES = ["am", "'m", "' m", "are", "is", "do", "'ll", "will", "be", "will", "been"]
+AUXILIARIES = ["am", "'m", "' m", "are", "is", "was", "do", "does", "did", "'ll", "will", "be", "been", "'ve", "have"]
 
 
 class PostProcessor:
@@ -30,18 +31,18 @@ class PostProcessor:
     @staticmethod
     def _decontract(phrase, is_predicate=False):
         # Decontract of common contractions and fragments
-        phrase = re.sub(r"n\'t", " not", phrase)
-        phrase = re.sub(r"\'t", " not", phrase)
-        phrase = re.sub(r"\'re", " are", phrase)
-        phrase = re.sub(r"\' re", " are", phrase)
-        phrase = re.sub(r"\'d", " would", phrase)
-        phrase = re.sub(r"\' d", " would", phrase)
-        phrase = re.sub(r"\'ll", " will", phrase)
-        phrase = re.sub(r"\' ll", " will", phrase)
-        phrase = re.sub(r"\'ve", " have", phrase)
-        phrase = re.sub(r"\' ve", " have", phrase)
-        phrase = re.sub(r"\'m", " am", phrase)
-        phrase = re.sub(r"\' m", " am", phrase)
+        phrase = re.sub(r"'\s*l\s*l", "'ll", phrase) # optional spaces
+        phrase = re.sub(r"'\s*r\s*e", "'re", phrase)
+        phrase = re.sub(r"'\s*v\s*e", "'ve", phrase)
+        phrase = re.sub(r"n't", " not", phrase)
+        phrase = re.sub(r"'t", " not", phrase)
+        phrase = re.sub(r"'re", " are", phrase)
+        phrase = re.sub(r"'d", " would", phrase)
+        phrase = re.sub(r"' d", " would", phrase)
+        phrase = re.sub(r"'ll", " will", phrase)
+        phrase = re.sub(r"'ve", " have", phrase)
+        phrase = re.sub(r"'m", " am", phrase)
+        phrase = re.sub(r"' m", " am", phrase)
         phrase = re.sub(r" wo ", "will ", ' ' + phrase + ' ')
         phrase = re.sub(r" ca ", "can ", ' ' + phrase + ' ')
 
@@ -54,9 +55,13 @@ class PostProcessor:
 
     def _pos_sequence(self, predicate):
         """ Returns the POS sequence of a given predicate string. We add
-            a token "I" to ensure correct pos sequence.
+            token "I" and "things" to ensure correct POS sequence.
         """
-        return ' '.join([t.pos_ for t in self._nlp("I " + predicate)][1:])
+        pos_seq = []
+        for token in self._nlp("I " + predicate.strip() + " things"):
+            tag = 'AUX' if token.tag_ == 'MD' else token.pos_  # Ensure backwards compatibility with SpaCy v2
+            pos_seq.append(tag)
+        return pos_seq[1:-1]
 
     def format(self, triple):
         # Fix contractions
@@ -71,26 +76,33 @@ class PostProcessor:
         obj = [t.lower_ for t in self._nlp(obj)]
 
         # Remove auxiliaries if there is a following verb or auxiliary
-        if len(pred) > 1:
-            for aux in AUXILIARIES:
-                if pred[0] == aux and pred_tags.split(' ')[1] in ['AUX', 'VERB']:
-                    pred = pred[1:]
-                    pred_tags = self._pos_sequence(' '.join(pred))
+        if len(pred) > 1 and pred_tags[1] in ['AUX', 'VERB', 'INTJ']:
+            if pred[0] in AUXILIARIES:
+                pred = pred[1:]
+                pred_tags = self._pos_sequence(' '.join(pred))
 
-        # If object starts with PART or ADP; move token to predicate
-        if obj_tags.split(' ')[0] in ['PART', 'ADP']:
+        # Move 'to' back to predicate if in object
+        if obj_tags[0] in ['PART', 'ADP'] and len(obj) > 1:
             pred = pred + [obj.pop(0)]
             pred_tags = self._pos_sequence(' '.join(pred))
 
-        # Simplify predicate by moving parts to object
+        # Simplify predicate by moving parts to object (for baselines)
         for rule, pred_idx in PRED_RULES.items():
-            if pred_tags.startswith(rule):
+            if ' '.join(pred_tags).startswith(rule):
                 obj = [t for i, t in enumerate(pred) if i not in pred_idx] + obj
                 pred = [t for i, t in enumerate(pred) if i in pred_idx]
+                break
 
-        return subj, ' '.join(pred), ' '.join(obj)
+        pred = ' '.join(pred)
+        obj = ' '.join(obj)
+
+        # Common error by SpaCy
+        if pred.startswith('do like'):
+            pred = pred[3:]
+
+        return subj, pred, obj
 
 
 if __name__ == '__main__':
     pp = PostProcessor()
-    print(pp.format(('speaker1', 'can eat', 'pizza')))
+    print(pp.format(('speaker1', "' v e got", 'some great news for speaker2')))

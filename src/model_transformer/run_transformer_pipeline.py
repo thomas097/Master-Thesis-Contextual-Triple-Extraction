@@ -31,6 +31,10 @@ class AlbertTripleExtractor:
         self._speaker1 = speaker1
         self._speaker2 = speaker2
 
+    @property
+    def name(self):
+        return "ALBERT"
+
     def _tokenize(self, dialog):
         """ Divides up the dialogue into separate turns and dereferences
             personal pronouns 'I' and 'you'.
@@ -50,13 +54,14 @@ class AlbertTripleExtractor:
                 tokens += [pronoun_to_speaker_id(t.lower_, speaker_id) for t in self._nlp(turn)] + ['<eos>']
         return tokens
 
-    def extract_triples(self, dialog, verbose=True, batch_size=32):
+    def extract_triples(self, dialog, post_process=True, batch_size=32, verbose=True, ):
         """
 
-        :param dialog:     separator-delimited dialogue
-        :param verbose:    whether to print messages (True) or be silent (False) (default: True)
-        :param batch_size: If a lot of possible triples exist, batch up processing
-        :return:           A list of confidence-triple pairs of the form (confidence, (subj, pred, obj, polarity))
+        :param dialog:       separator-delimited dialogue
+        :param post_process: Whether to apply rules to fix contractions and strip auxiliaries (like baselines)
+        :param batch_size:   If a lot of possible triples exist, batch up processing
+        :param verbose:      whether to print messages (True) or be silent (False) (default: True)
+        :return:             A list of confidence-triple pairs of the form (confidence, (subj, pred, obj, polarity))
         """
         # Assign unambiguous tokens to you/I
         tokens = self._tokenize(dialog)
@@ -93,18 +98,19 @@ class AlbertTripleExtractor:
             obj = speaker_id_to_speaker(obj, self._speaker1, self._speaker2)
 
             # Fix mistakes, expand contractions
-            subj, pred, obj = self._post_processor.format((subj, pred, obj))
+            if post_process:
+                subj, pred, obj = self._post_processor.format((subj, pred, obj))
+
             triples.append((ent, (subj, pred, obj, pol)))
 
-        for entailed, (subj, pred, obj, pol) in sorted(triples, key=lambda x: -x[0]):
-            yield entailed, (subj, pred, obj, pol)
+        return sorted(triples, key=lambda x: -x[0])
 
 
 if __name__ == '__main__':
-    model = AlbertTripleExtractor(path='models/2022-04-11')
+    model = AlbertTripleExtractor(path='models/2022-04-27')
 
     # Test!
-    example = 'I like photography, but not Spanish lessons<eos> I love that! I learned spanish too. What do you do? <eos> I am an electrical engineer. Not a linguist.'
+    example = "I went to the new university. It was great! <eos> I like studying too and learning. You? <eos> No, hate it!"
 
     for score, triple in model.extract_triples(example):
         print(score, triple)
